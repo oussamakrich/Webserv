@@ -17,7 +17,7 @@ class ParseConfig{
 		std::map<std::string , std::string> mimeTypes;
 
 	public:
-		ParseConfig(std::string *path);
+		ParseConfig(std::string &path);
 		~ParseConfig();
-
 };
+

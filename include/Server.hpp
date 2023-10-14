@@ -11,12 +11,12 @@ private:
 	int minBodySize;
 	std::string host;
 	std::string serverName;
-	
+
 
 public:
 	~Server();
-private:
 	Server();
+private:
 	Server(const Server &copy);
 	Server operator=(const Server &copy);
 
