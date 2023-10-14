@@ -1,7 +1,5 @@
 #include "../../include/ParseConfig.hpp"
-#include <fstream>
-#include <sstream>
-
+#include "../../include/TokenConfig.hpp"
 // Start: Canonical form:
 
 ParseConfig::ParseConfig(){}
@@ -58,15 +56,49 @@ void ParseConfig::FillMimeTypes(std::ifstream &file) {
 	}
 }
 
+void ParseConfig::SyntaxError(std::string &fileString){
 
-ParseConfig::ParseConfig(std::string &path) {
-	std::ifstream file(path);
-	if (!file.is_open())
-		throw std::runtime_error(CONFIG_FILE_NOT_FOUND);
-	this->FillMimeTypes(file);
 }
 
+//NOTE::just for print
+// void print(token tk){
+// 	if (tk == ESP)
+// 		std::cout << "espace" << std::endl;
+// 	if (tk == SERVER)
+// 		std::cout << "server" << std::endl;
+// 	if (tk == SEMICOLONE)
+// 		std::cout << "SEMICOLONE" << std::endl;
+// 	if (tk == COLONE)
+// 		std::cout << "COLONE" << std::endl;
+// 	if (tk == BRACKETOPEN)
+// 		std::cout << "BRACKETOPEN" << std::endl;
+// 	if (tk == BRACKETCLOSE)
+// 		std::cout << "BRACKETCLOSE" << std::endl;
+// 	if (tk == VALUE)
+// 		std::cout << "VALUE" << std::endl;
+// 	if (tk == INCLUDE)
+// 		std::cout << "INCLUDE" << std::endl;
+// }
 
+ParseConfig::ParseConfig(std::string &path){
 
+	std::string fileString;
+	std::ifstream configFile(path);
+	TokenConfig TokenConfig;
 
+	if (!configFile.is_open())	{
+		throw std::runtime_error("ERR_OPEN");
+	}
 
+	this->tokens = TokenConfig.TokenTheConfig(configFile);
+	this->FillMimeTypes(configFile);
+
+	//NOTE:: Just For Test
+	// for (std::vector<TOKEN_PAIR>::iterator it = tokens.begin(); it != tokens.end(); ++it){
+	// 	TOKEN_PAIR pair = *it;
+	// 	std::cout << pair.first << "   ";
+	// 	print(pair.second);
+	// }
+
+	configFile.close();
+}
