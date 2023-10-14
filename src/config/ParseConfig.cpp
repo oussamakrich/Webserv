@@ -3,7 +3,7 @@
 // Start: Canonical form:
 
 ParseConfig::ParseConfig(){}
-ParseConfig &ParseConfig::operator=(ParseConfig const &copy){}
+ParseConfig &ParseConfig::operator=(ParseConfig const &copy){ return *this;}
 ParseConfig::ParseConfig(ParseConfig const &copy){}
 
 // End: Canonical form
