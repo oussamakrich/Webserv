@@ -5,6 +5,7 @@
 ParseConfig::ParseConfig(){}
 ParseConfig &ParseConfig::operator=(ParseConfig const &copy){ return *this;}
 ParseConfig::ParseConfig(ParseConfig const &copy){}
+ParseConfig::~ParseConfig(){}
 
 // End: Canonical form
 
@@ -56,8 +57,82 @@ void ParseConfig::FillMimeTypes(std::ifstream &file) {
 	}
 }
 
-void ParseConfig::SyntaxError(std::string &fileString){
+TOKEN_PAIR ParseConfig::skipSpaces(std::vector<TOKEN_PAIR>::iterator &it){
 
+	for (;it != tokens.end(); ++it){
+		if (it->second != ESP)
+			break;
+	}
+	return *it;
+}
+
+void ParseConfig::checkLimit(std::vector<TOKEN_PAIR>::iterator &it){
+
+	skipSpaces(++it);
+	if (it->second != VALUE)
+		throw std::runtime_error(ERR_CONFIGFILE); 
+	for (;it != tokens.end(); ++it){
+		if (it->second != ESP && it->second != VALUE)
+			break;
+	}
+	if (it->second != CURLYOPEN)
+		throw std::runtime_error(ERR_CONFIGFILE); 
+}
+
+void ParseConfig::checkToken(std::vector<TOKEN_PAIR>::iterator &it, token type){
+	TOKEN_PAIR pair;
+
+	pair = skipSpaces(++it);
+	if (pair.second != type)
+		throw std::runtime_error(ERR_CONFIGFILE); 
+}
+
+
+void ParseConfig::closed(){
+	int bracketClosed = 0;
+	int curlyClosed = 0;
+	std::vector<TOKEN_PAIR>::iterator it;
+	for (it = tokens.begin(); it != tokens.end(); ++it){
+		TOKEN_PAIR pair = skipSpaces(it);
+		if (pair.second == BRACKETOPEN)
+			bracketClosed++;
+		if (pair.second == BRACKETCLOSE)
+			bracketClosed--;
+		if (pair.second == CURLYOPEN)
+			curlyClosed++;
+		if (pair.second == CURLYCLOSE)
+			curlyClosed--;
+		if (curlyClosed < 0 || bracketClosed < 0)
+			throw std::runtime_error(UNCLOSED);
+	}
+	if (curlyClosed != 0 || bracketClosed != 0)
+		throw std::runtime_error(UNCLOSED);
+}
+
+void ParseConfig::SyntaxError(){
+	std::vector<TOKEN_PAIR>::iterator it;
+	this->closed();
+	for (it = tokens.begin(); it != tokens.end(); ++it){
+		TOKEN_PAIR pair = skipSpaces(it);
+		if (pair.second == INCLUDE)
+			this->checkToken(it, COLONE);
+		else if (pair.second == SERVER)
+			this->checkToken(it, BRACKETOPEN);
+		else if (pair.second == LIMIT)
+			this->checkLimit(it);	
+		else if (pair.second == LOCATION){
+			this->checkToken(it, VALUE);
+			this->checkToken(it, CURLYOPEN);
+		}
+		else if (pair.second == BRACKETCLOSE){
+			pair = skipSpaces(++it);
+			if (pair.second != SERVER && pair.second != END)
+				throw std::runtime_error(ERR_CONFIGFILE); 
+		}
+		else if (pair.second == BRACKETOPEN || pair.second == CURLYOPEN)
+			throw std::runtime_error(ERR_CONFIGFILE); 
+	}
+	std::cout << "Syntax Valid"<< std::endl;
 }
 
 //NOTE::just for print
@@ -91,7 +166,8 @@ ParseConfig::ParseConfig(std::string &path){
 	}
 
 	this->tokens = TokenConfig.TokenTheConfig(configFile);
-	this->FillMimeTypes(configFile);
+	this->SyntaxError();
+	// this->FillMimeTypes(configFile);
 
 	//NOTE:: Just For Test
 	// for (std::vector<TOKEN_PAIR>::iterator it = tokens.begin(); it != tokens.end(); ++it){

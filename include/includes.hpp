@@ -13,7 +13,7 @@
 
 #define ERR_OPEN "Error: while opning file"
 #define ERR_CONFIGFILE "Error: config file syntax error"
-
+#define UNCLOSED "Error: unclosed Bracket"
 
 #define TOKEN_PAIR std::pair<std::string, token>
 
@@ -26,4 +26,10 @@
 	BRACKETCLOSE,
 	ESP,
 	VALUE,
+	LOCATION,
+	CURLYOPEN,
+	CURLYCLOSE,
+	TYPES,
+	LIMIT,
+	END,
 }token;
