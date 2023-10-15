@@ -25,7 +25,7 @@ void TokenConfig::tokenWord(std::string &line){
 	std::string value;
 	token				type;
 
-	pos = line.find_first_of(";:[] ");
+	pos = line.find_first_of("\t;:[]{} ");
 	value = line;
 	if (pos != line.npos)
 		value = line.substr(0, pos);
@@ -34,32 +34,29 @@ void TokenConfig::tokenWord(std::string &line){
 		type = SERVER;
 	else if (value == "include")
 		type = INCLUDE;
+	else if (value == "location")
+		type = LOCATION;
+	else if (value == "limit_except")
+		type = LIMIT;
 	this->tokens.push_back(std::make_pair(value, type));
 	line.erase(0, pos);
 }
 
-
+//FIX : switch else if with switch case
 void TokenConfig::tokenLine(std::string &line){
 
+	token type;
+	std::string search = " \t;:{}[]";
 	while (!line.empty()){
-		if (line[0] == ' '){
-			this->tokens.push_back(std::make_pair(" ", ESP));
-			line.erase(0, 1);
-		}
-		else if (line[0] == '['){
-			this->tokens.push_back(std::make_pair("[",BRACKETOPEN));
-			line.erase(0, 1);
-		}
-		else if (line[0] == ']'){
-			this->tokens.push_back(std::make_pair("]", BRACKETCLOSE));
-			line.erase(0, 1);
-		}
-		else if (line[0] == ':'){
-			this->tokens.push_back(std::make_pair(":", COLONE));
-			line.erase(0, 1);
-		}
-		else if (line[0] == ';'){
-			this->tokens.push_back(std::make_pair(";", SEMICOLONE));
+		if (search.find(line[0]) != search.npos){
+			if (line[0] == ' ' || line[0] == '\t') type = ESP;
+			else if (line[0] == '[') type = BRACKETOPEN;
+			else if (line[0] == ']') type = BRACKETCLOSE;
+			else if (line[0] == ':') type = COLONE;
+			else if (line[0] == ';') type =SEMICOLONE;
+			else if( line[0] == '{') type = CURLYOPEN;
+			else if( line[0] == '}') type = CURLYCLOSE;
+			this->tokens.push_back(std::make_pair("", type));
 			line.erase(0, 1);
 		}
 		else
@@ -70,10 +67,17 @@ void TokenConfig::tokenLine(std::string &line){
 std::vector<TOKEN_PAIR> TokenConfig::TokenTheConfig(std::ifstream &file){
 
 	std::string line;
+	std::string search = "{};[]";
 
+	//FIX:: Trim spaces from the end before check the back of line
 	while (!file.eof()){
 		std::getline(file, line, '\n');
+		if (line.find_last_not_of(" \t") == line.npos)
+			continue;
+		if (search.find(line.back()) == search.npos)
+			throw std::runtime_error(ERR_CONFIGFILE);
 		this->tokenLine(line);
 	}
+	this->tokens.push_back(std::make_pair("", END));
 	return this->tokens;
 }

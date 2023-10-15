@@ -1,5 +1,6 @@
 #include "../include/includes.hpp"
 #include "../include/ParseConfig.hpp"
+
 int main (int argc, char **argv)
 {
 	if (argc != 2)
@@ -11,11 +12,12 @@ int main (int argc, char **argv)
 	{
 		std::string path(argv[1]);
 		ParseConfig parser(path);
+
+
 	}
 	catch(const std::exception& e)
 	{
 		std::cerr << e.what() << '\n';
 	}
 	return (0);
-
 }
