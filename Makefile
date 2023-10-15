@@ -1,33 +1,35 @@
 NAME = webserver
 
-SRC = main.cpp
+SRC =	src/main.cpp \
+		src/config/GenerateServers.cpp \
+		src/config/ParseConfig.cpp \
+		src/config/TokenConfig.cpp \
+		src/server/Server.cpp \
+		src/utils/trim.cpp \
 
-HEADER = include/includes.hpp \
-				include/Server.hpp \
-				include/ParseConfig.hpp \
-				
-OBJDIR = obj/
+HEADER =	include/includes.hpp \
+			include/GenerateServers.hpp \
+			include/ParseConfig.hpp \
+			include/Server.hpp \
+			include/TokenConfig.hpp \
 
-OBJ = $(addprefix $(OBJDIR), $(SRC:.cpp=.o))
+OBJ = $(SRC:.cpp=.o)
 
 FLAGS = -Wall -Wextra -Werror -std=c++98
 
-all: $(OBJDIR) $(NAME)
-
-$(OBJDIR):
-                mkdir -p $(OBJDIR)
+all:  $(NAME)
 
 $(NAME): $(OBJ) $(HEADER)
-                c++ $(FLAGS) $(OBJ) -o $(NAME)
+			c++ $(FLAGS) $(OBJ) -o $(NAME)
 
-$(OBJDIR)%.o: %.cpp $(HEADER)
-                c++ $(FLAGS) -c $< -o $@
+%.o: %.cpp $(HEADER)
+			c++ $(FLAGS) -c $< -o $@
 
 clean:
-                rm -rf $(OBJDIR)
+			rm -rf $(OBJ)
 
 fclean: clean
-                rm -rf $(NAME)
+			rm -rf $(NAME)
 
 re: fclean all
 

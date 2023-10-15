@@ -1,6 +1,25 @@
 #include "../../include/TokenConfig.hpp"
 
 
+TokenConfig::TokenConfig(){
+}
+
+TokenConfig::~TokenConfig(){
+}
+
+TokenConfig &TokenConfig::operator=(const TokenConfig &copy){
+	if (this != &copy)
+	{
+		this->tokens = copy.tokens;
+	}
+	return (*this);
+}
+
+TokenConfig::TokenConfig(const TokenConfig &copy){
+	*this = copy;
+}
+
+
 void TokenConfig::tokenWord(std::string &line){
 	size_t pos;
 	std::string value;
@@ -9,42 +28,42 @@ void TokenConfig::tokenWord(std::string &line){
 	pos = line.find_first_of(";:[] ");
 	value = line;
 	if (pos != line.npos)
-		value = line.substr(0, pos);	
+		value = line.substr(0, pos);
 	type = VALUE;
 	if (value == "server")
 		type = SERVER;
 	else if (value == "include")
 		type = INCLUDE;
-	this->tokens.push_back(std::make_pair(value, type));	
+	this->tokens.push_back(std::make_pair(value, type));
 	line.erase(0, pos);
 }
 
 
 void TokenConfig::tokenLine(std::string &line){
-	
+
 	while (!line.empty()){
 		if (line[0] == ' '){
-			this->tokens.push_back(std::make_pair("", ESP));
+			this->tokens.push_back(std::make_pair(" ", ESP));
 			line.erase(0, 1);
 		}
 		else if (line[0] == '['){
-			this->tokens.push_back(std::make_pair("",BRACKETOPEN));
+			this->tokens.push_back(std::make_pair("[",BRACKETOPEN));
 			line.erase(0, 1);
 		}
 		else if (line[0] == ']'){
-			this->tokens.push_back(std::make_pair("", BRACKETCLOSE));
+			this->tokens.push_back(std::make_pair("]", BRACKETCLOSE));
 			line.erase(0, 1);
 		}
 		else if (line[0] == ':'){
-			this->tokens.push_back(std::make_pair("", COLONE));
+			this->tokens.push_back(std::make_pair(":", COLONE));
 			line.erase(0, 1);
 		}
 		else if (line[0] == ';'){
-			this->tokens.push_back(std::make_pair("", SEMICOLONE));
+			this->tokens.push_back(std::make_pair(";", SEMICOLONE));
 			line.erase(0, 1);
 		}
 		else
-			tokenWord(line);	
+			tokenWord(line);
 	}
 }
 
@@ -56,5 +75,5 @@ std::vector<TOKEN_PAIR> TokenConfig::TokenTheConfig(std::ifstream &file){
 		std::getline(file, line, '\n');
 		this->tokenLine(line);
 	}
-	return this->tokens;	
+	return this->tokens;
 }

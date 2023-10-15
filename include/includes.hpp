@@ -27,3 +27,23 @@
 	ESP,
 	VALUE,
 }token;
+
+typedef enum {
+	HOST,
+	PORT,
+	ROOT,
+	SERVER_NAME,
+	INDEX,
+	CLIENT_MAX_BODY_SIZE,
+	ERROR_PAGE,
+	DEFAULT_TYPE,
+	ERROR_LOG,
+	ACCESS_LOG,
+
+
+	ALLOW_METHODS,
+	LOCATION,
+}allowedRules;
+
+std::string trim(const std::string &s);
+

@@ -1,7 +1,8 @@
 #pragma once
 
 #include "includes.hpp"
-
+#include "GenerateServers.hpp"
+#include "Server.hpp"
 
 class ParseConfig{
 
@@ -17,7 +18,12 @@ class ParseConfig{
 	private:
 		std::map<std::string , std::string> mimeTypes;
 		std::vector<TOKEN_PAIR> tokens;
-
+		std::vector<Server*> servers;
+		std::string key;
+		std::string value;
+		std::stringstream ss;
+		bool newMime;
+		GenerateServers generator;
 	public:
 		ParseConfig(std::string &path);
 		~ParseConfig();

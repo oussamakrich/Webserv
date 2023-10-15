@@ -1,21 +1,25 @@
 #include "../../include/ParseConfig.hpp"
 #include "../../include/TokenConfig.hpp"
 // Start: Canonical form:
-
 ParseConfig::ParseConfig(){}
-ParseConfig &ParseConfig::operator=(ParseConfig const &copy){ return *this;}
-ParseConfig::ParseConfig(ParseConfig const &copy){}
-
+ParseConfig::~ParseConfig(){}
+ParseConfig &ParseConfig::operator=(ParseConfig const &copy){
+	if (this != &copy){}
+	return *this;
+}
+ParseConfig::ParseConfig(ParseConfig const &copy){
+	*this = copy;
+}
 // End: Canonical form
-
 
 void ParseConfig::FillMimeTypes(std::ifstream &file) {
 	std::string	line;
 	int			position;
 	while (std::getline(file, line))
 	{
-		if ((position = line.find("include:")) != std::string::npos)
+		if ((line.find("include:")) != std::string::npos)
 		{
+			position = line.find("include:");
 			line = line.substr(position + 9 , (line.find(";") - position - 9));
 			break;
 		}
@@ -25,10 +29,6 @@ void ParseConfig::FillMimeTypes(std::ifstream &file) {
 	std::ifstream mimeFile(line);
 	if (!mimeFile.is_open())
 		throw std::runtime_error("Error: Mime file not found.");
-	bool newMime;
-	std::string key;
-	std::string value;
-	std::stringstream ss;
 	while (std::getline(mimeFile, line))
 	{
 		if (line.empty())
@@ -57,7 +57,7 @@ void ParseConfig::FillMimeTypes(std::ifstream &file) {
 }
 
 void ParseConfig::SyntaxError(std::string &fileString){
-
+	(void)fileString;
 }
 
 //NOTE::just for print
@@ -91,7 +91,11 @@ ParseConfig::ParseConfig(std::string &path){
 	}
 
 	this->tokens = TokenConfig.TokenTheConfig(configFile);
+	configFile.close();
+	configFile.open(path);
 	this->FillMimeTypes(configFile);
+	//this->syntaxError(fileString);
+	this->generator.Generator(this->tokens, this->servers);
 
 	//NOTE:: Just For Test
 	// for (std::vector<TOKEN_PAIR>::iterator it = tokens.begin(); it != tokens.end(); ++it){
