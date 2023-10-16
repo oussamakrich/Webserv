@@ -12,8 +12,6 @@ int main (int argc, char **argv)
 	{
 		std::string path(argv[1]);
 		ParseConfig parser(path);
-
-
 	}
 	catch(const std::exception& e)
 	{
