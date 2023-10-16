@@ -56,7 +56,7 @@ void TokenConfig::tokenLine(std::string &line){
 			else if (line[0] == ';') type =SEMICOLONE;
 			else if( line[0] == '{') type = CURLYOPEN;
 			else if( line[0] == '}') type = CURLYCLOSE;
-			this->tokens.push_back(std::make_pair("", type));
+			this->tokens.push_back(std::make_pair(line.substr(0, 1), type));
 			line.erase(0, 1);
 		}
 		else
@@ -69,13 +69,14 @@ std::vector<TOKEN_PAIR> TokenConfig::TokenTheConfig(std::ifstream &file){
 	std::string line;
 	std::string search = "{};[]";
 
-	//FIX:: Trim spaces from the end before check the back of line
-	while (!file.eof()){
+	while (!file.eof())
+	{
 		std::getline(file, line, '\n');
-		if (line.find_last_not_of(" \t") == line.npos)
+		line = trim(line);
+		if (line.empty())
 			continue;
 		if (search.find(line.back()) == search.npos)
-			throw std::runtime_error(ERR_CONFIGFILE);
+			throw std::runtime_error("ERROR: line should be ended by special character");
 		this->tokenLine(line);
 	}
 	this->tokens.push_back(std::make_pair("", END));

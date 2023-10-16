@@ -60,9 +60,11 @@ void GenerateServers::Generator(std::vector<TOKEN_PAIR> &tokens, std::vector<Ser
 		if (i->second == SERVER)
 		{
 			Server *server  = new Server();
-			while (i->second != BRACKETCLOSE)
+			while (i->second != BRACKETCLOSE && i != tokens.end())
 			{
 				switcher = getValueType(i);
+				if (i->second == BRACKETCLOSE)
+					break;
 				switch (switcher)
 				{
 					case HOST:
@@ -95,12 +97,16 @@ void GenerateServers::Generator(std::vector<TOKEN_PAIR> &tokens, std::vector<Ser
 					case ACCESS_LOG:
 						server->setAccessLog(i);
 						break;
+					default:
+						break;
 				}
 				i++;
 			}
 			servers.push_back(server);
 		}
 	}
+	// (void)servers;
+	// std::cout << "Done" << std::endl;
 	int number = 1;
 	for (std::vector<Server*>::iterator i = servers.begin(); i != servers.end(); i++)
 	{
