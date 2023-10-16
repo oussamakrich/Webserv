@@ -127,6 +127,7 @@ void ParseConfig::SyntaxError(){
 			pair = skipSpaces(++it);
 			if (pair.second != SERVER && pair.second != END)
 				throw std::runtime_error(ERR_CONFIGFILE);
+			it--;
 		}
 		else if (pair.second == BRACKETOPEN || pair.second == CURLYOPEN)
 		{
@@ -143,11 +144,12 @@ ParseConfig::ParseConfig(std::string &path){
 	std::ifstream configFile(path);
 	TokenConfig TokenConfig;
 
-	if (!configFile.is_open())	{
+	if (!configFile.is_open())
 		throw std::runtime_error("ERR_OPEN");
-	}
 
 	this->tokens = TokenConfig.TokenTheConfig(configFile);
+	//FIX : Change open close with flush buffer 
+	// configFile.seekg(0)
 	configFile.close();
 	configFile.open(path);
 	this->SyntaxError();
