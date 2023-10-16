@@ -13,21 +13,22 @@ ParseConfig::ParseConfig(ParseConfig const &copy){
 }
 // End: Canonical form
 
-void ParseConfig::FillMimeTypes(std::ifstream &file) {
+void ParseConfig::FillMimeTypes() {
 	std::string	line;
-	int			position;
-	while (std::getline(file, line))
-	{
-		if ((line.find("include:")) != std::string::npos)
-		{
-			position = line.find("include:");
-			line = line.substr(position + 9 , (line.find(";") - position - 9));
-			break;
-		}
-	}
-	if (line.empty())
-		throw std::runtime_error("Error: No include found.");
-	std::ifstream mimeFile(line);
+	// int			position;
+	// while (std::getline(file, line))
+	// {
+	// 	if ((line.find("include:")) != std::string::npos)
+	// 	{
+	// 		position = line.find("include:");
+	// 		line = line.substr(position + 9 , (line.find(";") - position - 9));
+	// 		break;
+	// 	}
+	// }
+	// if (line.empty())
+	// 	throw std::runtime_error("Error: No include found.");
+	std::cout << mimeTypeFile << std::endl;
+	std::ifstream mimeFile(mimeTypeFile);
 	if (!mimeFile.is_open())
 		throw std::runtime_error("Error: Mime file not found.");
 	while (std::getline(mimeFile, line))
@@ -59,9 +60,12 @@ void ParseConfig::FillMimeTypes(std::ifstream &file) {
 
 void ParseConfig::getMimeFile(std::vector<TOKEN_PAIR>::iterator it){
 
-	for (;it != tokens.end(); ++it){
+	for (;it != tokens.end(); it++){
 		if (it->second == VALUE)
+		{
 			this->mimeTypeFile = it->first;
+			break;
+		}
 	}
 }
 void ParseConfig::checkBeforToken(std::vector<TOKEN_PAIR>::iterator it){
@@ -169,12 +173,12 @@ ParseConfig::ParseConfig(std::string &path){
 		throw std::runtime_error("ERR_OPEN");
 
 	this->tokens = TokenConfig.TokenTheConfig(configFile);
-	//FIX : Change open close with flush buffer 
+	//FIX : Change open close with flush buffer
 	// configFile.seekg(0)
-	configFile.close();
-	configFile.open(path);
+	// configFile.close();
+	// configFile.open(path);
 	this->SyntaxError();
-	this->FillMimeTypes(configFile);
+	this->FillMimeTypes();
 	this->generator.Generator(this->tokens, this->servers);
 
 

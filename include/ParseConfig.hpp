@@ -10,7 +10,7 @@ class ParseConfig{
 		ParseConfig();
 		ParseConfig &operator=(ParseConfig const &copy);
 		ParseConfig(ParseConfig const &copy);
-		void FillMimeTypes(std::ifstream &file); // throw (std::exception);
+		void FillMimeTypes(); // throw (std::exception);
 		void SyntaxError(); // throw (std::exception);
 		TOKEN_PAIR skipSpaces(std::vector<TOKEN_PAIR>::iterator &it);
 		void checkLimit(std::vector<TOKEN_PAIR>::iterator &it);
