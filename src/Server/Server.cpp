@@ -4,7 +4,6 @@
 #include <string>
 #include <vector>
 
-short Server::port = 0;
 // Start: Canonical Form
 Server::Server()
 {
@@ -212,10 +211,7 @@ void Server::setPort(std::vector<TOKEN_PAIR>::iterator &i)
 		{
 			std::stringstream ss(trim(i->first));
 			if (!(ss >> this->port))
-			{
-
 				throw std::runtime_error("Port: " + i->first + "not a valid number.");
-			}
 			found++;
 		}
 		i++;
