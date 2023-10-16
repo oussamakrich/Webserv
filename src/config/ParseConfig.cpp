@@ -129,7 +129,10 @@ void ParseConfig::SyntaxError(){
 				throw std::runtime_error(ERR_CONFIGFILE);
 		}
 		else if (pair.second == BRACKETOPEN || pair.second == CURLYOPEN)
+		{
+			std::cout << pair.first << pair.second << std::endl;
 			throw std::runtime_error(ERR_CONFIGFILE);
+		}
 	}
 	std::cout << "Syntax Valid"<< std::endl;
 }

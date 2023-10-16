@@ -130,11 +130,4 @@ void GenerateServers::Generator(std::vector<TOKEN_PAIR> &tokens, std::vector<Ser
 		std::cout << std::endl;
 		number++;
 	}
-
-	// std::cout << servers.size() << std::endl;
-	// for (std::vector<TOKEN_PAIR>::iterator i = tokens.begin(); i != tokens.end(); i++)
-	// {
-	// 	std::cout << "|" << i->first << "| |" << i->second << "|" << std::endl;
-	// }
-	(void )servers;
 }

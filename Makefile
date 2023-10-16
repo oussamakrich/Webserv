@@ -25,10 +25,10 @@ $(NAME): $(OBJ) $(HEADER)
 %.o: %.cpp $(HEADER)
 			c++ $(FLAGS) -c $< -o $@
 
-clean:
+clean c:
 			rm -rf $(OBJ)
 
-fclean: clean
+fclean f: clean
 			rm -rf $(NAME)
 
 re: fclean all
