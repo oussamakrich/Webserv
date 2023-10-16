@@ -1,5 +1,6 @@
 #include "../../include/ParseConfig.hpp"
 #include "../../include/TokenConfig.hpp"
+#include <stdexcept>
 // Start: Canonical form:
 ParseConfig::ParseConfig(){}
 ParseConfig::~ParseConfig(){}
@@ -56,6 +57,22 @@ void ParseConfig::FillMimeTypes(std::ifstream &file) {
 	}
 }
 
+void ParseConfig::getMimeFile(std::vector<TOKEN_PAIR>::iterator it){
+
+	for (;it != tokens.end(); ++it){
+		if (it->second == VALUE)
+			this->mimeTypeFile = it->first;
+			
+	}
+}
+void ParseConfig::checkBeforToken(std::vector<TOKEN_PAIR>::iterator it){
+	if (it == this->tokens.begin())
+		throw std::runtime_error("ERROR: COLONE and SEMICOLONE cannot be in the front");
+	it--;
+	if (it->second != VALUE)
+		throw std::runtime_error("ERROR: COLONE and SEMICOLONE should be preceded by VALUE");
+}
+
 TOKEN_PAIR ParseConfig::skipSpaces(std::vector<TOKEN_PAIR>::iterator &it){
 
 	for (;it != tokens.end(); ++it){
@@ -69,13 +86,13 @@ void ParseConfig::checkLimit(std::vector<TOKEN_PAIR>::iterator &it){
 
 	skipSpaces(++it);
 	if (it->second != VALUE)
-		throw std::runtime_error(ERR_CONFIGFILE);
+		throw std::runtime_error("ERROR: limit_except should be followed by VALUE");
 	for (;it != tokens.end(); ++it){
 		if (it->second != ESP && it->second != VALUE)
 			break;
 	}
 	if (it->second != CURLYOPEN)
-		throw std::runtime_error(ERR_CONFIGFILE);
+		throw std::runtime_error("ERROR: limit_except should be followed by CURLYBRACKETS");
 }
 
 void ParseConfig::checkToken(std::vector<TOKEN_PAIR>::iterator &it, token type){
@@ -113,8 +130,10 @@ void ParseConfig::SyntaxError(){
 	this->closed();
 	for (it = tokens.begin(); it != tokens.end(); ++it){
 		TOKEN_PAIR pair = skipSpaces(it);
-		if (pair.second == INCLUDE)
+		if (pair.second == INCLUDE){
 			this->checkToken(it, COLONE);
+			this->getMimeFile(it);
+		}
 		else if (pair.second == SERVER)
 			this->checkToken(it, BRACKETOPEN);
 		else if (pair.second == LIMIT)
@@ -130,10 +149,9 @@ void ParseConfig::SyntaxError(){
 			it--;
 		}
 		else if (pair.second == BRACKETOPEN || pair.second == CURLYOPEN)
-		{
-			std::cout << pair.first << pair.second << std::endl;
 			throw std::runtime_error(ERR_CONFIGFILE);
-		}
+		else if (pair.second == COLONE || pair.second == SEMICOLONE)
+			this->checkBeforToken(it);
 	}
 	std::cout << "Syntax Valid"<< std::endl;
 }

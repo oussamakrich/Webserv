@@ -76,7 +76,7 @@ std::vector<TOKEN_PAIR> TokenConfig::TokenTheConfig(std::ifstream &file){
 		if (line.empty())
 			continue;
 		if (search.find(line.back()) == search.npos)
-			throw std::runtime_error(ERR_CONFIGFILE);
+			throw std::runtime_error("ERROR: line should be ended by special character");
 		this->tokenLine(line);
 	}
 	this->tokens.push_back(std::make_pair("", END));
