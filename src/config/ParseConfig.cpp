@@ -111,25 +111,31 @@ void ParseConfig::closed(){
 void ParseConfig::SyntaxError(){
 	std::vector<TOKEN_PAIR>::iterator it;
 	this->closed();
-	for (it = tokens.begin(); it != tokens.end(); ++it){
+	for (it = tokens.begin(); it != tokens.end(); it++){
 		TOKEN_PAIR pair = skipSpaces(it);
 		if (pair.second == INCLUDE)
 			this->checkToken(it, COLONE);
 		else if (pair.second == SERVER)
+		{
 			this->checkToken(it, BRACKETOPEN);
+		}
 		else if (pair.second == LIMIT)
 			this->checkLimit(it);
-		else if (pair.second == LOCATION){
+		else if (pair.second == LOCATION)
+		{
 			this->checkToken(it, VALUE);
 			this->checkToken(it, CURLYOPEN);
 		}
 		else if (pair.second == BRACKETCLOSE){
 			pair = skipSpaces(++it);
+
 			if (pair.second != SERVER && pair.second != END)
 				throw std::runtime_error(ERR_CONFIGFILE);
 		}
 		else if (pair.second == BRACKETOPEN || pair.second == CURLYOPEN)
+		{
 			throw std::runtime_error(ERR_CONFIGFILE);
+		}
 	}
 	std::cout << "Syntax Valid"<< std::endl;
 }

@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+short Server::port = 0;
 // Start: Canonical Form
 Server::Server()
 {

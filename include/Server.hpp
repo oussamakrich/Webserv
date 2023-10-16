@@ -7,7 +7,7 @@
 class Server {
 
 	private:	// Variables:
-		short						port; // done.
+		static short						port; // done.
 		int							clientMaxBodySize; // done.
 		std::string					host; // done.
 		std::string					root; // done.

@@ -56,7 +56,7 @@ void TokenConfig::tokenLine(std::string &line){
 			else if (line[0] == ';') type =SEMICOLONE;
 			else if( line[0] == '{') type = CURLYOPEN;
 			else if( line[0] == '}') type = CURLYCLOSE;
-			this->tokens.push_back(std::make_pair("", type));
+			this->tokens.push_back(std::make_pair(line.substr(0, 1), type));
 			line.erase(0, 1);
 		}
 		else
