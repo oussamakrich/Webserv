@@ -61,7 +61,10 @@ void ParseConfig::getMimeFile(std::vector<TOKEN_PAIR>::iterator it){
 
 	for (;it != tokens.end(); ++it){
 		if (it->second == VALUE)
+		{
 			this->mimeTypeFile = it->first;
+			break ;
+		}
 	}
 }
 void ParseConfig::checkBeforToken(std::vector<TOKEN_PAIR>::iterator it){
