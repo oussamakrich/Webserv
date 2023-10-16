@@ -69,10 +69,11 @@ std::vector<TOKEN_PAIR> TokenConfig::TokenTheConfig(std::ifstream &file){
 	std::string line;
 	std::string search = "{};[]";
 
-	//FIX:: Trim spaces from the end before check the back of line
-	while (!file.eof()){
+	while (!file.eof())
+	{
 		std::getline(file, line, '\n');
-		if (line.find_last_not_of(" \t") == line.npos)
+		line = trim(line);
+		if (line.empty())
 			continue;
 		if (search.find(line.back()) == search.npos)
 			throw std::runtime_error(ERR_CONFIGFILE);
