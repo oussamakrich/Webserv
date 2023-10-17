@@ -6,12 +6,15 @@ SRC =	src/main.cpp \
 		src/config/TokenConfig.cpp \
 		src/server/Server.cpp \
 		src/utils/trim.cpp \
+		src/serverlog/Logger.cpp 
 
 HEADER =	include/includes.hpp \
 			include/GenerateServers.hpp \
 			include/ParseConfig.hpp \
 			include/Server.hpp \
 			include/TokenConfig.hpp \
+			include/Logger.hpp \
+
 
 OBJ = $(SRC:.cpp=.o)
 
