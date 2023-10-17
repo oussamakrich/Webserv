@@ -2,7 +2,7 @@
 
 std::string ltrim(const std::string &s) {
     std::string result = s;
-    size_t pos = result.find_first_not_of(" \"\t\n\r");
+    size_t pos = result.find_first_not_of(" \"\t\n\r\f\v");
     if (pos != std::string::npos) {
         result = result.substr(pos);
     }
@@ -12,7 +12,7 @@ std::string ltrim(const std::string &s) {
 // Trim spaces from the end of a string
 std::string rtrim(const std::string &s) {
     std::string result = s;
-    size_t pos = result.find_last_not_of(" \"\t\n\r");
+    size_t pos = result.find_last_not_of(" \"\t\n\r\f\v");
     if (pos != std::string::npos) {
         result = result.substr(0, pos + 1);
     }

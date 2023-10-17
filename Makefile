@@ -7,7 +7,8 @@ SRC =	src/main.cpp \
 		src/server/Server.cpp \
 		src/utils/trim.cpp \
 		src/serverlog/Logger.cpp \
-		src/Location/Location.cpp 
+		src/Location/Location.cpp \
+		src/Request/Request.cpp \
 
 HEADER =	include/includes.hpp \
 			include/GenerateServers.hpp \
@@ -15,7 +16,8 @@ HEADER =	include/includes.hpp \
 			include/Server.hpp \
 			include/TokenConfig.hpp \
 			include/Logger.hpp \
-			include/Location.hpp 
+			include/Location.hpp \
+			include/Request.hpp \
 
 
 OBJ = $(SRC:.cpp=.o)
