@@ -1,5 +1,6 @@
 #include "../../include/ParseConfig.hpp"
 #include "../../include/TokenConfig.hpp"
+#include <iostream>
 #include <stdexcept>
 // Start: Canonical form:
 ParseConfig::ParseConfig(){}
@@ -15,18 +16,7 @@ ParseConfig::ParseConfig(ParseConfig const &copy){
 
 void ParseConfig::FillMimeTypes() {
 	std::string	line;
-	// int			position;
-	// while (std::getline(file, line))
-	// {
-	// 	if ((line.find("include:")) != std::string::npos)
-	// 	{
-	// 		position = line.find("include:");
-	// 		line = line.substr(position + 9 , (line.find(";") - position - 9));
-	// 		break;
-	// 	}
-	// }
-	// if (line.empty())
-	// 	throw std::runtime_error("Error: No include found.");
+
 	std::cout << mimeTypeFile << std::endl;
 	std::ifstream mimeFile(mimeTypeFile);
 	if (!mimeFile.is_open())
@@ -85,19 +75,6 @@ TOKEN_PAIR ParseConfig::skipSpaces(std::vector<TOKEN_PAIR>::iterator &it){
 	return *it;
 }
 
-void ParseConfig::checkLimit(std::vector<TOKEN_PAIR>::iterator &it){
-
-	skipSpaces(++it);
-	if (it->second != VALUE)
-		throw std::runtime_error("ERROR: limit_except should be followed by VALUE");
-	for (;it != tokens.end(); ++it){
-		if (it->second != ESP && it->second != VALUE)
-			break;
-	}
-	if (it->second != CURLYOPEN)
-		throw std::runtime_error("ERROR: limit_except should be followed by CURLYBRACKETS");
-}
-
 void ParseConfig::checkToken(std::vector<TOKEN_PAIR>::iterator &it, token type){
 	TOKEN_PAIR pair;
 
@@ -141,8 +118,6 @@ void ParseConfig::SyntaxError(){
 		{
 			this->checkToken(it, BRACKETOPEN);
 		}
-		else if (pair.second == LIMIT)
-			this->checkLimit(it);
 		else if (pair.second == LOCATION)
 		{
 			this->checkToken(it, VALUE);
@@ -150,7 +125,6 @@ void ParseConfig::SyntaxError(){
 		}
 		else if (pair.second == BRACKETCLOSE){
 			pair = skipSpaces(++it);
-
 			if (pair.second != SERVER && pair.second != END)
 				throw std::runtime_error(ERR_CONFIGFILE);
 			it--;
@@ -173,14 +147,9 @@ ParseConfig::ParseConfig(std::string &path){
 		throw std::runtime_error("ERR_OPEN");
 
 	this->tokens = TokenConfig.TokenTheConfig(configFile);
-	//FIX : Change open close with flush buffer
-	// configFile.seekg(0)
-	// configFile.close();
-	// configFile.open(path);
+	configFile.close();
+
 	this->SyntaxError();
 	this->FillMimeTypes();
 	this->generator.Generator(this->tokens, this->servers);
-
-
-	configFile.close();
 }

@@ -1,6 +1,7 @@
 #include "../../include/Server.hpp"
 #include "../../include/includes.hpp"
-#include <sstream>
+#include <map>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -272,6 +273,62 @@ void Server::setAccessLog(std::vector<TOKEN_PAIR>::iterator &i)
 	}
 	if (found != 1)
 		throw std::runtime_error("Access log not found or more than one access log found.");
+}
+
+TOKEN_PAIR skipSpaces(std::vector<TOKEN_PAIR>::iterator &it){
+	for (;it->second != CURLYCLOSE; ++it){
+		if (it->second == VALUE)
+			break;
+	}
+	return *it;
+}
+
+void setDirctive(std::vector<TOKEN_PAIR>::iterator &it, Location &loc, Directives DIR){
+
+	std::vector<std::string> keys;
+	while (it->second != CURLYCLOSE){
+		if (it->second == SEMICOLONE)
+			break;
+		if (it->second == VALUE)
+			keys.push_back(it->first);
+		it++;
+	}
+	loc.fillDirectives(DIR, keys);
+}
+
+
+
+void		Server::setLocation(std::vector<TOKEN_PAIR>::iterator &it){
+	
+	std::pair<std::string, Location *> pairLocation;
+	std::string url;
+	Location location;
+	int urlFound = 0;
+	TOKEN_PAIR pair;
+	for(;it->second != CURLYCLOSE; it++){
+		pair = skipSpaces(it);
+		if (urlFound == 0 && pair.second == VALUE){
+				urlFound = 1;
+				url = trim(it->first);
+		}	
+		else if (trim(pair.first) == "limit_except")
+			setDirctive(++it, location, ALLOWED_METHODS);	
+		else if (trim(pair.first) == "rewrite")
+			setDirctive(++it, location, REWRITE);	
+		else if (trim(pair.first) == "root")
+			setDirctive(++it, location, ROOT_DIR);	
+		else if (trim(pair.first) == "autoindex")
+			setDirctive(++it, location, AUTO_INDEX);	
+		else if (trim(pair.first) == "index")
+			setDirctive(++it, location, INDEX_DIR);	
+	}
+
+	pairLocation.first = url;	
+	pairLocation.second = new Location(location);
+	this->locations.insert(pairLocation);
+
+	std::cout <<"location for : "<< url <<std::endl;
+	// location.print();
 }
 
 // End: Setters

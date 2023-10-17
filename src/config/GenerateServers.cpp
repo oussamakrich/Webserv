@@ -36,7 +36,6 @@ int GenerateServers::getValueType(std::vector<TOKEN_PAIR>::iterator &i)
 			else if (trim(i->first) == "default_type") return (i++, DEFAULT_TYPE);
 			else if (trim(i->first) == "error_log") return (i++, ERROR_LOG);
 			else if (trim(i->first) == "access_log") return (i++, ACCESS_LOG);
-			// else if (trim(i->first) == "location") return (i++, LOCATION);
 			// else if (trim(i->first) == "allow_methods") return (i++, ALLOW_METHODS);
 			// else if (trim(i->first) == "include") return (i++, INCLUDE);
 			// else if (trim(i->first) == "server") return (i++, SERVER);
@@ -47,7 +46,10 @@ int GenerateServers::getValueType(std::vector<TOKEN_PAIR>::iterator &i)
 			// else if (trim(i->first) == "esp") return (i++, ESP);
 
 		}
+		else if (i->second == LOCATION)
+			return (i++, LOCATION_S);
 		i++;
+
 	}
 	return (-1);
 }
@@ -96,6 +98,9 @@ void GenerateServers::Generator(std::vector<TOKEN_PAIR> &tokens, std::vector<Ser
 						break;
 					case ACCESS_LOG:
 						server->setAccessLog(i);
+						break;
+					case LOCATION_S:
+						server->setLocation(i);
 						break;
 					default:
 						break;

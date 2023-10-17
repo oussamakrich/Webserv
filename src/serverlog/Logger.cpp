@@ -1,6 +1,6 @@
 
 #include  "../../include/Logger.hpp"
-#include <sstream>
+
     Logger::Logger(const std::string logfile): _log(logfile, std::ios::app){}
     Logger::~Logger()
    {

@@ -18,7 +18,7 @@ class Server {
 		std::string 				defaultType; // done.
 		std::string 				accessLog; // done.
 		std::string 				errorLog; // done.
-		std::vector<Location>		locations; // done.
+		std::map<std::string, Location *>		locations; // done.
 	public:		// Getters:
 		short		getPort() const;
 		std::string getErrorLog() const;
@@ -42,10 +42,18 @@ class Server {
 		void		setServerName(std::vector<TOKEN_PAIR>::iterator &i);
 		void 		setRoot(std::vector<TOKEN_PAIR>::iterator &i);
 		void		setErrorPages(std::vector<TOKEN_PAIR>::iterator &i);
+		void		setLocation(std::vector<TOKEN_PAIR>::iterator &it);
 	public:		// Canonical Form:
 		~Server();
 		Server();
 		Server(const Server &copy);
 		Server &operator=(const Server &copy);
+		void print(){
+			std::map<std::string, Location *>::iterator it;
+			for(it=locations.begin();it != locations.end();it++){
+				std::cout << "url : " <<it->first << std::endl;
+				it->second->print(); 
+		}
+		};
 	private:
 };

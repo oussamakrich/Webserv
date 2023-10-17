@@ -30,7 +30,6 @@
 	CURLYOPEN,
 	CURLYCLOSE,
 	TYPES,
-	LIMIT,
 	END,
 }token;
 
@@ -46,6 +45,7 @@ typedef enum {
 	ERROR_LOG,
 	ACCESS_LOG,
 	ALLOW_METHODS,
+	LOCATION_S,
 }allowedRules;
 
 typedef enum {
@@ -54,7 +54,6 @@ typedef enum {
 	ROOT_DIR,
 	ALIAS_DIR,
 	TRY_FILES,
-	LIMIT_EXCEPT,
 	RETURN,
 	REWRITE,
 	AUTO_INDEX,

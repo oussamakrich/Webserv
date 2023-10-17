@@ -36,8 +36,6 @@ void TokenConfig::tokenWord(std::string &line){
 		type = INCLUDE;
 	else if (value == "location")
 		type = LOCATION;
-	else if (value == "limit_except")
-		type = LIMIT;
 	this->tokens.push_back(std::make_pair(value, type));
 	line.erase(0, pos);
 }
