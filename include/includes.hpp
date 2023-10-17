@@ -48,5 +48,18 @@ typedef enum {
 	ALLOW_METHODS,
 }allowedRules;
 
+typedef enum {
+	PROXY_PASS,
+	INDEX_DIR,
+	ROOT_DIR,
+	ALIAS_DIR,
+	TRY_FILES,
+	LIMIT_EXCEPT,
+	RETURN,
+	REWRITE,
+	AUTO_INDEX,
+	ALLOWED_METHODS,
+}Directives;
+
 std::string trim(const std::string &s);
 

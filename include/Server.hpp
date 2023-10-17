@@ -2,6 +2,7 @@
 
 #include "includes.hpp"
 #include <type_traits>
+#include "Location.hpp"
 
 
 class Server {
@@ -17,7 +18,7 @@ class Server {
 		std::string 				defaultType; // done.
 		std::string 				accessLog; // done.
 		std::string 				errorLog; // done.
-
+		std::vector<Location>		locations; // done.
 	public:		// Getters:
 		short		getPort() const;
 		std::string getErrorLog() const;
