@@ -86,6 +86,16 @@ std::string Server::getErrorLog() const
 	return (this->errorLog);
 }
 
+Location const &Server::getLocation(std::string const &url) const
+{
+	std::map<std::string, Location *>::const_iterator it;
+
+	it = this->locations.find(url);
+	if (it == this->locations.end())
+		throw std::runtime_error("404 Not Found");
+	return (*it->second);
+}
+
 // End: Getters
 
 
@@ -299,7 +309,7 @@ void setDirctive(std::vector<TOKEN_PAIR>::iterator &it, Location &loc, Directive
 
 
 void		Server::setLocation(std::vector<TOKEN_PAIR>::iterator &it){
-	
+
 	std::pair<std::string, Location *> pairLocation;
 	std::string url;
 	Location location;
@@ -310,20 +320,20 @@ void		Server::setLocation(std::vector<TOKEN_PAIR>::iterator &it){
 		if (urlFound == 0 && pair.second == VALUE){
 				urlFound = 1;
 				url = trim(it->first);
-		}	
+		}
 		else if (trim(pair.first) == "limit_except")
-			setDirctive(++it, location, ALLOWED_METHODS);	
+			setDirctive(++it, location, ALLOWED_METHODS);
 		else if (trim(pair.first) == "rewrite")
-			setDirctive(++it, location, REWRITE);	
+			setDirctive(++it, location, REWRITE);
 		else if (trim(pair.first) == "root")
-			setDirctive(++it, location, ROOT_DIR);	
+			setDirctive(++it, location, ROOT_DIR);
 		else if (trim(pair.first) == "autoindex")
-			setDirctive(++it, location, AUTO_INDEX);	
+			setDirctive(++it, location, AUTO_INDEX);
 		else if (trim(pair.first) == "index")
-			setDirctive(++it, location, INDEX_DIR);	
+			setDirctive(++it, location, INDEX_DIR);
 	}
 
-	pairLocation.first = url;	
+	pairLocation.first = url;
 	pairLocation.second = new Location(location);
 	this->locations.insert(pairLocation);
 

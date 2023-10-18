@@ -2,6 +2,7 @@
 #include "../../include/TokenConfig.hpp"
 #include <iostream>
 #include <stdexcept>
+#include <vector>
 // Start: Canonical form:
 ParseConfig::ParseConfig(){}
 ParseConfig::~ParseConfig(){}
@@ -137,6 +138,12 @@ void ParseConfig::SyntaxError(){
 	std::cout << "Syntax Valid"<< std::endl;
 }
 
+std::vector<Server*> &ParseConfig::getServers()
+{
+	this->generator.Generator(this->tokens, this->servers);
+	return this->servers;
+}
+
 ParseConfig::ParseConfig(std::string &path){
 
 	std::string fileString;
@@ -151,5 +158,5 @@ ParseConfig::ParseConfig(std::string &path){
 
 	this->SyntaxError();
 	this->FillMimeTypes();
-	this->generator.Generator(this->tokens, this->servers);
+
 }

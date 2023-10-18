@@ -24,7 +24,7 @@ int main (int argc, char **argv)
 
 		request = buffer.str();
 
-		Request req(request);
+		// Request req(request);
 	}
 	catch(const std::exception& e)
 	{

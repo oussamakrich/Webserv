@@ -4,7 +4,6 @@
 #include <type_traits>
 #include "Location.hpp"
 
-
 class Server {
 
 	private:	// Variables:
@@ -19,6 +18,7 @@ class Server {
 		std::string 				accessLog; // done.
 		std::string 				errorLog; // done.
 		std::map<std::string, Location *>		locations; // done.
+
 	public:		// Getters:
 		short		getPort() const;
 		std::string getErrorLog() const;
@@ -30,7 +30,7 @@ class Server {
 		std::vector<std::string> getErrorPages() const;
 		std::string getDefaultType() const;
 		std::string getAccessLog() const;
-
+		Location const &getLocation(std::string const &url) const;
 	public:		// Setters:
 		void		setErrorLog(std::vector<TOKEN_PAIR>::iterator &i);
 		void		setAccessLog(std::vector<TOKEN_PAIR>::iterator &i);
@@ -52,7 +52,7 @@ class Server {
 			std::map<std::string, Location *>::iterator it;
 			for(it=locations.begin();it != locations.end();it++){
 				std::cout << "url : " <<it->first << std::endl;
-				it->second->print(); 
+				it->second->print();
 		}
 		};
 	private:

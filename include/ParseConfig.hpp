@@ -3,6 +3,7 @@
 #include "includes.hpp"
 #include "GenerateServers.hpp"
 #include "Server.hpp"
+#include <vector>
 
 class ParseConfig{
 
@@ -18,8 +19,7 @@ class ParseConfig{
 		void FillServers(std::string &fileString); // throw (std::exception);
 		void getMimeFile(std::vector<TOKEN_PAIR>::iterator it);
 		void checkBeforToken(std::vector<TOKEN_PAIR>::iterator it);
-
-
+		std::vector<Server *> &getServers();
 	private:
 		std::string mimeTypeFile;
 		std::map<std::string , std::string> mimeTypes;

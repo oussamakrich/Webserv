@@ -1,3 +1,4 @@
+#include "Server.hpp"
 #include "includes.hpp"
 
 
@@ -9,8 +10,7 @@ class Request{
 		std::map<std::string, std::string>	headers;
 		std::string							body;
 		int									content_length;
-		std::string							content_type;
-		
+
 	public: // Getters:
 		std::string const &getMethod() const;
 		std::string const &getPath() const;
@@ -26,8 +26,11 @@ class Request{
 
 	public: // Canonical Form:
 		Request();
-		Request(std::string const &request);
 		Request(const Request &copy);
 		Request &operator=(const Request &copy);
 		~Request();
+	public: // request methods.
+		void CheckRequestFormat(Server const &server);
+		void RequestHandler(std::string const &request, Server const &server);
+		Location const &get_Matched_Location_For_Request_Uri(Server const &server);
 };

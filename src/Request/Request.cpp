@@ -78,7 +78,7 @@ void Request::setBody(std::string const &body) {
 
 // Constructor:
 
-Request::Request(std::string const &request)
+void Request::RequestHandler(std::string const &request, Server const &server)
 {
 	if (request.empty())
 		throw std::runtime_error("Request is empty.");
@@ -86,16 +86,14 @@ Request::Request(std::string const &request)
 	ss>>this->method;
 	ss>>this->path;
 	if (path.find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?#[]@!$&'()*+,;=%") != std::string::npos)
-		throw std::runtime_error("Invalid path.");
+		throw std::runtime_error("400 Bad Request.");
 	ss>>this->version;
 	ss.clear();
 	ss.str(request);
 	std::string line;
-
+	std::getline(ss, line);
 	while (std::getline(ss, line))
 	{
-		if (line.find(method) == 0)
-			continue;
 		if (line.empty())
 			break;
 		std::string key;
@@ -105,13 +103,41 @@ Request::Request(std::string const &request)
 		std::getline(ss2, value);
 		this->headers.insert(std::pair<std::string, std::string>(key, trim(value)));
 	}
+	while (std::getline(ss, line))
+	{
+		this->body += line;
+		this->body += '\n';
+	}
 	if (this->headers.find("Content-Length") != this->headers.end())
 	{
 		ss.clear();
 		ss.str(this->headers.find("Content-Length")->second);
 		ss>>this->content_length;
 	}
-	std::cout << method << " " << path << " " << version << std::endl;
-	for (std::map<std::string, std::string>::iterator it = this->headers.begin(); it != this->headers.end(); it++)
-		std::cout << it->first << ": " << it->second << std::endl;
+	this->CheckRequestFormat(server);
+
+	// std::cout << method << " " << path << " " << version << std::endl;
+	// for (std::map<std::string, std::string>::iterator it = this->headers.begin(); it != this->headers.end(); it++)
+	// 	std::cout << it->first << ": " << it->second << std::endl;
+}
+
+Location const &Request::get_Matched_Location_For_Request_Uri(Server const &server)
+{
+	return server.getLocation(this->path);
+}
+
+void Request::CheckRequestFormat(Server const &server)
+{
+	// NOTE: This function is not completed yet, i'm not sure if it's a good idea to throw exceptions here.
+	if (this->headers.find("Transfer-Encoding") != this->headers.end())
+	{
+		if (this->headers.find("Transfer-Encoding")->second != "chunked")
+			throw std::runtime_error("505 Not Implemented.");
+	}
+	else if (this->headers.find("Content-Length") == this->headers.end() && this->method == "POST")
+		throw std::runtime_error("400 Bad Request.");
+	else if (path.length() > 2048)
+		throw std::runtime_error("414 Request-URI Too Long");
+	else if (static_cast<int>(this->body.length()) > server.getClientMaxBodySize())
+		throw std::runtime_error("413 Request Entity Too Large");
 }
