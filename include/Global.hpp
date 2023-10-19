@@ -8,6 +8,8 @@ class Global {
 		std::map<std::string, std::string> mime_types;
 		std::vector<Server *> servers;
 	public:
+
+		
 		Global();
 		~Global();
 		Global(const Global &copy);
