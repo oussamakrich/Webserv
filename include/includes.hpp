@@ -7,9 +7,12 @@
 #include <fstream>
 #include <vector>
 
+#define TOKEN std::pair<Token, std::string>
+
 typedef enum {
 	RETURN,
 	LOCATION,
+	WORD,
 	SERVER,
 	OPEN_S_BRACKET,
 	CLOSE_S_BRACKET,
@@ -31,8 +34,7 @@ typedef enum {
 	DEFAULT_TYPE,
 	ERROR_LOG,
 	ACCESS_LOG,
-	PROXY_PASS,
 	TRY_FILES,
 	REWRITE,
 	AUTO_INDEX,
-}Types;
+}Token;

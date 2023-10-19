@@ -2,12 +2,15 @@
 
 #include "Server.hpp"
 #include "Global.hpp"
+#include "includes.hpp"
+#include "GenerateLocation.hpp"
+
 
 class GenerateGlobalClass {
 	private:
 
 	public:
-		Global *generateGlobalClass(std::vector<Types, std::string> &tokens);
+		static Global *generateGlobalClass(std::vector<TOKEN> &tokens);
 		GenerateGlobalClass();
 		~GenerateGlobalClass();
 		GenerateGlobalClass(const GenerateGlobalClass &copy);
