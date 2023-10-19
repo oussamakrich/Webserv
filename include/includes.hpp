@@ -7,7 +7,6 @@
 #include <fstream>
 #include <vector>
 
-#define TOKEN std::pair<Token, std::string>
 
 typedef enum {
 	RETURN,
@@ -38,3 +37,8 @@ typedef enum {
 	REWRITE,
 	AUTO_INDEX,
 }Token;
+
+
+#define TOKEN std::pair<Token, std::string>
+#define TOKEN_PAIR std::pair<Token, std::string>
+#define TOKEN_IT std::vector<TOKEN_PAIR>::iterator
