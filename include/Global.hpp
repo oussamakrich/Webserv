@@ -10,6 +10,7 @@ class Global {
 
 	public:
 		void addServer(Server *server);
+
 		Global();
 		~Global();
 		Global(const Global &copy);

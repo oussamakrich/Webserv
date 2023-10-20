@@ -4,6 +4,7 @@
 
 class Location {
 	private:// Add what you need here.
+		std::string url;
 		std::vector<std::string> Allowed_methods;
 		std::string index;
 		std::string root;
