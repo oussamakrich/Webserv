@@ -1,6 +1,7 @@
 #pragma once
 
 #include "includes.hpp"
+#include <string>
 
 class Server {
 	private:
@@ -14,6 +15,7 @@ class Server {
 		std::string 				defaultType; // done.
 		std::string 				accessLog; // done.
 		std::string 				errorLog; // done.
+	// std::map<>// mimeType
 		// std::map<std::string, Location *>		locations; // done.
 
 
@@ -22,6 +24,31 @@ class Server {
 		void SetMultiValue(TOKEN_IT &it);
 		void SetPort(TOKEN_IT &it);
 		void SetBodySize(TOKEN_IT &it);
+
+		std::string printvect(std::vector<std::string> vect)
+	{
+		std::vector<std::string>::iterator it = vect.begin();
+		std::string ret;
+		for(; it != vect.end(); it++){
+			ret += *it;
+			ret += "\t";
+		}
+		return ret;
+	}
+
+		void print(){
+			std::cout <<"------------------SERVER : " <<  serverName << "---------------" << std::endl;	
+			std::cout << "port				: " <<  port << std::endl;
+			std::cout << "host				: " <<	host << std::endl;
+			std::cout << "root				: "	<<	root<< std::endl;
+			std::cout << "defaultType			: "	<<	defaultType << std::endl;
+			std::cout << "accessLog			:	"	<<	accessLog << std::endl;
+			std::cout << "errorLog			: " <<	errorLog << std::endl;
+			std::cout << "index				:	"	<< printvect(index) << std::endl;
+			std::cout << "errorPages			:	"	<< printvect(errorPages) << std::endl;
+			
+		}
+
 		Server();
 		~Server();
 		Server(const Server &copy);

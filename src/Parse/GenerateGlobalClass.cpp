@@ -1,12 +1,19 @@
 #include "../../include/GenerateGlobalClass.hpp"
 
+		GenerateGlobalClass::GenerateGlobalClass(){}
+		GenerateGlobalClass::~GenerateGlobalClass(){}
+		GenerateGlobalClass::GenerateGlobalClass(const GenerateGlobalClass &copy){*this = copy;}
+		GenerateGlobalClass &GenerateGlobalClass::operator=(const GenerateGlobalClass &copy){return  *this;}
 
 
-Server *fillServer(TOKEN_IT &it){
+
+
+Server *GenerateGlobalClass::fillServer(TOKEN_IT &it){
 
 	Server *server = new Server();
 	while(it->first != CLOSE_S_BRACKET){
 		switch (it->first) {
+			case SERVER | OPEN_S_BRACKET : break;
 			case LOCATION				: break;
 			case PORT						: server->SetPort(it);				break;
 			case MAX_BODY_SIZE	: server->SetPort(it);				break;
@@ -14,23 +21,23 @@ Server *fillServer(TOKEN_IT &it){
 			case INDEX					: server->SetMultiValue(it);	break;
 			default							: server->SetSingleValue(it); break;
 		}
+		it++;
 	}
 	return server;
 } 
 
 
-Global *generateGlobalClass(std::vector<TOKEN> &tokens){
+Global *GenerateGlobalClass::generateGlobalClass(std::vector<TOKEN> tokens){
 	Global *global = new Global();
 
 	TOKEN_IT it;
-	TOKEN_PAIR pair;
 
 	for(it = tokens.begin(); it != tokens.end(); it++){
-		pair = *it;
-		if (pair.first == SERVER){
-			//NOTE : (fillServer) fill all attribute of the server and (addServer) add that server to Servers 
-			global->addServer(fillServer(it));
+		if (it->first == INCLUDE){
+			global->HandelMimeTypes(++it);
 		}
+		if (it->first == SERVER)
+			global->addServer(fillServer(++it));
 	}
 
 	return global;

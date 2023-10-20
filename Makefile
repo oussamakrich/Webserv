@@ -9,7 +9,7 @@ SRC =	./src/Global/Global.cpp \
 			./src/Token/Tokenizer.cpp
 
 
-HEADER =./include/GenerateGlobalClass.hpp\
+HEADER =./include/GenerateGlobalClass.hpp \
 				./include/GenerateLocation.hpp\
 				./include/Global.hpp\
 				./include/includes.hpp\
@@ -20,7 +20,7 @@ HEADER =./include/GenerateGlobalClass.hpp\
 
 OBJ = $(SRC:.cpp=.o)
 
-FLAGS = #-Wall -Wextra -Werror -std=c++98 -g
+FLAGS = -g#-Wall -Wextra -Werror -std=c++98 -g
 
 all:  $(NAME)
 

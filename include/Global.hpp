@@ -2,6 +2,8 @@
 
 #include "includes.hpp"
 #include "Server.hpp"
+#include <sstream>
+#include <string>
 
 class Global {
 	private:
@@ -9,7 +11,18 @@ class Global {
 		std::vector<Server *> servers;
 
 	public:
-		void addServer(Server *server);
+		void	addServer(Server *server);
+		void	HandelMimeTypes(TOKEN_IT &it);
+		void	openMimeFile(std::string Mimestr);
+		void	FillMimeType(std::stringstream &MimeStream);
+
+		void  print(){
+		std::vector<Server *>::iterator it = servers.begin();
+		for(;it != servers.end(); it++){
+			Server *ser = *it;		
+			ser->print();
+		}
+	};
 
 		Global();
 		~Global();

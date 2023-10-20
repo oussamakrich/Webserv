@@ -1,6 +1,9 @@
 #include "../include/includes.hpp"
 #include "../include/Tokenizer.hpp"
 #include "../include/GenerateGlobalClass.hpp"
+
+
+
 void printEnam(Token t)
 {
 	if (t == RETURN)
@@ -77,7 +80,10 @@ int main (int argc, char **argv)
 			printEnam(it->first);
 			std::cout << "\' Value: \'" << it->second << "\'" << std::endl;
 		}
+
 		// Global *WebServer = GenerateGlobalClass::generateGlobalClass(tokens);
+		// WebServer->print();
+
 		//WebServer.run();
 
 	}catch (std::exception &e) {

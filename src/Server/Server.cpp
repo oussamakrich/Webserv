@@ -36,7 +36,6 @@ void Server::SetSingleValue(TOKEN_IT &it){
 	else if (key == DEFAULT_TYPE)	defaultType = value;
 	else if (key == ACCESS_LOG)		accessLog = value;
 	else if (key == ERROR_LOG)		errorLog = value;
-	it++;
 }
 
 void Server::SetMultiValue(TOKEN_IT &it){
@@ -51,7 +50,6 @@ void Server::SetMultiValue(TOKEN_IT &it){
 	}
 	if (key == ERROR_PAGES)	errorPages = values;
 	else if (key == INDEX)	index = values;
-	it++;
 }
 
 void Server::SetPort(TOKEN_IT &it){
@@ -63,7 +61,6 @@ void Server::SetPort(TOKEN_IT &it){
 		it++;
 	}
 	port = prt;
-	it++;
 }
 
 void Server::SetBodySize(TOKEN_IT &it){
@@ -75,5 +72,4 @@ void Server::SetBodySize(TOKEN_IT &it){
 		it++;
 	}
 	port = size;
-	it++;
 }
