@@ -6,7 +6,8 @@ SRC =	./src/Global/Global.cpp \
 			./src/Parse/GenerateGlobalClass.cpp \
 			./src/Parse/GenerateLocation.cpp\
 			./src/Server/Server.cpp\
-			./src/Token/Tokenizer.cpp
+			./src/Token/Tokenizer.cpp\
+			./src/Utils/trim.cpp
 
 
 HEADER =./include/GenerateGlobalClass.hpp \

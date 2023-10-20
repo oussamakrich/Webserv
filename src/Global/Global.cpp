@@ -3,6 +3,8 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
+#include <string>
+#include <utility>
 
 Global::Global(){
 
@@ -39,13 +41,41 @@ void	Global::openMimeFile(std::string Mimestr){
 	if (!MimeFile.is_open())
 		throw std::runtime_error("Error: error in MimeType File");
 
-	MimeStream << MimeFile.rdbuf();
+	std::string line;
+	while (!MimeFile.eof())
+	{
+		std::getline(MimeFile, line);	
+		Otrim(line);
+		if (line.empty())
+			continue;
+		if (line.back() != ';')
+		{
+			MimeFile.close();
+			throw std::runtime_error("Error: in " + Mimestr + " evry line should end with ';'");
+		}
+		try{
+			this->FillMimeType(line);
+		}
+		catch (std::exception &e){
+			MimeFile.close();
+			std::cerr << e.what() << std::endl;
+			return;	
+		}
+	}
 	MimeFile.close();
-	
 }
 
-void	Global::FillMimeType(std::stringstream &MimeStream){
-		
+void	Global::FillMimeType(std::string line)
+{
+	std::stringstream FillStream(line);
+	std::string key, value;
+	
+	FillStream >> value;
+	FillStream >> key;
+	if (key.back() != ';')
+		throw std::runtime_error("Error : in MIMETYPE file accept only KEY VALUE;");
+	key.erase(key.size() - 1);
+	this->mime_types.insert(std::make_pair(key, value));
 }
 
 void Global::addServer(Server *server){
