@@ -39,17 +39,25 @@ class Server {
 
 		void print(){
 			std::cout <<"------------------SERVER : " <<  serverName << "---------------" << std::endl;	
-			std::cout << "port				: " <<  port << std::endl;
-			std::cout << "host				: " <<	host << std::endl;
-			std::cout << "root				: "	<<	root<< std::endl;
-			std::cout << "defaultType			: "	<<	defaultType << std::endl;
-			std::cout << "accessLog			:	"	<<	accessLog << std::endl;
-			std::cout << "errorLog			: " <<	errorLog << std::endl;
-			std::cout << "index				:	"	<< printvect(index) << std::endl;
-			std::cout << "errorPages			:	"	<< printvect(errorPages) << std::endl;
+			// std::cout << "port				: " <<  port << std::endl;
+			// std::cout << "host				: " <<	host << std::endl;
+			// std::cout << "root				: "	<<	root<< std::endl;
+			// std::cout << "defaultType			: "	<<	defaultType << std::endl;
+			// std::cout << "accessLog			:	"	<<	accessLog << std::endl;
+			// std::cout << "errorLog			: " <<	errorLog << std::endl;
+			// std::cout << "index				:	"	<< printvect(index) << std::endl;
+			// std::cout << "errorPages			:	"	<< printvect(errorPages) << std::endl;
+			std::cout << "mimeTypes				:" <<std::endl;
+			std::map<std::string, std::string>::iterator itt = mimeType.begin();
+
+			std::cout <<"-------------MIME TYPES---------" << std::endl;
+			for(;itt != mimeType.end(); itt++){
+				std::cout <<  itt->first << "	:	" << itt->second<< std::endl;
+		}
 			
 		}
 
+	public:
 		Server();
 		~Server();
 		Server(const Server &copy);

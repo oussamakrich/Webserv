@@ -74,15 +74,15 @@ int main (int argc, char **argv)
 
 		std::vector<TOKEN> tokens = Tokenizer::tokenGenerator(file);//
 
-		for (std::vector<TOKEN>::iterator it = tokens.begin(); it != tokens.end(); it++)
-		{
-			std::cout << "Token: \'";
-			printEnam(it->first);
-			std::cout << "\' Value: \'" << it->second << "\'" << std::endl;
-		}
+		// for (std::vector<TOKEN>::iterator it = tokens.begin(); it != tokens.end(); it++)
+		// {
+		// 	std::cout << "Token: \'";
+		// 	printEnam(it->first);
+		// 	std::cout << "\' Value: \'" << it->second << "\'" << std::endl;
+		// }
 
-		// Global *WebServer = GenerateGlobalClass::generateGlobalClass(tokens);
-		// WebServer->print();
+		Global *WebServer = GenerateGlobalClass::generateGlobalClass(tokens);
+		WebServer->print();
 
 		//WebServer.run();
 

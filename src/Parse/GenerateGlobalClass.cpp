@@ -15,7 +15,7 @@ Server *GenerateGlobalClass::fillServer(TOKEN_IT &it){
 		switch (it->first) {
 			case SERVER | OPEN_S_BRACKET : break;
 			case LOCATION				: break;
-			case TYPES					:			break;				
+			case TYPES					:	server->SetTypes(++it);		break;				
 			case PORT						: server->SetPort(it);				break;
 			case MAX_BODY_SIZE	: server->SetPort(it);				break;
 			case ERROR_PAGES		: server->SetMultiValue(it);	break;

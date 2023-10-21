@@ -181,8 +181,8 @@ std::vector<TOKEN> Tokenizer::tokenGenerator(std::ifstream &file)
 				tokens.push_back(TOKEN(holder2->second, word));
 				continue;
 			}
-			else if (tokens.back().first == SEMICOLON)
-				Tokenizer::fatalError(1, i, trim(line));
+			// else if (tokens.back().first == SEMICOLON)
+			// 	Tokenizer::fatalError(1, i, trim(line));
 			tokens.push_back(TOKEN(WORD, word));
 		}
 		i++;

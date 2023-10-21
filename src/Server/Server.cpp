@@ -1,6 +1,7 @@
 
 #include "../../include/Server.hpp"
 #include <cstdlib>
+#include <utility>
 
 	Server::Server(){}
 
@@ -17,6 +18,23 @@
 		// = copy. ;
 		// = copy. ;
 	return *this;
+}
+
+
+void Server::SetTypes(TOKEN_IT &it){
+	std::string value, key;
+
+	if (it->first == OPEN_C_BRACKET)
+		it++;
+	for(;it->first != CLOSE_C_BRACKET; it++){
+		value = it->second;
+		it++;
+		while(it->first != SEMICOLON){
+			key = it->second;	
+			mimeType.insert(std::make_pair(key, value));
+			it++;
+		}
+	}
 }
 
 void Server::SetSingleValue(TOKEN_IT &it){
@@ -73,3 +91,4 @@ void Server::SetBodySize(TOKEN_IT &it){
 	}
 	port = size;
 }
+
