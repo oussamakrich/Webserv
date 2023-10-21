@@ -14,6 +14,17 @@
 #define GREEN "\033[0;32m"
 #define RESET "\033[0m"
 
+
+typedef enum {
+	DIRECTIVE_SYNTAX_ERROR,
+	UNKNOWN_DIRECTIVE,
+	MISSING_SEMICOLON,
+	UNCLOSED_BRACKETS,
+	NESTED_BLOCKS_NOT_ALLOWED,
+	MISSING_URL_BLOCK,
+}Error;
+
+
 typedef enum {
 	RETURN,
 	LOCATION,
@@ -41,6 +52,7 @@ typedef enum {
 	COLON,
 	SPACE,
 	WORD,
+	QUOTES
 }Token;
 
 typedef struct {

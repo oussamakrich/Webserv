@@ -5,7 +5,6 @@
 #include "includes.hpp"
 #include "GenerateLocation.hpp"
 
-
 class GenerateGlobalClass {
 	private:
 
