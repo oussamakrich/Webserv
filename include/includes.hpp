@@ -18,8 +18,7 @@ typedef enum {
 	SERVER,
 	INCLUDE,
 	TYPES,
-	HOST,
-	PORT,
+	LISTEN,
 	ROOT,
 	SERVER_NAME,
 	INDEX,
@@ -42,6 +41,12 @@ typedef enum {
 	WORD,
 }Token;
 
+typedef struct {
+	Token		type;
+	std::string	value;
+	int			column;
+	unsigned int			row;
+}t_tokens;
 
 #define TOKEN std::pair<Token, std::string>
 #define TOKEN_PAIR std::pair<Token, std::string>
@@ -58,3 +63,6 @@ void Otrim(std::string &line);
 
 //INFO : JUST FOR PRINT
 void printtokens(TOKEN_VECT &tokens);
+// Printers: this section will be removed its for debugging purposes only.
+void printTokens(std::vector<TOKEN> tokens);
+void printEnam(Token t);

@@ -2,9 +2,6 @@
 #include "../include/Tokenizer.hpp"
 #include "../include/GenerateGlobalClass.hpp"
 
-
-
-
 int main (int argc, char **argv)
 {
 	if (argc != 2){
