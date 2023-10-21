@@ -4,9 +4,16 @@
 #include <string>
 
 class Server {
+
+	public:
+		Server();
+		~Server();
+		Server(const Server &copy);
+		Server &operator=(const Server &copy);
+
 	private:
-		short								port; // done.
-		int									clientMaxBodySize; // done.
+		int								port; // done.
+		int								clientMaxBodySize; // done.
 		std::string					host; // done.
 		std::string					root; // done.
 		std::string					serverName; // done.
@@ -22,59 +29,30 @@ class Server {
 	public:
 		void SetSingleValue(TOKEN_IT &it);
 		void SetMultiValue(TOKEN_IT &it);
-		void SetPort(TOKEN_IT &it);
-		void SetBodySize(TOKEN_IT &it);
+		void SetInt(TOKEN_IT &it);
 		void SetTypes(TOKEN_IT &it);
+		void SetHostAndPort(TOKEN_IT &it);
 
-		std::string printvect(std::vector<std::string> vect)
-	{
-		std::vector<std::string>::iterator it = vect.begin();
-		std::string ret;
-		for(; it != vect.end(); it++){
-			ret += *it;
-			ret += "\t";
-		}
-		return ret;
-	}
 
-		void print(){
-			std::cout <<"------------------SERVER : " <<  serverName << "---------------" << std::endl;	
-			// std::cout << "port				: " <<  port << std::endl;
-			// std::cout << "host				: " <<	host << std::endl;
-			// std::cout << "root				: "	<<	root<< std::endl;
-			// std::cout << "defaultType			: "	<<	defaultType << std::endl;
-			// std::cout << "accessLog			:	"	<<	accessLog << std::endl;
-			// std::cout << "errorLog			: " <<	errorLog << std::endl;
-			// std::cout << "index				:	"	<< printvect(index) << std::endl;
-			// std::cout << "errorPages			:	"	<< printvect(errorPages) << std::endl;
-			std::cout << "mimeTypes				:" <<std::endl;
-			std::map<std::string, std::string>::iterator itt = mimeType.begin();
-
-			std::cout <<"-------------MIME TYPES---------" << std::endl;
-			for(;itt != mimeType.end(); itt++){
-				std::cout <<  itt->first << "	:	" << itt->second<< std::endl;
-		}
-			
-		}
+	//FIX : Just for print 
+		void print();
 
 	public:
-		Server();
-		~Server();
-		Server(const Server &copy);
-		Server &operator=(const Server &copy);
+		int			getPort() const;
+		int			getClientMaxBodySize() const;
+		std::string getErrorLog() const;
+		std::string	getHost() const;
+		std::string	getServerName() const;
+		std::string getRoot() const;
+		std::vector<std::string> getIndex() const;
+		std::vector<std::string> getErrorPages() const;
+		std::string getDefaultType() const;
+		std::string getAccessLog() const;
+
+
 };
 
 
 
 	// public:		// Getters:
-	// 	short		getPort() const;
-	// 	std::string getErrorLog() const;
-	// 	std::string	getHost() const;
-	// 	std::string	getServerName() const;
-	// 	std::string getRoot() const;
-	// 	std::vector<std::string> getIndex() const;
-	// 	int			getClientMaxBodySize() const;
-	// 	std::vector<std::string> getErrorPages() const;
-	// 	std::string getDefaultType() const;
-	// 	std::string getAccessLog() const;
 	// 	Location const &getLocation(std::string const &url) const;

@@ -13,14 +13,19 @@ Server *GenerateGlobalClass::fillServer(TOKEN_IT &it){
 	Server *server = new Server();
 	while(it->first != CLOSE_S_BRACKET){
 		switch (it->first) {
-			case SERVER | OPEN_S_BRACKET : break;
 			case LOCATION				: break;
 			case TYPES					:	server->SetTypes(++it);		break;				
-			case PORT						: server->SetPort(it);				break;
-			case MAX_BODY_SIZE	: server->SetPort(it);				break;
+			case PORT						: server->SetInt(it);				break;
+			case MAX_BODY_SIZE	: server->SetInt(it);				break;
 			case ERROR_PAGES		: server->SetMultiValue(it);	break;
 			case INDEX					: server->SetMultiValue(it);	break;
-			default							: server->SetSingleValue(it); break;
+			case HOST						: server->SetSingleValue(it); break;
+			case ROOT						: server->SetSingleValue(it); break;
+			case SERVER_NAME		: server->SetSingleValue(it); break;
+			case DEFAULT_TYPE		: server->SetSingleValue(it); break;
+			case ERROR_LOG			: server->SetSingleValue(it); break;
+			case ACCESS_LOG			: server->SetSingleValue(it); break;
+			default							: break;
 		}
 		it++;
 	}
