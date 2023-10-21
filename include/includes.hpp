@@ -7,6 +7,7 @@
 #include <fstream>
 #include <vector>
 
+
 #define TOKEN std::pair<Token, std::string>
 
 #define RED "\033[0;31m"
@@ -19,8 +20,7 @@ typedef enum {
 	SERVER,
 	INCLUDE,
 	TYPES,
-	HOST,
-	PORT,
+	LISTEN,
 	ROOT,
 	SERVER_NAME,
 	INDEX,
@@ -33,7 +33,6 @@ typedef enum {
 	REWRITE,
 	AUTO_INDEX,
 	ALLOWED_METHOD,
-
 	OPEN_S_BRACKET,
 	CLOSE_S_BRACKET,
 	OPEN_C_BRACKET,
@@ -44,5 +43,17 @@ typedef enum {
 	WORD,
 }Token;
 
+typedef struct {
+	Token		type;
+	std::string	value;
+	int			column;
+	unsigned int			row;
+}t_tokens;
 
 #define CONFIG_GUID "Configuration file is written in the following format:\ninclude path/to/mime.types;\nserver [\n 	location {\n 		...\n 	};\n]\n\nserver [\n 	...\n]\n\nserver [\n 	...\n]\n\n\n--------------------------------------\n* include: is used to include a mime.types file its optional.\n* server: is used to define a server block.\n* location: is used to define a location block.\n* types: is used to define a types block.\n* port: is used to define a port to listen on.\n* root: is used to define a root directory.\n* server_name: is used to define a server name.\n* index: is used to define a index file.\n* max_body_size: is used to define a max body size.\n* error_pages: is used to define a error pages in this formal: error_page 404 [error code] /*.html;\n	all error codes will be redirected to the specified html file and the '*' will be replaced by a number.\n* default_type: is used to define a default type."
+
+
+
+// Printers: this section will be removed its for debugging purposes only.
+void printTokens(std::vector<TOKEN> tokens);
+void printEnam(Token t);

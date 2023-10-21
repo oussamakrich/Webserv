@@ -1,17 +1,20 @@
 #include "../../include/Tokenizer.hpp"
+#include <cctype>
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
+#include <iterator>
 #include <ostream>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 std::vector<std::string> Tokenizer::allowedMethods = std::vector<std::string>();
 std::map<std::string, Token> Tokenizer::SpecialWords = std::map<std::string, Token>();
 std::map<std::string, Token> Tokenizer::SpecialSymbols = std::map<std::string, Token>();
-std::stack<Token> Tokenizer::curlyBrackets = std::stack<Token>();
-std::stack<Token> Tokenizer::squareBrackets = std::stack<Token>();
+std::stack<std::pair<Token, int> > curlyBrackets = std::stack<std::pair<Token, int> >();
+std::stack<std::pair<Token, int> > squareBrackets  = std::stack<std::pair<Token, int> >();
 
 bool Tokenizer::serverFound = false;
 
@@ -55,8 +58,7 @@ void Tokenizer::generateTokenMap(void)
 	SpecialWords["server"] = SERVER;
 	SpecialWords["include"] = INCLUDE;
 	SpecialWords["types"] = TYPES;
-	SpecialWords["host"] = HOST;
-	SpecialWords["port"] = PORT;
+	SpecialWords["listen"] = LISTEN;
 	SpecialWords["root"] = ROOT;
 	SpecialWords["server_name"] = SERVER_NAME;
 	SpecialWords["index"] = INDEX;
@@ -77,116 +79,111 @@ void Tokenizer::generateTokenMap(void)
 
 }
 
-void Tokenizer::fatalError(int error, int line, std::string str)
-{
-	if (error == 1)
-	{
-		std::cout << RED"Error:\n" <<  RESET"Line " << line << ": Unexpected token \'" << trim(str) << ".\'\n";
-		std::cout << GREEN"                          ^\n";
-		std::cout << RESET;
-	}
-	else if (error == 2)
-	{
-		std::cout << RED"Error:\n" <<  RESET"Line " << line << ": Unclosed server block." << "\n";
-		std::cout << RESET;
-	}
-	else if (error == 3)
-	{
-		std::cout << RED"Error:\n" <<  RESET"Line " << line << ": Unclosed directive: " << str << " 'missing semicolon'" << RED" ;" << RESET"\n";
-		std::cout << GREEN"                             ^\n";
-		std::cout << RESET;
-	}
-	else if (error == 4)
-	{
-		std::cout << RED"Error:\n" <<  RESET"Line " << line << ": Unclosed Bracket '{' \'" << trim(str) << ".\'\n";
-		std::cout << GREEN"                          ^\n";
-		std::cout << RESET;
-	}
-	std::cout << "See fatal.log for more details.\n";
-	std::ofstream fatal("fatal.log");
-	if (fatal.is_open() == true)
-	{
-		fatal << CONFIG_GUID;
-		fatal.close();
-	}
-	exit(1);
-}
+// void Tokenizer::tokenizeSpecialSymbols(std::string &line, int lineNumber, int index)
+// {
 
+// }
 
 std::vector<TOKEN> Tokenizer::tokenGenerator(std::ifstream &file)
 {
-	std::vector<TOKEN> tokens;
-	std::stringstream ss;
-	std::string line;
-	std::string word;
-	std::map<std::string,Token>::iterator holder;
-	std::map<std::string, Token>::iterator holder2; //
-
-	generateTokenMap();
-	int i = 1;
+	std::vector<t_tokens>	tokens;
+	int					lineNumber = 0;
+	std::string			line;
+	std::vector<TOKEN> 	tokenizedFile;
+	Tokenizer::generateTokenMap();
 	while (std::getline(file, line))
 	{
-		ss.clear();
-		ss.str(line);
-		while (ss>>word)
+		for (unsigned int i = 0; i < line.length(); i++)
 		{
-			word = trim(word);
-			holder = SpecialWords.find(word);
-			holder2 = SpecialSymbols.find(word);
-			if (holder != SpecialWords.end())
+			if (std::isspace(line[i]))
+				tokens.push_back((t_tokens){SPACE, " ", lineNumber, i});
+			else if (line[i] == '[')
+				tokens.push_back((t_tokens){OPEN_S_BRACKET, "[", lineNumber, i});
+			else if (line[i] == ']')
+				tokens.push_back((t_tokens){CLOSE_S_BRACKET, "]", lineNumber, i});
+			else if (line[i] == '{')
+				tokens.push_back((t_tokens){OPEN_C_BRACKET, "{", lineNumber, i});
+			else if (line[i] == '}')
+				tokens.push_back((t_tokens){CLOSE_C_BRACKET, "}", lineNumber, i});
+			else if (line[i] == ';')
+				tokens.push_back((t_tokens){SEMICOLON, ";", lineNumber, i});
+			else if (line[i] == '\"')
 			{
-				if (serverFound)
-					Tokenizer::fatalError(2, i, "");
-				if (holder->second == SERVER)
-					serverFound = true;
-				if (!tokens.empty() && tokens.back().first != SEMICOLON && tokens.back().first != OPEN_C_BRACKET && tokens.back().first != CLOSE_C_BRACKET && tokens.back().first != OPEN_S_BRACKET && tokens.back().first != CLOSE_S_BRACKET)
-					Tokenizer::fatalError(3, i - 1, trim(tokens.back().second));
-				tokens.push_back(TOKEN(holder->second, word));
-				continue;
+				if (line.find('\"', i+1) == std::string::npos)
+				{
+					std::cout << "Unclosed double Quotes:" << lineNumber << ":" << i;
+					exit(1);
+				}
+				tokens.push_back((t_tokens){
+					WORD,
+					line.substr(i+1, ((line.find('\"', i + 1) - i) - 1)),
+					lineNumber,
+					i,
+					 });
+				i += tokens.back().value.length() + 1;
+				if (tokens.back().value.length() == 0)
+				{
+					std::cout << "Empty double Quotes:" << lineNumber << ":" << i;
+					exit(1);
+				}
 			}
-			else if (word[word.length() - 1] == ';')
+			else if (line[i] == '\'')
 			{
-				word = word.substr(0, word.length() - 1);
-				tokens.push_back(TOKEN(WORD, word));
-				tokens.push_back(TOKEN(SEMICOLON, ";"));
-				continue;
+				if (line.find('\'', i+1) == std::string::npos)
+				{
+					std::cout << "Unclosed single Quotes:" << lineNumber << ":" << i;
+					exit(1);
+				}
+				tokens.push_back((t_tokens){
+					WORD,
+					line.substr(i+1, ((line.find('\'', i + 1) - i) - 1)),
+					lineNumber,
+					i,
+					 });
+				i += tokens.back().value.length() + 1;
+				i += tokens.back().value.length() + 1;
+				if (tokens.back().value.length() == 0)
+				{
+					std::cout << "Empty single Quotes:" << lineNumber << ":" << i;
+					exit(1);
+				}
 			}
-			else if (holder2 != SpecialSymbols.end())
+			else
 			{
-				if (holder2->second == OPEN_S_BRACKET)
-				{
-					if (squareBrackets.empty() == false && squareBrackets.top() == OPEN_S_BRACKET)
-						Tokenizer::fatalError(4, i, trim(line));
-					squareBrackets.push(OPEN_S_BRACKET);
-					serverFound = false;
-				}
-				else if (holder2->second == CLOSE_S_BRACKET)
-				{
-					if (!squareBrackets.empty() && squareBrackets.top() != OPEN_S_BRACKET)
-						Tokenizer::fatalError(4, i, trim(line));
-					squareBrackets.pop();
-				}
-				else if (holder2->second == OPEN_C_BRACKET)
-				{
-					if (!curlyBrackets.empty() && curlyBrackets.top() == OPEN_C_BRACKET)
-						Tokenizer::fatalError(4, i, trim(line));
-					curlyBrackets.push(OPEN_C_BRACKET);
-				}
-				else if (holder2->second == CLOSE_C_BRACKET)
-				{
-					if (curlyBrackets.empty() || curlyBrackets.top() != OPEN_C_BRACKET)
-						Tokenizer::fatalError(1, i, trim(line));
-					curlyBrackets.pop();
-				}
-				tokens.push_back(TOKEN(holder2->second, word));
-				continue;
-			}
-			else if (tokens.back().first == SEMICOLON)
-				Tokenizer::fatalError(1, i, trim(line));
-			tokens.push_back(TOKEN(WORD, word));
-		}
-		i++;
-	}
+				unsigned int len = i;
+				while (len < line.length() && Tokenizer::is_not_of(line[len], " \t\r;{}[]"))
+					len++;
+				tokens.push_back((t_tokens){
+					WORD,
+					line.substr(i, (len - i)),
+					lineNumber,
+					i
+				});
 
-	return tokens;
+				i += (len - i) - 1;
+
+			}
+		}
+		lineNumber++;
+	}
+	for (unsigned int i = 0; i < tokens.size(); i++)
+	{
+		if (tokens[i].type == WORD)
+		{
+			if (SpecialWords.find(tokens[i].value) != SpecialWords.end())
+				tokens[i].type = SpecialWords[tokens[i].value];
+		}
+		if (tokens[i].type != SPACE)
+		{
+			tokenizedFile.push_back(std::make_pair(tokens[i].type, tokens[i].value));
+		}
+	}
+	return tokenizedFile;
+}
+
+bool Tokenizer::is_not_of(char c, std::string str)
+{
+	if (str.find(c) == std::string::npos)
+		return true;
+	return false;
 }
