@@ -3,7 +3,7 @@
 		GenerateGlobalClass::GenerateGlobalClass(){}
 		GenerateGlobalClass::~GenerateGlobalClass(){}
 		GenerateGlobalClass::GenerateGlobalClass(const GenerateGlobalClass &copy){*this = copy;}
-		GenerateGlobalClass &GenerateGlobalClass::operator=(const GenerateGlobalClass &copy){return  *this;}
+		GenerateGlobalClass &GenerateGlobalClass::operator=(const GenerateGlobalClass &copy){ (void)copy; return  *this;}
 
 
 

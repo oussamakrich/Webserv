@@ -55,7 +55,6 @@ void Server::SetSingleValue(TOKEN_IT &it){
 
 	std::string value, keyWord;
 	Token				key = it->first;
-	int			multi = 0;
 
 	keyWord = it->second;
 	it++;

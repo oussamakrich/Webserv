@@ -17,9 +17,9 @@ int main (int argc, char **argv)
 
 		// printTokens(tokens);
 		
-		Global *WebServer = GenerateGlobalClass::generateGlobalClass(tokens);
-
-		WebServer->print();
+		// Global *WebServer = GenerateGlobalClass::generateGlobalClass(tokens);
+		//
+		// WebServer->print();
 
 		//WebServer.run();
 
