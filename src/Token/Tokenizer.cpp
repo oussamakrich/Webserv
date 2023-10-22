@@ -128,16 +128,18 @@ void Tokenizer::BlockHandler(std::vector<TOKEN> &tokenizedFile, std::vector<t_to
 	bool isLocation = (i->type == LOCATION);
 
 	std::vector<t_tokens>::iterator type = i;
-	i++;
-	while (i != tokens.end() && i->type == SPACE && isLocation) i++;
+	i++;//}
+	while (i != tokens.end() && i->type == SPACE) i++;
 	if ((i == tokens.end() || i->type != WORD) && isLocation)
 		Tokenizer::fatalError(MISSING_URL_BLOCK, type);
 	tokenizedFile.push_back(std::make_pair(i->type, i->value));
 	if (isLocation) i++;
+
 	while (i != tokens.end() && i->type == SPACE) i++;
 	if (i == tokens.end() || i->type != OPEN_C_BRACKET)
 		Tokenizer::fatalError(UNCLOSED_BRACKETS, type);
-	tokenizedFile.push_back(std::make_pair(i->type, i->value));
+	if (isLocation && i->type == OPEN_C_BRACKET)
+		tokenizedFile.push_back(std::make_pair(i->type, i->value));
 	i++;
 	while (i != tokens.end() && i->type != CLOSE_C_BRACKET)
 	{
