@@ -1,6 +1,5 @@
 NAME = webserver
 
-<<<<<<< HEAD
 SRC =	./src/Global/Global.cpp \
 			./src/Location/Location.cpp \
 			./src/main.cpp \
@@ -9,7 +8,7 @@ SRC =	./src/Global/Global.cpp \
 			./src/Server/Server.cpp\
 			./src/Token/Tokenizer.cpp\
 			./src/Utils/trim.cpp\
-			./print/printtoken.cpp
+			./src//Print/printTokens.cpp 
 
 
 HEADER =./include/GenerateGlobalClass.hpp \
@@ -19,35 +18,11 @@ HEADER =./include/GenerateGlobalClass.hpp \
 				./include/Location.hpp\
 				./include/Server.hpp\
 				./include/Tokenizer.hpp
-=======
-SRC =	src/main.cpp \
-		src/Token/Tokenizer.cpp \
-		src/Print/printTokens.cpp \
-
-
-
-
-
-
-
-HEADER =	include/includes.hpp \
-			include/Tokenizer.hpp \
-
-
-
-
-
-
->>>>>>> origin/moulmoudTokenizer
 
 
 OBJ = $(SRC:.cpp=.o)
 
-<<<<<<< HEAD
 FLAGS = -g#-Wall -Wextra -Werror -std=c++98 -g
-=======
-FLAGS = -Wall -Wextra -Werror -std=c++98
->>>>>>> origin/moulmoudTokenizer
 
 all:  $(NAME)
 

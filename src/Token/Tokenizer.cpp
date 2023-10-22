@@ -97,10 +97,10 @@ std::vector<TOKEN> Tokenizer::tokenGenerator(std::ifstream &file)
 		{
 			if (std::isspace(line[i]))
 				tokens.push_back((t_tokens){SPACE, " ", lineNumber, i});
-			else if (line[i] == '[')
-				tokens.push_back((t_tokens){OPEN_S_BRACKET, "[", lineNumber, i});
-			else if (line[i] == ']')
-				tokens.push_back((t_tokens){CLOSE_S_BRACKET, "]", lineNumber, i});
+			// else if (line[i] == '[')
+			// 	tokens.push_back((t_tokens){OPEN_S_BRACKET, "[", lineNumber, i});
+			// else if (line[i] == ']')
+			// 	tokens.push_back((t_tokens){CLOSE_S_BRACKET, "]", lineNumber, i});
 			else if (line[i] == '{')
 				tokens.push_back((t_tokens){OPEN_C_BRACKET, "{", lineNumber, i});
 			else if (line[i] == '}')
@@ -151,7 +151,7 @@ std::vector<TOKEN> Tokenizer::tokenGenerator(std::ifstream &file)
 			else
 			{
 				unsigned int len = i;
-				while (len < line.length() && Tokenizer::is_not_of(line[len], " \t\r;{}[]"))
+				while (len < line.length() && Tokenizer::is_not_of(line[len], " \t\r;{}"))
 					len++;
 				tokens.push_back((t_tokens){
 					WORD,

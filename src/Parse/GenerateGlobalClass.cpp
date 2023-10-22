@@ -11,24 +11,28 @@
 Server *GenerateGlobalClass::fillServer(TOKEN_IT &it){
 
 	Server *server = new Server();
-	while(it->first != CLOSE_S_BRACKET){
+	while(it->first != CLOSE_C_BRACKET){
 		switch (it->first) {
 			case LOCATION				: break;
-			case TYPES					:	server->SetTypes(++it);		break;				
-			case PORT						: server->SetInt(it);				break;
-			case MAX_BODY_SIZE	: server->SetInt(it);				break;
+			case TYPES					:	server->SetTypes(++it);			break;				
+			case MAX_BODY_SIZE	: server->SetInt(it);					break;
 			case ERROR_PAGES		: server->SetMultiValue(it);	break;
 			case INDEX					: server->SetMultiValue(it);	break;
-			case HOST						: server->SetSingleValue(it); break;
 			case ROOT						: server->SetSingleValue(it); break;
+			case LISTEN					: server->SetHostAndPort(++it); break;
 			case SERVER_NAME		: server->SetSingleValue(it); break;
 			case DEFAULT_TYPE		: server->SetSingleValue(it); break;
 			case ERROR_LOG			: server->SetSingleValue(it); break;
 			case ACCESS_LOG			: server->SetSingleValue(it); break;
-			default							: break;
+			case OPEN_C_BRACKET :	break;													
+			case COLON					:	break;													
+			case SEMICOLON			:	break;													
+			default							: error("Error: Unexpected key : " + it->second);
 		}
 		it++;
 	}
+	if (server->getRoot().empty())
+		error("Error : root is required");
 	return server;
 } 
 

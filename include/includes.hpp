@@ -59,10 +59,8 @@ typedef struct {
 
 
 void Otrim(std::string &line);
+void error(std::string error);
 
-
-//INFO : JUST FOR PRINT
-void printtokens(TOKEN_VECT &tokens);
 // Printers: this section will be removed its for debugging purposes only.
 void printTokens(std::vector<TOKEN> tokens);
 void printEnam(Token t);

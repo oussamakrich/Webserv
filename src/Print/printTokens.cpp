@@ -1,4 +1,6 @@
 #include "../../include/includes.hpp"
+#include "../../include/Server.hpp"
+#include <iostream>
 
 void printEnam(Token t)
 {
@@ -70,4 +72,35 @@ void printTokens(std::vector<TOKEN> tokens)
 			std::cout << RESET;
 			std::cout  << it->second  << std::endl;
 		}
+}
+
+void printvect(std::vector<std::string> vect){
+std::vector<std::string>::iterator it = vect.begin();
+	for(;it != vect.end(); it++){
+		std::cout << *it;
+		std::cout << "  ";
+	}
+	std::cout <<std::endl;
+}
+void printmap(std::map<std::string, std::string> vect){
+std::map<std::string,std::string >::iterator it = vect.begin();
+	for(;it != vect.end(); it++){
+			std::cout <<  it->first << "	:	" << it->second<< std::endl;
+	}
+	std::cout << "++++++++++++++++++++++++++++++++++++" <<std::endl;
+
+}
+
+void Server::print(){
+	std::cout << "\n--------	serverName	  " << serverName << std::endl;
+	std::cout << "port			: " << port << std::endl;
+	std::cout << "host			: " << host << std::endl;
+	std::cout << "body			: " << clientMaxBodySize << std::endl;
+	std::cout << "root			: " << root << std::endl;
+	std::cout << "index			: "; printvect(index);
+	std::cout << "errorpage		: "; printvect(errorPages);
+	std::cout << "deflttype		: " << defaultType << std::endl;
+	std::cout << "accesslog		: " << accessLog << std::endl;
+	std::cout << "errorLog		: " << errorLog << std::endl;
+	std::cout << "----mimetype				:" << std::endl; printmap(mimeType);
 }

@@ -33,9 +33,13 @@ class Server {
 		void SetTypes(TOKEN_IT &it);
 		void SetHostAndPort(TOKEN_IT &it);
 
+		void print();
+	private:
+		void parseListen(std::string line); 
+		void handelOne(std::string line);
+		void hostV6(std::string line);
 
 	//FIX : Just for print 
-		void print();
 
 	public:
 		int			getPort() const;
