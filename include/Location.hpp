@@ -1,5 +1,4 @@
-#ifndef __LOCATION_H__
-#define __LOCATION_H__
+#pragma once 
 #include "includes.hpp"
 #include <vector>
 #include <string>
@@ -56,5 +55,3 @@ public :
 		bool isAutoIndex()							const;
 		
 };
-
-#endif

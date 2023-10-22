@@ -1,7 +1,6 @@
 NAME = webserver
 
 SRC =	src/main.cpp \
-		src/config/GenerateServers.cpp \
 		src/config/ParseConfig.cpp \
 		src/config/TokenConfig.cpp \
 		src/server/Server.cpp \
@@ -18,7 +17,6 @@ HEADER =	include/includes.hpp \
 			include/Logger.hpp \
 			include/Location.hpp \
 			include/Request.hpp \
-
 
 OBJ = $(SRC:.cpp=.o)
 
