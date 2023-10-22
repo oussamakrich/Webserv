@@ -64,7 +64,7 @@ void Server::SetSingleValue(TOKEN_IT &it){
 	value = it->second;
 	it++;
 	if (it->first != SEMICOLON)
-		error("Error: " + keyWord +" Accept onlyone Value");
+		error("Error: " + keyWord +" Accept only one Value");
 	if (key == SERVER_NAME)				serverName = value;
 	else if (key == DEFAULT_TYPE)	defaultType = value;
 	else if (key == ACCESS_LOG)		accessLog = value;

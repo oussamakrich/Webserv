@@ -16,20 +16,7 @@ class Global {
 		void	openMimeFile(std::string Mimestr);
 		void	FillMimeType(std::string line);
 
-		void  print(){
-		std::vector<Server *>::iterator it = servers.begin();
-		std::map<std::string, std::string>::iterator itt = mime_types.begin();
-
-		std::cout <<"-------------MIME TYPES---------" << std::endl;
-		for(;itt != mime_types.end(); itt++){
-			std::cout <<  itt->first << "	:	" << itt->second<< std::endl;
-		}
-
-		for(;it != servers.end(); it++){
-			Server *ser = *it;
-			ser->print();
-		}
-	};
+		void  print();
 
 		Global();
 		~Global();

@@ -1,5 +1,6 @@
 #include "../../include/includes.hpp"
 #include "../../include/Server.hpp"
+#include "../../include/Global.hpp"
 #include <iostream>
 
 void printEnam(Token t)
@@ -104,3 +105,19 @@ void Server::print(){
 	std::cout << "errorLog		: " << errorLog << std::endl;
 	std::cout << "----mimetype				:" << std::endl; printmap(mimeType);
 }
+
+
+void  Global::print(){
+		std::vector<Server *>::iterator it = servers.begin();
+		std::map<std::string, std::string>::iterator itt = mime_types.begin();
+
+		std::cout <<"-------------MIME TYPES---------" << std::endl;
+		for(;itt != mime_types.end(); itt++){
+			std::cout <<  itt->first << "	:	" << itt->second<< std::endl;
+		}
+
+		for(;it != servers.end(); it++){
+			Server *ser = *it;
+			ser->print();
+		}
+};
