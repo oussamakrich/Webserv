@@ -1,26 +1,27 @@
 NAME = webserver
 
 SRC =	src/main.cpp \
-		src/config/ParseConfig.cpp \
-		src/config/TokenConfig.cpp \
-		src/server/Server.cpp \
-		src/utils/trim.cpp \
-		src/serverlog/Logger.cpp \
-		src/Location/Location.cpp \
-		src/Request/Request.cpp \
+		src/Token/Tokenizer.cpp \
+		src/Print/printTokens.cpp \
+
+
+
+
+
+
 
 HEADER =	include/includes.hpp \
-			include/GenerateServers.hpp \
-			include/ParseConfig.hpp \
-			include/Server.hpp \
-			include/TokenConfig.hpp \
-			include/Logger.hpp \
-			include/Location.hpp \
-			include/Request.hpp \
+			include/Tokenizer.hpp \
+
+
+
+
+
+
 
 OBJ = $(SRC:.cpp=.o)
 
-FLAGS = -Wall -Wextra -Werror -std=c++98 -g
+FLAGS = -Wall -Wextra -Werror -std=c++98
 
 all:  $(NAME)
 

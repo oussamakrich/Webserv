@@ -1,0 +1,30 @@
+Configuration file is written in the following format:
+include path/to/mime.types;
+server [
+ 	location {
+ 		...
+ 	};
+]
+
+server [
+ 	...
+]
+
+server [
+ 	...
+]
+
+
+--------------------------------------
+* include: is used to include a mime.types file its optional.
+* server: is used to define a server block.
+* location: is used to define a location block.
+* types: is used to define a types block.
+* port: is used to define a port to listen on.
+* root: is used to define a root directory.
+* server_name: is used to define a server name.
+* index: is used to define a index file.
+* max_body_size: is used to define a max body size.
+* error_pages: is used to define a error pages in this formal: error_page 404 [error code] /*.html;
+	all error codes will be redirected to the specified html file and the '*' will be replaced by a number.
+* default_type: is used to define a default type.

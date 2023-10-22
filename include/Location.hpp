@@ -5,8 +5,6 @@
 using namespace std;
 class Location {
 
-
-	
 private:
 	template<class container, class value>	bool Add(container c, value v); 
 	vector <string>  						Allowed_Method;			

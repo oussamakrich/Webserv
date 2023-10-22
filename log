@@ -1,0 +1,124 @@
+INCLUDE: include
+SPACE:  
+WORD: mime.types
+SEMICOLON: ;
+ERROR_LOG: error_log
+SPACE:  
+WORD: /var/log/nginx/example.com/error.log
+SEMICOLON: ;
+ERROR_PAGES: error_page
+SPACE:  
+WORD: 404
+SPACE:  
+WORD: 500
+SPACE:  
+WORD: 502
+SPACE:  
+WORD: 503
+SPACE:  
+WORD: 504
+SPACE:  
+WORD: /error/@.html
+SEMICOLON: ;
+SERVER: server
+SPACE:  
+OPEN_S_BRACKET: [
+SPACE:  
+TYPES: types
+SPACE:  
+OPEN_C_BRACKET: {
+WORD: text/html
+SPACE:  
+WORD: html
+SPACE:  
+WORD: htm
+SPACE:  
+WORD: shtml
+SEMICOLON: ;
+CLOSE_C_BRACKET: }
+SPACE:  
+LISTEN: listen
+SPACE:  
+WORD: www.example.com:80
+SEMICOLON: ;
+SPACE:  
+SERVER_NAME: server_name
+SPACE:  
+WORD: example.com
+SEMICOLON: ;
+SPACE:  
+DEFAULT_TYPE: default_type
+SPACE:  
+WORD: application/octet-stream
+SEMICOLON: ;
+SPACE:  
+ROOT: root
+SPACE:  
+WORD: /
+SEMICOLON: ;
+SPACE:  
+INDEX: index
+SPACE:  
+WORD: index.html
+SEMICOLON: ;
+SPACE:  
+LOCATION: location
+SPACE:  
+WORD: /restricted
+SPACE:  
+OPEN_C_BRACKET: {
+SPACE:  
+SPACE:  
+WORD: limit_except:
+SPACE:  
+WORD: GET
+SPACE:  
+WORD: POST
+SEMICOLON: ;
+SPACE:  
+SPACE:  
+INDEX: index
+SPACE:  
+WORD: index.html
+SEMICOLON: ;
+SPACE:  
+SPACE:  
+ROOT: root
+SPACE:  
+WORD: /tmp/www
+SEMICOLON: ;
+SPACE:  
+SPACE:  
+AUTO_INDEX: autoindex
+SPACE:  
+WORD: on
+SEMICOLON: ;
+SPACE:  
+CLOSE_C_BRACKET: }
+SPACE:  
+LOCATION: location
+SPACE:  
+WORD: /tmp
+SPACE:  
+OPEN_C_BRACKET: {
+SPACE:  
+SPACE:  
+RETURN: return
+SPACE:  
+WORD: 301
+SPACE:  
+WORD: http://ex        ample.com
+SEMICOLON: ;
+SPACE:  
+CLOSE_C_BRACKET: }
+SPACE:  
+MAX_BODY_SIZE: max_body_size
+SPACE:  
+WORD: 10000mb
+SEMICOLON: ;
+SPACE:  
+ACCESS_LOG: access_log
+SPACE:  
+WORD: /var/log/nginx/example.com/access.log
+SEMICOLON: ;
+CLOSE_S_BRACKET: ]
