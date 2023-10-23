@@ -1,7 +1,7 @@
 #pragma once
 
 #include "includes.hpp"
-#include <string>
+#include "Location.hpp"
 
 class Server {
 
@@ -23,10 +23,11 @@ class Server {
 		std::string 				accessLog; // done.
 		std::string 				errorLog; // done.
 		std::map<std::string, std::string> mimeType;
-		// std::map<std::string, Location *>		locations; // done.
+		std::map<std::string, Location*>		locations; // done.
 
 
 	public:
+		void fillLocation(TOKEN_IT &it);
 		void SetSingleValue(TOKEN_IT &it);
 		void SetMultiValue(TOKEN_IT &it);
 		void SetInt(TOKEN_IT &it);

@@ -1,7 +1,6 @@
 
 #include "../../include/Server.hpp"
-#include <climits>
-#include <cstdlib>
+#include "../../include/GenerateLocation.hpp"
 
 void error(std::string error){
 	std::cerr << error << std::endl;
@@ -34,6 +33,12 @@ void error(std::string error){
 	return *this;
 }
 
+void Server::fillLocation(TOKEN_IT &it){
+
+	Location *location =	GenerateLocation::generateLocation(it);
+	std::string uri = location->getUri();
+	this->locations.insert(std::make_pair(uri, location));
+}
 
 void Server::SetTypes(TOKEN_IT &it){
 	std::string value, key;
