@@ -1,6 +1,7 @@
 #include "../../include/includes.hpp"
 #include "../../include/Server.hpp"
 #include "../../include/Global.hpp"
+#include <map>
 
 void printEnam(Token t)
 {
@@ -110,6 +111,16 @@ void Server::print(){
 	std::cout << "| errorLog		: " << errorLog << std::endl;
 	std::cout << "|----------------errorpage---------------" <<std::endl; printPages(errorPages);
 	std::cout << "|----------------mimetype----------------" << std::endl; printmap(mimeType);
+	std::cout << "|----------------location----------------" << std::endl;
+	std::map<std::string,Location*>::iterator it = locations.begin();
+	
+	for(;it != locations.end(); it++){
+			std::cout << "|\t URL : "  << it->first << std::endl;
+			it->second->printLocation(); 
+			std::cout << "|"<< std::endl;
+	}
+	std::cout << "++++++++++++++++++++++++++++++++++++" <<std::endl;
+
 }
 
 
