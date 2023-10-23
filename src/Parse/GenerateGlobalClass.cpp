@@ -43,9 +43,6 @@ Global *GenerateGlobalClass::generateGlobalClass(std::vector<TOKEN> tokens){
 	TOKEN_IT it;
 
 	for(it = tokens.begin(); it != tokens.end(); it++){
-		// if (it->first == INCLUDE){
-		// 	global->HandelMimeTypes(++it);
-		// }
 		if (it->first == SERVER)
 			global->addServer(fillServer(++it));
 	}
