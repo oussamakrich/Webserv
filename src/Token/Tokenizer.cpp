@@ -1,15 +1,4 @@
 #include "../../include/Tokenizer.hpp"
-#include <_types/_intmax_t.h>
-#include <cctype>
-#include <cstdlib>
-#include <filesystem>
-#include <fstream>
-#include <iterator>
-#include <ostream>
-#include <sstream>
-#include <string>
-#include <utility>
-#include <vector>
 
 std::map<std::string, Token> Tokenizer::SpecialWords = std::map<std::string, Token>();
 std::map<std::string, Token> Tokenizer::SpecialSymbols = std::map<std::string, Token>();
@@ -21,29 +10,29 @@ Tokenizer::Tokenizer() {}
 Tokenizer::~Tokenizer() {}
 
 void Tokenizer::generateTokenMap(void){
-SpecialWords["return"] = RETURN;
-SpecialWords["location"] = LOCATION;
-SpecialWords["server"] = SERVER;
-SpecialWords["include"] = INCLUDE;
-SpecialWords["types"] = TYPES;
-SpecialWords["listen"] = LISTEN;
-SpecialWords["root"] = ROOT;
-SpecialWords["server_name"] = SERVER_NAME;
-SpecialWords["index"] = INDEX;
-SpecialWords["max_body_size"] = MAX_BODY_SIZE;
-SpecialWords["error_page"] = ERROR_PAGES;
-SpecialWords["default_type"] = DEFAULT_TYPE;
-SpecialWords["error_log"] = ERROR_LOG;
-SpecialWords["access_log"] = ACCESS_LOG;
-SpecialWords["try_files"] = TRY_FILES;
-SpecialWords["rewrite"] = REWRITE;
-SpecialWords["autoindex"] = AUTO_INDEX;
-SpecialWords["allowed_methods"] = ALLOWED_METHOD;
-SpecialSymbols["["] = OPEN_S_BRACKET;
-SpecialSymbols["]"] = CLOSE_S_BRACKET;
-SpecialSymbols["{"] = OPEN_C_BRACKET;
-SpecialSymbols["}"] = CLOSE_C_BRACKET;
-SpecialSymbols[";"] = SEMICOLON;
+	SpecialWords["return"] = RETURN;
+	SpecialWords["location"] = LOCATION;
+	SpecialWords["server"] = SERVER;
+	SpecialWords["include"] = INCLUDE;
+	SpecialWords["types"] = TYPES;
+	SpecialWords["listen"] = LISTEN;
+	SpecialWords["root"] = ROOT;
+	SpecialWords["server_name"] = SERVER_NAME;
+	SpecialWords["index"] = INDEX;
+	SpecialWords["max_body_size"] = MAX_BODY_SIZE;
+	SpecialWords["error_page"] = ERROR_PAGES;
+	SpecialWords["default_type"] = DEFAULT_TYPE;
+	SpecialWords["error_log"] = ERROR_LOG;
+	SpecialWords["access_log"] = ACCESS_LOG;
+	SpecialWords["try_files"] = TRY_FILES;
+	SpecialWords["rewrite"] = REWRITE;
+	SpecialWords["autoindex"] = AUTO_INDEX;
+	SpecialWords["allowed_methods"] = ALLOWED_METHOD;
+	SpecialSymbols["["] = OPEN_S_BRACKET;
+	SpecialSymbols["]"] = CLOSE_S_BRACKET;
+	SpecialSymbols["{"] = OPEN_C_BRACKET;
+	SpecialSymbols["}"] = CLOSE_C_BRACKET;
+	SpecialSymbols[";"] = SEMICOLON;
 }
 
 void Tokenizer::WordHandler(std::string &line, int lineNumber, unsigned int &i, std::vector<t_tokens> &tokens)
@@ -289,7 +278,3 @@ void Tokenizer::fatalError(Error error,std::vector<t_tokens>::iterator &i)
 	}
 	exit(error);
 }
-
-
-
-

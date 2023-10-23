@@ -30,21 +30,23 @@ class Location {
 				bool             AddTryFile(const string &file); 
 				bool             AddIndex(const string &index);
 
-		/*********************************< setter >*******************/
+				/*********************************< setter >*******************/
 
-				void         setRoot(const string &root);
-				void         setAutoIndex(bool val);
-				void         setRedirection(bool val);
-				void         setDefaultType(const string &type);
-				void         setRedirectionCode(int  code);
-				void         setRedirectionText(string &text);
-				void         setRedirection(int code , string &text); 
-				void         setPath(string &path);
+						void         setRoot(const string &root);
+						void         setAutoIndex(bool val);
+						void         setRedirection(bool val);
+						void         setDefaultType(const string &type);
+						void         setRedirectionCode(int  code);
+						void         setRedirectionText(string &text);
+						void         setRedirection(int code , string &text); 
+						void         setPath(string &path);
 
-		/*********************************< getter >*******************/
+				/*********************************< getter >*******************/
 
 				bool                      				getErrorPage(int code, string  &page)	const;
 				const vector<std::pair<int,string> >    &getErrorPageList() 					const;
+				const vector<string>					&getIndexesList()						const;
+				const vector<string>					&getTryFiles()							const;
 				const string                         	&getDefaultTypes() 						const;
 				const string                			&getRoot() 								const;
 				const string                      		&getPath() 								const;

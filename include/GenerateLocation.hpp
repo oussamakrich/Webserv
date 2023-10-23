@@ -13,7 +13,7 @@ private:
 
 //***************************** pars  ***************************************
 
-		static void ParsReturn(Location &lc, tk_iterator &tokens);
+		static	void ParsReturn(Location &lc, tk_iterator &tokens);
 		static void ParsAllowedMethod(Location &lc, tk_iterator &tokens);
 		static void ParsErrorPage(Location &lc, tk_iterator &tokens);
 		static void ParsMultiValue(Location &lc, tk_iterator &tokens, bool (Location::*f)(const string &)); // index try_files e
