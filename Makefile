@@ -1,24 +1,23 @@
 NAME = webserver
 
-SRC =	src/main.cpp \
-		src/Token/Tokenizer.cpp \
-		src/Print/printTokens.cpp \
+SRC =	./src/Global/Global.cpp \
+			./src/Location/Location.cpp \
+			./src/main.cpp \
+			./src/Parse/GenerateGlobalClass.cpp \
+			./src/Parse/GenerateLocation.cpp\
+			./src/Server/Server.cpp\
+			./src/Token/Tokenizer.cpp\
+			./src/Utils/trim.cpp\
+			./src//Print/printTokens.cpp 
 
 
-
-
-
-
-
-HEADER =	include/includes.hpp \
-			include/Tokenizer.hpp \
-
-
-
-
-
-
-
+HEADER =./include/GenerateGlobalClass.hpp \
+				./include/GenerateLocation.hpp\
+				./include/Global.hpp\
+				./include/includes.hpp\
+				./include/Location.hpp\
+				./include/Server.hpp\
+				./include/Tokenizer.hpp
 
 OBJ = $(SRC:.cpp=.o)
 
