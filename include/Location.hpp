@@ -8,7 +8,7 @@ using namespace std;
 class Location {
 
 		private:
-			template<class container, class value>	bool Add(container c, value v); 
+			template<class container, class value>	bool Add(container &c, value v); 
 			vector <string>  						Allowed_Method;			
 			vector <string> 						indexes; 
 			vector <string> 						try_file;
@@ -51,9 +51,11 @@ class Location {
 				const string                			&getRoot() 								const;
 				const string                      		&getPath() 								const;
 				const string                 			getUri() 								const; // uri = root + path;
-		/*********************************< cheker >*******************/
+		/*********************************< checker >*******************/
 				bool isMethodAllowed(const string &method) 	const;
 				bool isRedirection()						const; 
 				bool isAutoIndex()							const;
-		
+		/*********************************< for Debug  >*******************/
+
+		void printLocation();
 };
