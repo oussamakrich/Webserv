@@ -35,7 +35,7 @@ void Tokenizer::generateTokenMap(void){
 	SpecialSymbols[";"] = SEMICOLON;
 }
 
-void Tokenizer::WordHandler(std::string &line, int lineNumber, unsigned int &i, std::vector<t_tokens> &tokens)
+void Tokenizer::WordHandler(std::string &line, int lineNumber, unsigned int &i, TOKEN_STRUCTS &tokens)
 {
 	unsigned int len = i;
 	while (len < line.length() && Tokenizer::is_not_of(line[len], " \t\r;{}"))
@@ -49,7 +49,7 @@ void Tokenizer::WordHandler(std::string &line, int lineNumber, unsigned int &i, 
 	i += (len - i) - 1;
 }
 
-void Tokenizer::QuotesHandler(std::string &line, int lineNumber, unsigned int  &i, std::vector<t_tokens> &tokens, char quote)
+void Tokenizer::QuotesHandler(std::string &line, int lineNumber, unsigned int  &i, TOKEN_STRUCTS &tokens, char quote)
 {
 	if (line.find(quote, i + 1) == std::string::npos)
 	{
@@ -66,12 +66,12 @@ void Tokenizer::QuotesHandler(std::string &line, int lineNumber, unsigned int  &
 	i += (tokens.back().value.length() + 1);
 }
 
-std::vector<TOKEN> Tokenizer::tokenGenerator(std::ifstream &file)
+TOKEN_OUT Tokenizer::tokenGenerator(std::ifstream &file)
 {
-	std::vector<t_tokens>	tokens;
+	TOKEN_STRUCTS	tokens;
+	TOKEN_OUT 	tokenizedFile;
 	int					lineNumber = 1;
 	std::string			line;
-	std::vector<TOKEN> 	tokenizedFile;
 	Tokenizer::generateTokenMap();
 	while (std::getline(file, line))
 	{
@@ -90,40 +90,40 @@ std::vector<TOKEN> Tokenizer::tokenGenerator(std::ifstream &file)
 	return tokenizedFile;
 }
 
-void Tokenizer::SemiColonSyntax(std::vector<t_tokens>::iterator &i, std::vector<t_tokens> &tokens)
+void Tokenizer::SemiColonSyntax(TOKEN_STRUCTS::iterator &i, TOKEN_STRUCTS &tokens)
 {
 	if (i == tokens.begin())
-		Tokenizer::fatalError(DIRECTIVE_SYNTAX_ERROR, i);
-	std::vector<t_tokens>::iterator it = i;
+		Tokenizer::fatalError(DIRECTIVE_SYNTAX_ERROR, i, RESET" expected space after ");
+	TOKEN_ITERATOR it = i;
 	it--;
 	while (it != tokens.begin() && it->type == SPACE)
 		it--;
 	if (it != tokens.begin() && it->type != SEMICOLON && it->type != OPEN_C_BRACKET && it->type != CLOSE_C_BRACKET)
-		Tokenizer::fatalError(MISSING_SEMICOLON, it);
+		Tokenizer::fatalError(MISSING_SEMICOLON, it, RESET " missing semicolon after ");
 }
 
-void Tokenizer::BlockHandler(std::vector<TOKEN> &tokenizedFile, std::vector<t_tokens> &tokens, std::vector<t_tokens>::iterator &i)
+void Tokenizer::BlockHandler(TOKEN_OUT &tokenizedFile, TOKEN_STRUCTS &tokens, TOKEN_ITERATOR &i)
 {
 	bool isLocation = (i->type == LOCATION);
 
-	std::vector<t_tokens>::iterator type = i;
+	TOKEN_ITERATOR type = i;
 	i++;
 	while (i != tokens.end() && i->type == SPACE) i++;
 	if ((i == tokens.end() || i->type != WORD) && isLocation)
-		Tokenizer::fatalError(MISSING_URL_BLOCK, type);
+		Tokenizer::fatalError(MISSING_URL_BLOCK, type,  RESET " missing url ");
 	tokenizedFile.push_back(std::make_pair(i->type, i->value));
 	if (isLocation) i++;
 
 	while (i != tokens.end() && i->type == SPACE) i++;
 	if (i == tokens.end() || i->type != OPEN_C_BRACKET)
-		Tokenizer::fatalError(UNCLOSED_BRACKETS, type);
+		Tokenizer::fatalError(UNCLOSED_BRACKETS, type, RESET " unclosed or missing open bracket.");
 	if (isLocation && i->type == OPEN_C_BRACKET)
 		tokenizedFile.push_back(std::make_pair(i->type, i->value));
 	i++;
 	while (i != tokens.end() && i->type != CLOSE_C_BRACKET)
 	{
 		if (i->type == OPEN_C_BRACKET)
-			Tokenizer::fatalError(NESTED_BLOCKS_NOT_ALLOWED, type);
+			Tokenizer::fatalError(NESTED_BLOCKS_NOT_ALLOWED, type, RESET " nested blocks are not allowed.");
 		else if (i->type == WORD && SpecialWords.find(i->value) != SpecialWords.end())
 		{
 			tokenizedFile.push_back(std::make_pair(SpecialWords.find(i->value)->second, i->value));
@@ -139,12 +139,12 @@ void Tokenizer::BlockHandler(std::vector<TOKEN> &tokenizedFile, std::vector<t_to
 		i++;
 	}
 	if (i == tokens.end())
-		Tokenizer::fatalError(UNCLOSED_BRACKETS, type);
+		Tokenizer::fatalError(UNCLOSED_BRACKETS, type, RESET " unclosed or missing open bracket.");
 	Tokenizer::SemiColonSyntax(i, tokens); // REMOVE this if you are already checking for semicolon in the parsing part.
 	tokenizedFile.push_back(std::make_pair(i->type, i->value));
 }
 
-void Tokenizer::ServerHandler(TOKENIZED_FILE &tokenizedFile, TOKEN_STRUCTS &tokens, std::vector<t_tokens>::iterator &i)
+void Tokenizer::ServerHandler(TOKEN_OUT &tokenizedFile, TOKEN_STRUCTS &tokens, TOKEN_ITERATOR &i)
 {
 
 	Tokenizer::serverFound++;
@@ -152,48 +152,48 @@ void Tokenizer::ServerHandler(TOKENIZED_FILE &tokenizedFile, TOKEN_STRUCTS &toke
 	while (i != tokens.end() && i->type == SPACE)
 		i++;
 	if (i == tokens.end() || i->type != OPEN_C_BRACKET)
-		Tokenizer::fatalError(UNCLOSED_BRACKETS, --i);
+		Tokenizer::fatalError(UNCLOSED_BRACKETS, --i, RESET " unclosed or missing open bracket.");
 	tokenizedFile.push_back(std::make_pair(i->type, i->value));
 	Tokenizer::curlyBrackets.push(OPEN_C_BRACKET);
 }
 
 
-void Tokenizer::WordSyntax(std::vector<t_tokens>::iterator &i, std::vector<t_tokens> &tokens)
+void Tokenizer::WordSyntax(TOKEN_ITERATOR &i, TOKEN_STRUCTS &tokens)
 {
 	if (i->type == QUOTES) i->type = WORD;
 	if (i->type == WORD)
 	{
-		std::vector<t_tokens>::iterator it = i;
+		TOKEN_ITERATOR it = i;
 		if (i == tokens.begin())
-			Tokenizer::fatalError(UNKNOWN_DIRECTIVE, i);
+			Tokenizer::fatalError(UNKNOWN_DIRECTIVE, i, RESET " unknown directive ");
 		it--;
 		while (it != tokens.begin() && it->type == SPACE)
 			it--;
 		if (it != tokens.begin() && (it->type == SEMICOLON || it->type == CLOSE_C_BRACKET || it->type == OPEN_C_BRACKET))
-			Tokenizer::fatalError(UNKNOWN_DIRECTIVE, i);
+			Tokenizer::fatalError(UNKNOWN_DIRECTIVE, i, RESET " unknown directive ");
 	}
 }
 
-void Tokenizer::CloseCurlyBracketsSyntax(std::vector<t_tokens>::iterator &i, std::vector<t_tokens> &tokens, std::vector<TOKEN> &tokenizedFile)
+void Tokenizer::CloseCurlyBracketsSyntax(TOKEN_ITERATOR &i, TOKEN_STRUCTS &tokens, TOKEN_OUT &tokenizedFile)
 {
 	Tokenizer::SemiColonSyntax(i, tokens);
 	if (!Tokenizer::curlyBrackets.empty())
 		Tokenizer::curlyBrackets.pop();
 	else
-		Tokenizer::fatalError(UNCLOSED_BRACKETS, i);
-	std::vector<t_tokens>::iterator it = i;
+		Tokenizer::fatalError(UNCLOSED_BRACKETS, i, RESET " unclosed or missing open bracket.");
+	TOKEN_ITERATOR it = i;
 	tokenizedFile.push_back(std::make_pair(i->type, i->value));
 	it++;
 	while (it != tokens.end() && it->type == SPACE)
 		it++;
 	if (it != tokens.end() && SpecialWords[it->value] != SERVER)
-		Tokenizer::fatalError(UNCLOSED_BRACKETS, i);
+		Tokenizer::fatalError(UNCLOSED_BRACKETS, i, RESET " unclosed or missing open bracket.");
 }
 
 
-bool Tokenizer::syntaxCheck(std::vector<TOKEN> &tokenizedFile, std::vector<t_tokens> &tokens)
+void Tokenizer::syntaxCheck(TOKEN_OUT &tokenizedFile, TOKEN_STRUCTS &tokens)
 {
-	std::vector<t_tokens>::iterator i;
+	TOKEN_ITERATOR i;
 
 	for (i = tokens.begin(); i != tokens.end(); i++)
 	{
@@ -208,7 +208,7 @@ bool Tokenizer::syntaxCheck(std::vector<TOKEN> &tokenizedFile, std::vector<t_tok
 			else if (i->type == SERVER)
 			{
 				if (curlyBrackets.size() != 0)
-					Tokenizer::fatalError(UNCLOSED_BRACKETS, i);
+					Tokenizer::fatalError(UNCLOSED_BRACKETS, i, RESET " unclosed or missing open bracket.");
 				Tokenizer::ServerHandler(tokenizedFile, tokens, i);
 			}
 		}
@@ -222,51 +222,24 @@ bool Tokenizer::syntaxCheck(std::vector<TOKEN> &tokenizedFile, std::vector<t_tok
 		}
 		if (i == tokens.end()) break;
 	}
-	if (Tokenizer::serverFound == 0)
-		Tokenizer::fatalError(SERVER_BLOCK_NOT_FOUND, i);
-	if (!Tokenizer::curlyBrackets.empty())
-		Tokenizer::fatalError(UNCLOSED_BRACKETS, --i);
-	return true;
+	if (Tokenizer::serverFound == 0) Tokenizer::fatalError(SERVER_BLOCK_NOT_FOUND, i, RESET " server block not found.\n\n");
+	else if (!Tokenizer::curlyBrackets.empty()) Tokenizer::fatalError(UNCLOSED_BRACKETS, --i, RESET " unclosed or missing open bracket.");
 }
 
 bool Tokenizer::is_not_of(char c, std::string str) {return (str.find(c) == std::string::npos);}
 
-void Tokenizer::fatalError(Error error,std::vector<t_tokens>::iterator &i)
+
+void Tokenizer::fatalError(Error error,TOKEN_ITERATOR &i, std::string str)
 {
-	if (error == DIRECTIVE_SYNTAX_ERROR)
+	if (error == SERVER_BLOCK_NOT_FOUND)
 	{
-		std::cout << RED"Syntax Error:" << RESET" line " <<U_WHITE"config.conf:" << i->column << ":" << (i)->row << RESET" expected space after " << i->value << ".\n\n" ;
-		std::cout << RED"\t\tError code: (DIRECTIVE_SYNTAX_ERROR)\n" << RESET;
+		std::cout << SYNTAX_ERROR << 0 << ":" << 0 << str ;
+		std::cout << RED"\t\tError code: ("<< (error + 1) << ")\n" << RESET;
 	}
-	else if (error == UNKNOWN_DIRECTIVE)
+	else
 	{
-		std::cout << RED"Syntax Error:" << RESET" line " <<U_WHITE"config.conf:" << i->column << ":" << (i)->row << RESET " unknown directive " << i->value << ".\n\n" ;
-		std::cout << RED"\t\tError code: (UNKNOWN_DIRECTIVE)\n" << RESET;
+		std::cout << SYNTAX_ERROR << i->column << ":" << (i)->row << str << i->value << ".\n\n" ;
+		std::cout << RED"\t\tError code: ("<< (error + 1) << ")\n" << RESET;
 	}
-	else if (error == MISSING_SEMICOLON)
-	{
-		std::cout << RED"Syntax Error:" << RESET" line " <<U_WHITE"config.conf:" << i->column << ":" << (i)->row << RESET " missing semicolon after " << i->value << ".\n\n" ;
-		std::cout << RED"\t\tError code: (MISSING_SEMICOLON)\n" << RESET;
-	}
-	else if (error == UNCLOSED_BRACKETS)
-	{
-		std::cout << RED"Syntax Error:" << RESET" line " <<U_WHITE"config.conf:" << i->column << ":" << (i)->row << RESET " unclosed or missing open bracket." << i->value << ".\n\n" ;
-		std::cout << RED"\t\tError code: (UNCLOSED_BRACKETS)\n" << RESET;
-	}
-	else if (error == NESTED_BLOCKS_NOT_ALLOWED)
-	{
-		std::cout << RED"Syntax Error:" << RESET" line " <<U_WHITE"config.conf:" << i->column << ":" << (i)->row << RESET " nested blocks are not allowed." << i->value << ".\n\n" ;
-		std::cout << RED"\t\tError code: (NESTED_BLOCKS_NOT_ALLOWED)\n" << RESET;
-	}
-	else if (error == MISSING_URL_BLOCK)
-	{
-		std::cout << RED"Syntax Error:" << RESET" line " <<U_WHITE"config.conf:" << i->column << ":" << (i)->row << RESET " missing url '" << i->value << "'.\n\n" ;
-		std::cout << RED"\t\tError code: (MISSING_URL_BLOCK)\n" << RESET;
-	}
-	else if (error == SERVER_BLOCK_NOT_FOUND)
-	{
-		std::cout << RED"Syntax Error:" << RESET" line " <<U_WHITE"config.conf:" << 0 << ":" << 0 << RESET " server block not found.\n\n" ;
-		std::cout << RED"\t\tError code: (SERVER_BLOCK_NOT_FOUND)\n" << RESET;
-	}
-	exit(error);
+	exit(error + 1);
 }
