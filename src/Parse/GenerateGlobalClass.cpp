@@ -13,7 +13,7 @@ Server *GenerateGlobalClass::fillServer(TOKEN_IT &it){
 	Server *server = new Server();
 	while(it->first != CLOSE_C_BRACKET){
 		switch (it->first) {
-			case LOCATION				: server->fillLocation(++it);		break;
+			case LOCATION				: 		break;
 			case TYPES					:	server->SetTypes(++it);			break;				
 			case MAX_BODY_SIZE	: server->SetInt(it);					break;
 			case ERROR_PAGES		: server->SetMultiValue(it);	break;
