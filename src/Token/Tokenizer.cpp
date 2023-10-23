@@ -290,3 +290,6 @@ void Tokenizer::fatalError(Error error,std::vector<t_tokens>::iterator &i)
 	exit(error);
 }
 
+
+
+

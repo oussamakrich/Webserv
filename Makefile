@@ -19,7 +19,6 @@ HEADER =./include/GenerateGlobalClass.hpp \
 				./include/Server.hpp\
 				./include/Tokenizer.hpp
 
-
 OBJ = $(SRC:.cpp=.o)
 
 FLAGS = -Wall -Wextra -Werror -std=c++98 -fsanitize=address -g
