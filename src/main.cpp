@@ -13,7 +13,7 @@ int main (int argc, char **argv)
 
 		std::vector<TOKEN> tokens = Tokenizer::tokenGenerator(file);//
 
-		// printTokens(tokens);
+		printTokens(tokens);
 		// Global *WebServer = GenerateGlobalClass::generateGlobalClass(tokens);
 		//WebServer.run();
 

@@ -14,6 +14,8 @@ Location::Location(string path): path(path)
 {
 	this->redirection_code = 200;
 	this->redirection_text = "ok";
+	this->AutoIndex = false;
+	this->default_type = "Al";
 }
 Location::~Location(){}
 void Location::final()
@@ -55,11 +57,13 @@ void	Location::setPath(string &path)                        {  this->path = path
 	
 	}
 
-const vector<std::pair<int,string> >    &Location::getErrorPageList()  const    { return    error_page;          }
-const string                         	&Location::getDefaultTypes()   const    { return    default_type;        }
-const string                			&Location::getRoot()           const    { return    root;                }
-const string                      		&Location::getPath() 		   const    { return    path;                }
-const string                 			Location::getUri() 		       const    { return    root + path;         }
+const vector<std::pair<int,string> >    &Location::getErrorPageList()   const    { return    error_page;          }
+const vector<string>					&Location::getIndexesList()		const 	 { return indexes; 				  }
+const vector<string>					&Location::getTryFiles()		const	 { return try_file;				  }
+const string                         	&Location::getDefaultTypes()    const    { return    default_type;        }
+const string                			&Location::getRoot()            const    { return    root;                }
+const string                      		&Location::getPath() 		    const    { return    path;                }
+const string                 			Location::getUri() 		        const    { return    root + path;         }
 
 /*********************************< cheker >*******************/
 

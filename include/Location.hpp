@@ -43,6 +43,8 @@ public :
 
 		bool                      				getErrorPage(int code, string  &page)	const;
 		const vector<std::pair<int,string> >    &getErrorPageList() 					const;
+		const vector<string>					&getIndexesList()						const;
+		const vector<string>					&getTryFiles()							const;
 		const string                         	&getDefaultTypes() 						const;
 		const string                			&getRoot() 								const;
 		const string                      		&getPath() 								const;
