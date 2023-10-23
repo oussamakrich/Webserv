@@ -53,10 +53,8 @@ void Tokenizer::QuotesHandler(std::string &line, int lineNumber, unsigned int  &
 {
 	if (line.find(quote, i + 1) == std::string::npos)
 	{
-		if (quote == '\"')
-			std::cout << "Unclosed Double Quotes: line: " << U_WHITE"config.conf:" << lineNumber << ":" << i;
-		else if (quote == '\'')
-			std::cout << "Unclosed Single Quotes: line: " << U_WHITE"config.conf:" << lineNumber << ":" << i;
+		if (quote == '\"') std::cout << "Unclosed Double Quotes: line: " << U_WHITE"config.conf:" << lineNumber << ":" << i;
+		else std::cout << "Unclosed Single Quotes: line: " << U_WHITE"config.conf:" << lineNumber << ":" << i;
 		exit(1);
 	}
 	tokens.push_back((t_tokens){
@@ -79,20 +77,12 @@ std::vector<TOKEN> Tokenizer::tokenGenerator(std::ifstream &file)
 	{
 		for (unsigned int i = 0; i < line.length(); i++)
 		{
-			if (std::isspace(line[i]))
-				tokens.push_back((t_tokens){SPACE, " ", lineNumber, i});
-			else if (line[i] == '{')
-				tokens.push_back((t_tokens){OPEN_C_BRACKET, "{", lineNumber, i});
-			else if (line[i] == '}')
-				tokens.push_back((t_tokens){CLOSE_C_BRACKET, "}", lineNumber, i});
-			else if (line[i] == ';')
-				tokens.push_back((t_tokens){SEMICOLON, ";", lineNumber, i});
-			else if (line[i] == '\"')
-				Tokenizer::QuotesHandler(line, lineNumber, i, tokens, line[i]);
-			else if (line[i] == '\'')
-				Tokenizer::QuotesHandler(line, lineNumber, i, tokens, line[i]);
-			else
-				Tokenizer::WordHandler(line, lineNumber, i, tokens);
+			if (std::isspace(line[i])) tokens.push_back((t_tokens){SPACE, " ", lineNumber, i});
+			else if (line[i] == '{') tokens.push_back((t_tokens){OPEN_C_BRACKET, "{", lineNumber, i});
+			else if (line[i] == '}') tokens.push_back((t_tokens){CLOSE_C_BRACKET, "}", lineNumber, i});
+			else if (line[i] == ';') tokens.push_back((t_tokens){SEMICOLON, ";", lineNumber, i});
+			else if (line[i] == '\"' || line[i] == '\'') Tokenizer::QuotesHandler(line, lineNumber, i, tokens, line[i]);
+			else Tokenizer::WordHandler(line, lineNumber, i, tokens);
 		}
 		lineNumber++;
 	}
@@ -118,15 +108,17 @@ void Tokenizer::BlockHandler(std::vector<TOKEN> &tokenizedFile, std::vector<t_to
 
 	std::vector<t_tokens>::iterator type = i;
 	i++;
-	while (i != tokens.end() && i->type == SPACE && isLocation) i++;
+	while (i != tokens.end() && i->type == SPACE) i++;
 	if ((i == tokens.end() || i->type != WORD) && isLocation)
 		Tokenizer::fatalError(MISSING_URL_BLOCK, type);
 	tokenizedFile.push_back(std::make_pair(i->type, i->value));
 	if (isLocation) i++;
+
 	while (i != tokens.end() && i->type == SPACE) i++;
 	if (i == tokens.end() || i->type != OPEN_C_BRACKET)
 		Tokenizer::fatalError(UNCLOSED_BRACKETS, type);
-	tokenizedFile.push_back(std::make_pair(i->type, i->value));
+	if (isLocation && i->type == OPEN_C_BRACKET)
+		tokenizedFile.push_back(std::make_pair(i->type, i->value));
 	i++;
 	while (i != tokens.end() && i->type != CLOSE_C_BRACKET)
 	{

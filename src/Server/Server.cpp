@@ -1,9 +1,10 @@
 
 #include "../../include/Server.hpp"
 #include "../../include/GenerateLocation.hpp"
+#include <algorithm>
 
 void error(std::string error){
-	std::cerr << error << std::endl;
+	std::cerr << RED"Syntax Error : "<< RESET << error  << std::endl;
 	exit(1);
 }
 
@@ -31,6 +32,40 @@ void error(std::string error){
 		errorLog = copy.errorLog;
 		mimeType = copy.mimeType;
 	return *this;
+}
+
+int Server::parseErrorPage(std::string codeValue){
+	if (codeValue.find_first_not_of("0123456789") != codeValue.npos) 
+		error("error code should be a number in ErrorPage");
+	if (codeValue.size() != 3)
+		error("error code range between 400 To 599");
+	int errorCode = atoi(codeValue.c_str());
+	if (errorCode < 400 || errorCode > 599)
+		error("error code range between 400 To 599");
+	if (std::find(CheckRepeat.begin(), CheckRepeat.end(), errorCode) != CheckRepeat.end())
+			error("errorCode is repeated twice in ErrorPage");
+	CheckRepeat.push_back(errorCode);
+	return errorCode;	
+}
+
+void Server::SetErrorPages(TOKEN_IT &it){
+	ERRPAGE_PAIR pair;
+	int	code;
+	std::string value;
+
+	if (it->first != WORD)	error("Expect NUMBER after ErrorPage");
+	 code = this->parseErrorPage(it->second);
+	it++;
+	if (it->first != WORD)	error("Expect Tow value after ErrorPage");
+	value = it->second;
+	it++;
+	if (it->first != SEMICOLON)	error("Expect only Tow value after ErrorPage");
+	
+	pair.first = code;
+	pair.second = value;
+	if (std::find(errorPages.begin(), errorPages.end(), pair) != errorPages.end())
+			error("value is repeated twice in ErrorPage");
+	errorPages.push_back(pair);	
 }
 
 void Server::fillLocation(TOKEN_IT &it){
@@ -79,16 +114,15 @@ void Server::SetSingleValue(TOKEN_IT &it){
 
 void Server::SetMultiValue(TOKEN_IT &it){
 
-	Token				key = it->first;
-	std::vector<std::string> values;
 	while (it->first != SEMICOLON)
 	{
-		if (it->first == WORD)
-			values.push_back(it->second);
+		if (it->first == WORD){
+			if (std::find(index.begin(), index.end(), it->second) != index.end())
+				error(it->second + " is repeated twice in index");
+			index.push_back(it->second);
+		}
 		it++;
 	}
-	if (key == ERROR_PAGES)	errorPages = values;
-	else if (key == INDEX)	index = values;
 }
 
 void Server::SetInt(TOKEN_IT &it){
@@ -107,7 +141,7 @@ void	Server::handelOne(std::string line){
 	size_t pos= line.find_first_not_of("0123456789");
 	if (pos == line.npos){
 		if (line.size() > 5)
-			error("Error: port is grather tha max");
+			error("Port is grather tha max");
 		this->port = atoi(line.c_str());
 	}
 	else
@@ -120,17 +154,17 @@ void Server::hostV6(std::string line)
 	size_t pos = line.find(']');	
 
 	if (pos == line.npos)
-			error("Error : listen '[' Should be closed");
+			error("Listen '[' Should be closed");
 	this->host = line.substr(0, pos + 1);
 	if (this->host.find_first_not_of("ABCDEFabcdef0123456789:[]") != host.npos)
-		error("Error: unexpected Charachter in host");
+		error("Unexpected Charachter in host");
 	line.erase(0, pos + 1);
 	if (!line.empty()){
 		if (line.front() != ':' || line.back() == ':')
-			error("Error : listen expect ':' after host");
+			error("Listen expect ':' after host");
 		portStr = line.substr(1);
 		if (portStr.find_first_not_of("0123456789") != line.npos || portStr.size() > 5)
-			error("Error: in Port Value");
+			error("In Port Value");
 		this->port = atoi(portStr.c_str());
 	}
 }
@@ -148,16 +182,16 @@ void Server::parseListen(std::string line){
 		else
 		{
 			if (pos !=line.rfind(':'))
-				error("Error : identifier repeated twice ':' ");
+				error("Identifier repeated twice ':' ");
 			this->host = line.substr(0, pos);
 			portStr = line.substr(pos + 1);
 			if (portStr.find_first_not_of("0123456789") != line.npos || portStr.size() > 5)
-				error("Error: in Port Value");
+				error("In Port Value");
 			this->port = atoi(portStr.c_str());
 		}
 	}
 	if (port <= 0 || port >  USHRT_MAX)
-		error("Error: port out of Range");
+		error("Port out of Range");
 } 
 
 void	Server::SetHostAndPort(TOKEN_IT &it){
@@ -165,9 +199,11 @@ void	Server::SetHostAndPort(TOKEN_IT &it){
 	std::string value = it->second;
 	it++;	
 	if (it->first != SEMICOLON)
-		error("Error: Listen accept one value");
+		error("Listen accept one value");
 	if(value.back() == ':')
-		error("Error: ':' cannot be in the back");
+		error("':' cannot be in the back");
+	if(value.front() == ':')
+		error("':' cannot be in the front");
 	this->parseListen(value);
 }
 
@@ -195,7 +231,7 @@ std::string Server::getRoot() const{
 std::vector<std::string> Server::getIndex() const{
 	return index;
 }
-std::vector<std::string> Server::getErrorPages() const{
+std::vector<ERRPAGE_PAIR> Server::getErrorPages() const{
 	return errorPages;
 }
 std::string Server::getDefaultType() const{

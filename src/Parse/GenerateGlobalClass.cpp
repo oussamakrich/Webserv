@@ -16,7 +16,7 @@ Server *GenerateGlobalClass::fillServer(TOKEN_IT &it){
 			case LOCATION				: 		break;
 			case TYPES					:	server->SetTypes(++it);			break;				
 			case MAX_BODY_SIZE	: server->SetInt(it);					break;
-			case ERROR_PAGES		: server->SetMultiValue(it);	break;
+			case ERROR_PAGES		: server->SetErrorPages(++it);	break;
 			case INDEX					: server->SetMultiValue(it);	break;
 			case ROOT						: server->SetSingleValue(it); break;
 			case LISTEN					: server->SetHostAndPort(++it); break;
@@ -26,13 +26,13 @@ Server *GenerateGlobalClass::fillServer(TOKEN_IT &it){
 			case ACCESS_LOG			: server->SetSingleValue(it); break;
 			case OPEN_C_BRACKET :	break;													
 			case COLON					:	break;													
-			case SEMICOLON			:	break;													
-			default							: error("Error: Unexpected key : " + it->second);
+			case SEMICOLON			:	error("Unexpected SEMICOLONE");													
+			default							: error("Unexpected key : " + it->second);
 		}
 		it++;
 	}
 	if (server->getRoot().empty())
-		error("Error : root is required");
+		error("root is required");
 	return server;
 } 
 
@@ -43,9 +43,9 @@ Global *GenerateGlobalClass::generateGlobalClass(std::vector<TOKEN> tokens){
 	TOKEN_IT it;
 
 	for(it = tokens.begin(); it != tokens.end(); it++){
-		if (it->first == INCLUDE){
-			global->HandelMimeTypes(++it);
-		}
+		// if (it->first == INCLUDE){
+		// 	global->HandelMimeTypes(++it);
+		// }
 		if (it->first == SERVER)
 			global->addServer(fillServer(++it));
 	}
