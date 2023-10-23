@@ -36,6 +36,7 @@ class Server {
 		void SetHostAndPort(TOKEN_IT &it);
 		void SetErrorPages(TOKEN_IT &it);
 
+	//FIX : Just for print 
 		void print();
 	private:
 		void parseListen(std::string line); 
@@ -43,7 +44,6 @@ class Server {
 		void hostV6(std::string line);
 		int parseErrorPage(std::string codeValue);
 
-	//FIX : Just for print 
 
 	public:
 		int			getPort() const;

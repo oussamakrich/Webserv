@@ -9,18 +9,19 @@
 #include "../../include/GenerateLocation.hpp"
 #include "../../include/Location.hpp"
 
-#define ERR_MET_NOT_SUPR 	"Syntax  Error : Method not suported"
+#define ERR_MET_NOT_SUPR 	"Method not suported"
 #define ERR_INVALID_RANGE 	"Exception : Invalid Range ! end must be big than start\n"
-#define ERR_MET_REPEAT 		"Syntax Error : Method Repeated !"
-#define ERR_LOCATION 		"Syntax  Error : Location messing path or open curly bracket }" 		
-#define ERR_HTTP_INV_RANGE 	"Syntax  Error : Redirection code  must be in  range [100, 599]"
-#define ERR_MESS_SEMICOLON	"Syntax  Error : messing semicolon [ ; ]"
+#define ERR_MET_REPEAT 		"Method Repeated !"
+#define ERR_LOCATION 		"Location messing path or open curly bracket }" 		
+#define ERR_HTTP_INV_RANGE 	"invalid http code number"
+#define ERR_MESS_SEMICOLON	"messing semicolon [ ; ]"
 #define ERR_OUT_OF_MEM      "Fatal Error : out of memory"
-#define ERR_SYN_RETURN 		"Syntax  Error : return directive"
-#define ERR_ERR_PAGE        "Syntax  Error : : error_page  directive"
-#define ERR_ERR_PAGE_MULT   "Syntax  Error : error_page  \"multi page of code\""
-#define ERR_MULT_VAL        "Syntax  Error: Repeat value"
-#define ERR_AUTOINDEX_VAL 	"Error : AutoIndex accept on/off value"
+#define ERR_SYN_RETURN 		"return directive"
+#define ERR_ERR_PAGE        "error_page  directive"
+#define ERR_ERR_PAGE_MULT   "error_page  \"multi page of code\""
+#define ERR_REPEAT_VAL        "Repeat value"
+#define ERR_AUTOINDEX_VAL 	"AutoIndex accept on/off value"
+#define ERR_DIRECTIVE    	"Directive must be followed by value(s)" 
 
 #define IS_METHOD_SUPORTED(method)((method == "GET" || method == "DELETE" || method == "POST" ))
 
@@ -30,17 +31,19 @@ Location *GenerateLocation::generateLocation(std::vector<TOKEN>::iterator &token
 
 	if(tokens->first == WORD && (tokens + 1)->first == OPEN_C_BRACKET) 
 	 	lc = new (nothrow) Location(tokens->second);
-	else  FatalError(ERR_LOCATION);
-	if (lc == NULL)  FatalError(ERR_OUT_OF_MEM);
+	else  SyntaxError(ERR_LOCATION);
+	if (lc == NULL)  SyntaxError(ERR_OUT_OF_MEM);
 	tokens += 2; // skip path and open_c_bracket
 	if (tokens->first == RETURN)
 		{
-			ParsReturn(*lc, tokens);
+			ParsReturn(*lc, ++tokens);
 			return lc;
 		}
 	while (tokens->first != CLOSE_C_BRACKET)
 	{	
-		switch (tokens->first)
+			int tok = tokens->first;
+			tokens++;
+		switch (tok)
 		{
 			case ALLOWED_METHOD : ParsAllowedMethod(*lc, tokens);														break; 
 			case INDEX 			: ParsMultiValue(*lc, tokens, &Location::AddIndex);										break;
@@ -49,11 +52,11 @@ Location *GenerateLocation::generateLocation(std::vector<TOKEN>::iterator &token
 			case ROOT			: ParsSingleValue( *lc, tokens, &Location::setRoot , &Location::getRoot); 				break;
 			case DEFAULT_TYPE   : ParsSingleValue(*lc, tokens, &Location::setDefaultType, &Location::getDefaultTypes); 	break;
 			case AUTO_INDEX 	: ParsAutoIndex(*lc, tokens);  															break;
-			default				: FatalError();
+			default				: SyntaxError("Syntax : Location Invalid  Directive");
 		}// end switch 
-		if (tokens->first == SEMICOLON)   throw std::runtime_error(ERR_MESS_SEMICOLON);
+		if (tokens->first != SEMICOLON)   throw std::runtime_error(ERR_MESS_SEMICOLON);
 		tokens++;
-	}// end while
+	}// end while 
 		return lc;
 } // end GenerateLocation 
 
@@ -80,13 +83,14 @@ void	GenerateLocation::ParsReturn(Location &lc, tk_iterator &tokens)
 				 throw std::runtime_error(ERR_SYN_RETURN);
 		tokens++;
 		if (tokens->first != SEMICOLON || (tokens + 1)->first != CLOSE_C_BRACKET)
-			 throw std::runtime_error(ERR_MESS_SEMICOLON);
+			 throw std::runtime_error(tokens->first != SEMICOLON ? ERR_MESS_SEMICOLON : "in return directive");
 		lc.setRedirection(true);	
 	
 	}
 	catch(const std::exception& e)
 	{
-		FatalError(e.what());
+			cout << tokens->second; 
+		SyntaxError(e.what());
 	}
 	
 }
@@ -96,8 +100,8 @@ void GenerateLocation::ParsAllowedMethod(Location &lc, tk_iterator &tokens)
 		while (tokens->first == WORD)
 		{
 			if (IS_METHOD_SUPORTED(tokens->second) != true)
-				FatalError(ERR_MET_NOT_SUPR);
-			if (lc.AddHttpMethod(tokens->second) == false) FatalError(ERR_MET_REPEAT);
+				SyntaxError(ERR_MET_NOT_SUPR);
+			if (lc.AddHttpMethod(tokens->second) == false) SyntaxError(ERR_MET_REPEAT);
 			tokens++;
 		}
 }
@@ -110,7 +114,7 @@ void GenerateLocation::ParsErrorPage(Location &lc, tk_iterator &tokens)
 		if (tokens->first == WORD && isInteger(tokens->second))
 		{
 			code = std::atoi(tokens->second.c_str());
-			if(isInRange(100, 599, code) != true)   
+			if(isInRange(400, 599, code) != true)   
 				throw std::runtime_error(ERR_HTTP_INV_RANGE);
 			tokens++;
 			if(tokens->first != WORD) 
@@ -123,34 +127,38 @@ void GenerateLocation::ParsErrorPage(Location &lc, tk_iterator &tokens)
 	}
 	catch(const std::exception& e)
 	{
-		FatalError(e.what());
+		SyntaxError(e.what());
 	}
 	
 }
 
 void GenerateLocation::ParsMultiValue(Location &lc, tk_iterator &tokens, bool (Location::*fun)(const string &))
 {
+	
+	int number = 0; 
 	while (tokens->first == WORD)
 	{
-		if ((lc.*fun)(tokens->second) == false) FatalError(ERR_MULT_VAL);
+		if ((lc.*fun)(tokens->second) == false) SyntaxError(ERR_REPEAT_VAL);
 		tokens++;
+		number++;
 	}
+	if(number < 1) SyntaxError(ERR_DIRECTIVE);
 }
 
 void GenerateLocation::ParsSingleValue(Location &lc, tk_iterator &tokens, void (Location::*set)(const string &), const string &(Location::*get)(void) const)
-{
-	if (tokens->first == WORD &&  (lc.*get)().size() != 0) 
+{ 
+	if (tokens->first == WORD &&  (lc.*get)().size() == 0) 
 		(lc.*set)(tokens->second);
 	else 
-		FatalError();
+		SyntaxError(tokens->first == WORD ? ERR_DIRECTIVE : ERR_REPEAT_VAL);
 	tokens++;
 }
 
- void GenerateLocation::ParsAutoIndex(Location lc, tk_iterator &tokens)
+ void GenerateLocation::ParsAutoIndex(Location &lc, tk_iterator &tokens)
 {
 	if (tokens->first == WORD && (tokens->second == "on" || tokens->second == "off"))
 		lc.setAutoIndex(tokens->second == "on");
-	else FatalError(ERR_AUTOINDEX_VAL);
+	else SyntaxError(ERR_AUTOINDEX_VAL);
 	tokens++;
 }
 // util 
@@ -161,9 +169,9 @@ bool isInRange(int start, int end, int value)
 	return value >= start &&  value <= end;
 }
 
-void FatalError(string msg , int code)
+void SyntaxError(string msg , int code)
 {
-		std::cerr << msg << std::endl;
+		std::cerr <<RED <<  "Syntax  Error : "<< RESET << msg << std::endl;
 		exit(code);
  }
 
