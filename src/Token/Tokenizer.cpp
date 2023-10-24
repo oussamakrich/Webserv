@@ -64,6 +64,15 @@ void Tokenizer::QuotesHandler(std::string &line, int lineNumber, unsigned int  &
 		i,
 		 });
 	i += (tokens.back().value.length() + 1);
+	if (tokens.back().value.empty())
+	{
+		if (quote == '\"')
+			std::cout << SYNTAX_ERROR << lineNumber << ":" << i << RESET" Empty Double Quotes. \n";
+		else
+			std::cout << SYNTAX_ERROR << lineNumber << ":" << i << RESET" Empty Single Quotes. \n";
+		std::cout << RED"\n\t\tError code: ("<< (EMPTY_QUOTES + 1) << ")\n" << RESET;
+		exit(1);
+	}
 }
 
 TOKEN_OUT Tokenizer::tokenGenerator(std::ifstream &file)
@@ -100,6 +109,11 @@ void Tokenizer::SemiColonSyntax(TOKEN_STRUCTS::iterator &i, TOKEN_STRUCTS &token
 		it--;
 	if (it != tokens.begin() && it->type != SEMICOLON && it->type != OPEN_C_BRACKET && it->type != CLOSE_C_BRACKET)
 		Tokenizer::fatalError(MISSING_SEMICOLON, it, RESET " missing semicolon after ");
+	while (it != tokens.begin() && it->type == SPACE)
+		it--;
+	it--;
+	if (it != tokens.begin() && it->type == SEMICOLON)
+		Tokenizer::fatalError(MISSING_SEMICOLON, it, RESET " Unexpected semicolon.");
 }
 
 void Tokenizer::BlockHandler(TOKEN_OUT &tokenizedFile, TOKEN_STRUCTS &tokens, TOKEN_ITERATOR &i)
@@ -109,8 +123,9 @@ void Tokenizer::BlockHandler(TOKEN_OUT &tokenizedFile, TOKEN_STRUCTS &tokens, TO
 	TOKEN_ITERATOR type = i;
 	i++;
 	while (i != tokens.end() && i->type == SPACE) i++;
-	if ((i == tokens.end() || i->type != WORD) && isLocation)
+	if ((i == tokens.end() || (i->type != WORD && i->type != QUOTES)) && isLocation)
 		Tokenizer::fatalError(MISSING_URL_BLOCK, type,  RESET " missing url ");
+	if (i->type == QUOTES) i->type = WORD;
 	tokenizedFile.push_back(std::make_pair(i->type, i->value));
 	if (isLocation) i++;
 
@@ -127,20 +142,20 @@ void Tokenizer::BlockHandler(TOKEN_OUT &tokenizedFile, TOKEN_STRUCTS &tokens, TO
 		else if (i->type == WORD && SpecialWords.find(i->value) != SpecialWords.end())
 		{
 			tokenizedFile.push_back(std::make_pair(SpecialWords.find(i->value)->second, i->value));
-			Tokenizer::SemiColonSyntax(i, tokens); // REMOVE this if you are already checking for semicolon in the parsing part.
+			Tokenizer::SemiColonSyntax(i, tokens);
 		}
 		else if (i->type != SPACE)
 		{
 			if (i->type == QUOTES) i->type = WORD;
 			tokenizedFile.push_back(std::make_pair(i->type, i->value));
 			if (i->type == WORD && !isLocation && i->value.find('/') != std::string::npos)
-				Tokenizer::SemiColonSyntax(i, tokens); // REMOVE this if you are already checking for semicolon in the parsing part.
+				Tokenizer::SemiColonSyntax(i, tokens);
 		}
 		i++;
 	}
 	if (i == tokens.end())
 		Tokenizer::fatalError(UNCLOSED_BRACKETS, type, RESET " unclosed or missing open bracket.");
-	Tokenizer::SemiColonSyntax(i, tokens); // REMOVE this if you are already checking for semicolon in the parsing part.
+	Tokenizer::SemiColonSyntax(i, tokens);
 	tokenizedFile.push_back(std::make_pair(i->type, i->value));
 }
 

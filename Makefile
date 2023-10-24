@@ -8,7 +8,7 @@ SRC =	./src/Global/Global.cpp \
 			./src/Server/Server.cpp\
 			./src/Token/Tokenizer.cpp\
 			./src/Utils/trim.cpp\
-			./src//Print/printTokens.cpp 
+			./src//Print/printTokens.cpp
 
 
 HEADER =./include/GenerateGlobalClass.hpp \
@@ -21,7 +21,7 @@ HEADER =./include/GenerateGlobalClass.hpp \
 
 OBJ = $(SRC:.cpp=.o)
 
-FLAGS = -Wall -Wextra -Werror -std=c++98 -fsanitize=address -g
+FLAGS = -Wall -Wextra -Werror -std=c++98 #-fsanitize=address -g
 
 all:  $(NAME)
 
