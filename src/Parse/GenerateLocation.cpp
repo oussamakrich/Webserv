@@ -79,7 +79,7 @@ void	GenerateLocation::ParsReturn(Location &lc, tk_iterator &tokens)
 		}
 		else if (tokens->first == WORD)
 				lc.setRedirectionText(tokens->second);
-			else
+		else
 				 throw std::runtime_error(ERR_SYN_RETURN);
 		tokens++;
 		if (tokens->first != SEMICOLON || (tokens + 1)->first != CLOSE_C_BRACKET)
@@ -89,7 +89,7 @@ void	GenerateLocation::ParsReturn(Location &lc, tk_iterator &tokens)
 	}
 	catch(const std::exception& e)
 	{
-			cout << tokens->second; 
+		cout << tokens->second; 
 		SyntaxError(e.what());
 	}
 	
