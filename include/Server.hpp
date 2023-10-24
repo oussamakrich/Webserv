@@ -65,7 +65,6 @@ class Server {
 		std::map<std::string, Location*> getAllLocation() const;
 		std::map<std::string, std::string> getMimeType() const;
 
-
 		int	getListen() const;
 
 };

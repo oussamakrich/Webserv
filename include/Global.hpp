@@ -11,6 +11,7 @@ class Global {
 
 	public:
 		void	addServer(Server *server);
+		void run();
 		// void	openMimeFile(std::string Mimestr);
 		// void	FillMimeType(std::string line);
 
@@ -19,5 +20,6 @@ class Global {
 		Global();
 		~Global();
 		Global(const Global &copy);
+
 		Global &operator=(const Global &copy);
 };

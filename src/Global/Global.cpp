@@ -24,3 +24,12 @@ void  Global::print(){
 			std::cout << *(*it) << std::endl;
 		}
 };
+void  Global::run()
+{
+	std::vector<Server *>::iterator it = servers.begin();
+
+		for(;it != servers.end(); it++){
+			std::cout << (*it)->start() << std::endl;
+		}
+
+}
