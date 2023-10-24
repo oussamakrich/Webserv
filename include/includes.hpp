@@ -12,7 +12,8 @@
 #define GREEN "\033[0;32m"
 #define RESET "\033[0m"
 #define U_WHITE "\033[4;37m"
-
+#define U_YELLOW "\033[4;33m"
+#define BLUE "\033[0;34m"
 typedef enum {
 	DIRECTIVE_SYNTAX_ERROR,
 	UNKNOWN_DIRECTIVE,
@@ -22,6 +23,7 @@ typedef enum {
 	MISSING_URL_BLOCK,
 	SERVER_BLOCK_NOT_FOUND,
 	EMPTY_QUOTES,
+	EMPTY_BLOCK,
 }Error;
 
 

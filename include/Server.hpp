@@ -2,6 +2,7 @@
 
 #include "includes.hpp"
 #include "Location.hpp"
+#include <ostream>
 
 class Server {
 
@@ -35,11 +36,13 @@ class Server {
 		void SetTypes(TOKEN_IT &it);
 		void SetHostAndPort(TOKEN_IT &it);
 		void SetErrorPages(TOKEN_IT &it);
+		void Shrink();
 
-	//FIX : Just for print 
+	//FIX : Just for print
 		void print();
+
 	private:
-		void parseListen(std::string line); 
+		void parseListen(std::string line);
 		void handelOne(std::string line);
 		void hostV6(std::string line);
 		int parseErrorPage(std::string codeValue);
@@ -64,3 +67,5 @@ class Server {
 
 	// public:		// Getters:
 	// 	Location const &getLocation(std::string const &url) const;
+
+std::ostream &operator<<(std::ostream &out, const Server &server);

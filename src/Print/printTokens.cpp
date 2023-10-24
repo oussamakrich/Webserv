@@ -113,10 +113,10 @@ void Server::print(){
 	std::cout << "|----------------mimetype----------------" << std::endl; printmap(mimeType);
 	std::cout << "|----------------location----------------" << std::endl;
 	std::map<std::string,Location*>::iterator it = locations.begin();
-	
+
 	for(;it != locations.end(); it++){
 			std::cout << "|\t URL : "  << it->first << std::endl;
-			it->second->printLocation(); 
+			it->second->printLocation();
 			std::cout << "|"<< std::endl;
 	}
 	std::cout << "++++++++++++++++++++++++++++++++++++" <<std::endl;
@@ -124,11 +124,3 @@ void Server::print(){
 }
 
 
-void  Global::print(){
-		std::vector<Server *>::iterator it = servers.begin();
-
-		for(;it != servers.end(); it++){
-			Server *ser = *it;
-			ser->print();
-		}
-};

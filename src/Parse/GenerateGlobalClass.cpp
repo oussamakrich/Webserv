@@ -33,6 +33,7 @@ Server *GenerateGlobalClass::fillServer(TOKEN_IT &it){
 	}
 	if (server->getRoot().empty())
 		error("root is required");
+	server->Shrink();
 	return server;
 } 
 
