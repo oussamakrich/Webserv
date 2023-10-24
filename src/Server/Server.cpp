@@ -1,8 +1,6 @@
 
 #include "../../include/Server.hpp"
 #include "../../include/GenerateLocation.hpp"
-#include <algorithm>
-#include <mutex>
 
 void error(std::string error){
 	std::cerr << RED"Syntax Error : "<< RESET << error  << std::endl;
@@ -42,7 +40,7 @@ void Server::Shrink(){
 }
 
 int Server::parseErrorPage(std::string codeValue){
-	if (codeValue.find_first_not_of("0123456789") != codeValue.npos) 
+	if (codeValue.find_first_not_of("0123456789") != codeValue.npos)
 		error("error code should be a number in ErrorPage");
 	if (codeValue.size() != 3)
 		error("error code range between 400 To 599");
@@ -52,7 +50,7 @@ int Server::parseErrorPage(std::string codeValue){
 	if (std::find(CheckRepeat.begin(), CheckRepeat.end(), errorCode) != CheckRepeat.end())
 			error("errorCode is repeated twice in ErrorPage");
 	CheckRepeat.push_back(errorCode);
-	return errorCode;	
+	return errorCode;
 }
 
 void Server::SetErrorPages(TOKEN_IT &it){
@@ -67,12 +65,12 @@ void Server::SetErrorPages(TOKEN_IT &it){
 	value = it->second;
 	it++;
 	if (it->first != SEMICOLON)	error("Expect only Tow value after ErrorPage");
-	
+
 	pair.first = code;
 	pair.second = value;
 	if (std::find(errorPages.begin(), errorPages.end(), pair) != errorPages.end())
 			error("value is repeated twice in ErrorPage");
-	errorPages.push_back(pair);	
+	errorPages.push_back(pair);
 }
 
 void Server::fillLocation(TOKEN_IT &it){
@@ -122,7 +120,7 @@ void Server::SetSingleValue(TOKEN_IT &it){
 	else if (key == ACCESS_LOG)		accessLog = value;
 	else if (key == ERROR_LOG)		errorLog = value;
 	else if (key == ROOT)					root = value;
-	
+
 }
 
 void Server::SetMultiValue(TOKEN_IT &it){
@@ -159,12 +157,12 @@ void	Server::handelOne(std::string line){
 	}
 	else
 		this->host = line;
-}	
+}
 
 void Server::hostV6(std::string line)
 {
 	std::string portStr;
-	size_t pos = line.find(']');	
+	size_t pos = line.find(']');
 
 	if (pos == line.npos)
 			error("Listen '[' Should be closed");
@@ -185,7 +183,7 @@ void Server::hostV6(std::string line)
 void Server::parseListen(std::string line){
 	size_t pos;
 	std::string portStr;
-	if (line[0] == '[')	
+	if (line[0] == '[')
 		this->hostV6(line);
 	else
 	{
@@ -205,12 +203,12 @@ void Server::parseListen(std::string line){
 	}
 	if (port <= 0 || port >  USHRT_MAX)
 		error("Port out of Range");
-} 
+}
 
 void	Server::SetHostAndPort(TOKEN_IT &it){
-	
+
 	std::string value = it->second;
-	it++;	
+	it++;
 	if (it->first != SEMICOLON)
 		error("Listen accept one value");
 	if(value.back() == ':')
@@ -254,12 +252,52 @@ std::string Server::getAccessLog() const{
 	return accessLog;
 }
 
-Location	&Server::getLocation(std::string url) {
+Location	&Server::getLocation(std::string url){
 
 	return *locations[url];
 }
 
-std::map<std::string, Location*> Server::getAllLocation(){
+std::map<std::string, Location*> Server::getAllLocation() const{
 	return locations;
 }
 
+std::map<std::string, std::string> Server::getMimeType() const{
+	return mimeType;
+}
+
+
+
+std::ostream &operator<<(std::ostream &out, const Server &server){
+	out << BLUE "serverName: " << U_YELLOW << server.getServerName() << std::endl;
+	out << RED "\tport: " << GREEN << server.getPort() << std::endl;
+	out << RED "\tclientMaxBodySize: " <<GREEN <<  server.getClientMaxBodySize() << std::endl;
+	out << RED "\thost: " <<GREEN <<  server.getHost() << std::endl;
+	out << RED "\troot: " <<GREEN <<  server.getRoot() << std::endl;
+	out << RED "\tserverName: " <<GREEN <<  server.getServerName() << std::endl;
+	out << RED "\tindex: " << GREEN;
+	for (size_t i = 0; i < server.getIndex().size(); i++)
+		out << server.getIndex()[i] << " ";
+	out << std::endl;
+	out << RED"\terrorPages: "<< RESET;
+	for (size_t i = 0; i < server.getErrorPages().size(); i++)
+		out << server.getErrorPages()[i].first << " " << server.getErrorPages()[i].second << " ";
+	out << std::endl;
+	out << RED"\tdefaultType: " << GREEN << server.getDefaultType() << std::endl;
+	out << RED"\taccessLog: " << GREEN << server.getAccessLog() << std::endl;
+	out << RED"\terrorLog: "  << GREEN<< server.getErrorLog() << std::endl;
+	out << "mimeType: " << std::endl;
+
+	std::map<std::string, std::string> mime = server.getMimeType();
+	for (std::map<std::string, std::string>::const_iterator it = mime.begin(); it != mime.end(); it++)
+		out << it -> first << " " << it -> second << std::endl;
+	out << "locations: " << std::endl;
+	std::map<std::string, Location*> loc = server.getAllLocation();
+	for (std::map<std::string, Location*>::const_iterator it = loc.begin(); it != loc.end(); it++)
+	{
+		out << it -> first << " " ;
+		it -> second->printLocation();
+		std::cout << std::endl;
+	}
+	return out;
+
+}

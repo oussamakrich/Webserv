@@ -2,6 +2,7 @@
 
 #include "includes.hpp"
 #include "Location.hpp"
+#include <ostream>
 
 class Server {
 
@@ -41,11 +42,9 @@ class Server {
 
 		bool	 start();
 
-	//FIX : Just for print 
-		void print();
 
 	private:
-		void parseListen(std::string line); 
+		void parseListen(std::string line);
 		void handelOne(std::string line);
 		void hostV6(std::string line);
 		int parseErrorPage(std::string codeValue);
@@ -63,7 +62,9 @@ class Server {
 		std::string getDefaultType() const;
 		std::string getAccessLog() const;
 		Location	&getLocation(std::string url);
-		std::map<std::string, Location*> getAllLocation();
+		std::map<std::string, Location*> getAllLocation() const;
+		std::map<std::string, std::string> getMimeType() const;
+
 
 		int	getListen() const;
 
@@ -72,3 +73,5 @@ class Server {
 
 
 	// public:		// Getters:
+
+std::ostream &operator<<(std::ostream &out, const Server &server);

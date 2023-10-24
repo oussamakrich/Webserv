@@ -6,4 +6,4 @@ webserver
 a.out
 test.cpp
 *.log
-config.conf
+*.conf
