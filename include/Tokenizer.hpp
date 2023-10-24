@@ -21,10 +21,11 @@ class Tokenizer {
 		static void ServerHandler(TOKEN_OUT &tokenizedFile, TOKEN_STRUCTS &tokens, TOKEN_ITERATOR &i);
 		static void BlockHandler(TOKEN_OUT &tokenizedFile, TOKEN_STRUCTS &tokens, TOKEN_ITERATOR &i);
 		static void syntaxCheck(TOKEN_OUT &tokenizedFile, TOKEN_STRUCTS &tokens);
+		static void fatalError(Error error,TOKEN_ITERATOR &it, std::string str);
 		static void SemiColonSyntax(TOKEN_ITERATOR &i, TOKEN_STRUCTS &tokens);
 		static void WordSyntax(TOKEN_ITERATOR &i, TOKEN_STRUCTS &tokens);
-		static void fatalError(Error error,TOKEN_ITERATOR &it, std::string str);
 		static bool is_not_of(char c, std::string str);
+		static void validateTokens(TOKEN_STRUCTS &tokens);
 		static void generateTokenMap(void);
 	public:
 		static TOKEN_OUT tokenGenerator(std::ifstream &file);

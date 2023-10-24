@@ -120,7 +120,7 @@ void GenerateLocation::ParsErrorPage(Location &lc, tk_iterator &tokens)
 			if(tokens->first != WORD) 
 				throw std::runtime_error(ERR_ERR_PAGE);
 		}
-			else throw std::runtime_error(ERR_ERR_PAGE);
+		else throw std::runtime_error(ERR_ERR_PAGE);
 
 		if (lc.AddErrorPage(tokens->second, code) == false) throw std::runtime_error(ERR_ERR_PAGE_MULT);
 		tokens++;

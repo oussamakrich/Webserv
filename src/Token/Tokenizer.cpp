@@ -35,6 +35,39 @@ void Tokenizer::generateTokenMap(void){
 	SpecialSymbols[";"] = SEMICOLON;
 }
 
+void Tokenizer::validateTokens(TOKEN_STRUCTS &tokens)
+{
+	unsigned int size = tokens.size();
+	for (unsigned int i = 0; i < size; i++)
+	{
+		if (i < size && tokens[i].type == SEMICOLON)
+		{
+			i++;
+			while (i < size && tokens[i].type == SPACE)
+				i++;
+			if (i < size && tokens[i].type == SEMICOLON && tokens[i].type == OPEN_C_BRACKET)
+			{
+				std::cout << SYNTAX_ERROR << tokens[i].column << ":" << tokens[i].row << RESET" expected word or quotes after semicolon.\n";
+				std::cout << RED"\n\t\tError code: ("<< (MISSING_SEMICOLON + 1) << ")\n" << RESET;
+				exit(1);
+			}
+		}
+		else if (i < size && tokens[i].type == OPEN_C_BRACKET)
+		{
+			i++;
+			while (i < size && tokens[i].type == SPACE)
+				i++;
+			if (i < size && tokens[i].type == SEMICOLON)
+			{
+				std::cout << SYNTAX_ERROR << tokens[i].column << ":" << tokens[i].row << RESET" expected word or quotes before semicolon.\n";
+				std::cout << RED"\n\t\tError code: ("<< (MISSING_SEMICOLON + 1) << ")\n" << RESET;
+				exit(1);
+			}
+		}
+
+	}
+}
+
 void Tokenizer::WordHandler(std::string &line, int lineNumber, unsigned int &i, TOKEN_STRUCTS &tokens)
 {
 	unsigned int len = i;
@@ -95,7 +128,8 @@ TOKEN_OUT Tokenizer::tokenGenerator(std::ifstream &file)
 		}
 		lineNumber++;
 	}
-	syntaxCheck(tokenizedFile, tokens);
+	Tokenizer::validateTokens(tokens);
+	Tokenizer::syntaxCheck(tokenizedFile, tokens);
 	return tokenizedFile;
 }
 
@@ -109,11 +143,6 @@ void Tokenizer::SemiColonSyntax(TOKEN_STRUCTS::iterator &i, TOKEN_STRUCTS &token
 		it--;
 	if (it != tokens.begin() && it->type != SEMICOLON && it->type != OPEN_C_BRACKET && it->type != CLOSE_C_BRACKET)
 		Tokenizer::fatalError(MISSING_SEMICOLON, it, RESET " missing semicolon after ");
-	// while (it != tokens.begin() && it->type == SPACE)
-	// 	it--;
-	// it--;
-	// if (it != tokens.begin() && it->type == SEMICOLON)
-	// 	Tokenizer::fatalError(MISSING_SEMICOLON, it, RESET " Unexpected semicolon.");
 }
 
 void Tokenizer::BlockHandler(TOKEN_OUT &tokenizedFile, TOKEN_STRUCTS &tokens, TOKEN_ITERATOR &i)

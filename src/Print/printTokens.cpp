@@ -1,7 +1,7 @@
 #include "../../include/includes.hpp"
 #include "../../include/Server.hpp"
 #include "../../include/Global.hpp"
-#include <iostream>
+#include <map>
 
 void printEnam(Token t)
 {
@@ -75,6 +75,13 @@ void printTokens(std::vector<TOKEN> tokens)
 		}
 }
 
+void printPages(std::vector<ERRPAGE_PAIR> vect){
+std::vector<ERRPAGE_PAIR>::iterator it = vect.begin();
+	for(;it != vect.end(); it++){
+		std::cout << "|\t" << it->first << "	:	" << it->second << "\t |" << std::endl;
+	}
+}
+
 void printvect(std::vector<std::string> vect){
 std::vector<std::string>::iterator it = vect.begin();
 	for(;it != vect.end(); it++){
@@ -86,35 +93,39 @@ std::vector<std::string>::iterator it = vect.begin();
 void printmap(std::map<std::string, std::string> vect){
 std::map<std::string,std::string >::iterator it = vect.begin();
 	for(;it != vect.end(); it++){
-			std::cout <<  it->first << "	:	" << it->second<< std::endl;
+			std::cout << "|\t" << it->first << "	:	" << it->second << "\t |"<< std::endl;
 	}
 	std::cout << "++++++++++++++++++++++++++++++++++++" <<std::endl;
 
 }
 
 void Server::print(){
-	std::cout << "\n--------	serverName	  " << serverName << std::endl;
-	std::cout << "port			: " << port << std::endl;
-	std::cout << "host			: " << host << std::endl;
-	std::cout << "body			: " << clientMaxBodySize << std::endl;
-	std::cout << "root			: " << root << std::endl;
-	std::cout << "index			: "; printvect(index);
-	std::cout << "errorpage		: "; printvect(errorPages);
-	std::cout << "deflttype		: " << defaultType << std::endl;
-	std::cout << "accesslog		: " << accessLog << std::endl;
-	std::cout << "errorLog		: " << errorLog << std::endl;
-	std::cout << "----mimetype				:" << std::endl; printmap(mimeType);
+	std::cout << "++++++++++++serverName : " << serverName <<"++++++++++++" << std::endl;
+	std::cout << "| port			: " << port << std::endl;
+	std::cout << "| host			: " << host << std::endl;
+	std::cout << "| body			: " << clientMaxBodySize << std::endl;
+	std::cout << "| root			: " << root << std::endl;
+	std::cout << "| index			: "; printvect(index);
+	std::cout << "| deflttype		: " << defaultType << std::endl;
+	std::cout << "| accesslog		: " << accessLog << std::endl;
+	std::cout << "| errorLog		: " << errorLog << std::endl;
+	std::cout << "|----------------errorpage---------------" <<std::endl; printPages(errorPages);
+	std::cout << "|----------------mimetype----------------" << std::endl; printmap(mimeType);
+	std::cout << "|----------------location----------------" << std::endl;
+	std::map<std::string,Location*>::iterator it = locations.begin();
+	
+	for(;it != locations.end(); it++){
+			std::cout << "|\t URL : "  << it->first << std::endl;
+			it->second->printLocation(); 
+			std::cout << "|"<< std::endl;
+	}
+	std::cout << "++++++++++++++++++++++++++++++++++++" <<std::endl;
+
 }
 
 
 void  Global::print(){
 		std::vector<Server *>::iterator it = servers.begin();
-		std::map<std::string, std::string>::iterator itt = mime_types.begin();
-
-		std::cout <<"-------------MIME TYPES---------" << std::endl;
-		for(;itt != mime_types.end(); itt++){
-			std::cout <<  itt->first << "	:	" << itt->second<< std::endl;
-		}
 
 		for(;it != servers.end(); it++){
 			Server *ser = *it;
