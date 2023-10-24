@@ -88,8 +88,7 @@ void Server::SetTypes(TOKEN_IT &it){
 		it++;
 	if (it->first != WORD)	error("Types should be followd by WORD");
 	value = it->second;
-	it++;
-	if (it->first != WORD)	error("Types Expect Key and Value");
+	if ((++it)->first != WORD)	error("Types Expect Key and Value");
 
 	while (it->first != CLOSE_C_BRACKET){
 		while (it->first != SEMICOLON && it->first != CLOSE_C_BRACKET){
