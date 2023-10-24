@@ -306,31 +306,31 @@ std::ostream &operator<<(std::ostream &out, const Server &server){
 
 //  bool Server::start()
 //  {
-    
+
 //     std::stringstream ss_port(port);
 //     addrinfo hinsts, *bind_addr;
 //     memset(&hinsts, 0, sizeof(hinsts));
 //     hinsts.ai_family = AF_INET;
 //     hinsts.ai_socktype = SOCK_STREAM;
 //     hinsts.ai_flags = AI_PASSIVE;
-	
+
 //     getaddrinfo(host.c_str(), ss_port.str().c_str(),&hinsts, &bind_addr);
 //     if (bind_addr == NULL)
 // 	{
-// 		std::cout << "get address info fail!\n"; 
+// 		std::cout << "get address info fail!\n";
 //         return false;
 // 	}
 // 	struct  sockaddr_in *in = ( sockaddr_in *)bind_addr->ai_addr;
 // 	std::cerr << "hsot " << host << " port " << port <<"address : "<< in->sin_addr.s_addr << endl;
 //  	_listen  = socket(bind_addr->ai_family, bind_addr->ai_socktype, bind_addr->ai_protocol);
 //     if (_listen < 0)
-//     {   	
-//         std::cout << "fail creat socket \n"; 
+//     {
+//         std::cout << "fail creat socket \n";
 //         return freeaddrinfo(bind_addr), false;
 //     }
 //     if (bind(_listen, (struct sockaddr *)bind_addr->ai_addr, bind_addr->ai_addrlen) != 0 )
 //     {
-// 		std::cout << "bin fail !\n"; 
+// 		std::cout << "bin fail !\n";
 //          return false;
 //     }
 //     if (listen(_listen,  SOMAXCONN))
@@ -349,9 +349,8 @@ std::ostream &operator<<(std::ostream &out, const Server &server){
 
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (sockfd == -1)
-	{	
-		std::cerr << 
-			std::cerr << "socket creation failed...\n";
+	{
+		std::cerr << "socket creation failed...\n";
 		return false;
 	}
 	bzero(&servaddr, sizeof(servaddr));
