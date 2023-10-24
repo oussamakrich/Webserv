@@ -77,7 +77,7 @@ void Tokenizer::validateTokens(TOKEN_STRUCTS &tokens)
 void Tokenizer::WordHandler(std::string &line, int lineNumber, unsigned int &i, TOKEN_STRUCTS &tokens)
 {
 	unsigned int len = i;
-	while (len < line.length() && Tokenizer::is_not_of(line[len], " \t\r;{}"))
+	while (len < line.length() && Tokenizer::is_not_of(line[len], " \t\r;{}#"))
 		len++;
 	tokens.push_back((t_tokens){
 		WORD,
@@ -130,6 +130,8 @@ TOKEN_OUT Tokenizer::tokenGenerator(std::ifstream &file)
 			else if (line[i] == '}') tokens.push_back((t_tokens){CLOSE_C_BRACKET, "}", lineNumber, i});
 			else if (line[i] == ';') tokens.push_back((t_tokens){SEMICOLON, ";", lineNumber, i});
 			else if (line[i] == '\"' || line[i] == '\'') Tokenizer::QuotesHandler(line, lineNumber, i, tokens, line[i]);
+			else if (line[i] == '#')
+				break;
 			else Tokenizer::WordHandler(line, lineNumber, i, tokens);
 		}
 		lineNumber++;
