@@ -58,11 +58,11 @@ class Server {
 		std::vector<ERRPAGE_PAIR> getErrorPages() const;
 		std::string getDefaultType() const;
 		std::string getAccessLog() const;
-
+		Location	&getLocation(std::string url);
+		std::map<std::string, Location*> getAllLocation();
 
 };
 
 
 
 	// public:		// Getters:
-	// 	Location const &getLocation(std::string const &url) const;

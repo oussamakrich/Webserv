@@ -2,6 +2,7 @@
 #include "../../include/Server.hpp"
 #include "../../include/GenerateLocation.hpp"
 #include <algorithm>
+#include <mutex>
 
 void error(std::string error){
 	std::cerr << RED"Syntax Error : "<< RESET << error  << std::endl;
@@ -252,3 +253,13 @@ std::string Server::getDefaultType() const{
 std::string Server::getAccessLog() const{
 	return accessLog;
 }
+
+Location	&Server::getLocation(std::string url) {
+
+	return *locations[url];
+}
+
+std::map<std::string, Location*> getAllLocation(){
+	return locations;
+}
+
