@@ -109,8 +109,9 @@ void Tokenizer::BlockHandler(TOKEN_OUT &tokenizedFile, TOKEN_STRUCTS &tokens, TO
 	TOKEN_ITERATOR type = i;
 	i++;
 	while (i != tokens.end() && i->type == SPACE) i++;
-	if ((i == tokens.end() || i->type != WORD) && isLocation)
+	if ((i == tokens.end() || (i->type != WORD && i->type != QUOTES)) && isLocation)
 		Tokenizer::fatalError(MISSING_URL_BLOCK, type,  RESET " missing url ");
+	if (i->type == QUOTES) i->type = WORD;
 	tokenizedFile.push_back(std::make_pair(i->type, i->value));
 	if (isLocation) i++;
 
