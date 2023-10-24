@@ -34,6 +34,12 @@ void error(std::string error){
 	return *this;
 }
 
+void Server::Shrink(){
+		index.shrink_to_fit();
+		errorPages.shrink_to_fit();
+		CheckRepeat.shrink_to_fit();
+}
+
 int Server::parseErrorPage(std::string codeValue){
 	if (codeValue.find_first_not_of("0123456789") != codeValue.npos) 
 		error("error code should be a number in ErrorPage");
@@ -80,14 +86,21 @@ void Server::SetTypes(TOKEN_IT &it){
 
 	if (it->first == OPEN_C_BRACKET)
 		it++;
-	for(;it->first != CLOSE_C_BRACKET; it++){
-		value = it->second;
-		it++;
-		while(it->first != SEMICOLON){
-			key = it->second;	
-			mimeType.insert(std::make_pair(key, value));
+	if (it->first != WORD)	error("Types should be followd by WORD");
+	value = it->second;
+	it++;
+	if (it->first != WORD)	error("Types Expect Key and Value");
+
+	while (it->first != CLOSE_C_BRACKET){
+		while (it->first != SEMICOLON && it->first != CLOSE_C_BRACKET){
+			key = it->second;
+			if (!mimeType.insert(std::make_pair(key, value)).second)
+				error("duplicate Type");
 			it++;
 		}
+		if (it->first == CLOSE_C_BRACKET)
+			break;
+		it++;
 	}
 }
 

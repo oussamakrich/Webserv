@@ -35,9 +35,11 @@ class Server {
 		void SetTypes(TOKEN_IT &it);
 		void SetHostAndPort(TOKEN_IT &it);
 		void SetErrorPages(TOKEN_IT &it);
+		void Shrink();
 
 	//FIX : Just for print 
 		void print();
+
 	private:
 		void parseListen(std::string line); 
 		void handelOne(std::string line);
