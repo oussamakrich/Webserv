@@ -26,7 +26,6 @@ std::string UrlDecode(std::string codedStr){
         else
             uncodedStr += codedStr[i];
     }
-    // std::cout << uncodedStr << std::endl;
     return uncodedStr;
 }
 
@@ -49,8 +48,6 @@ std::string UrlEncode(std::string simpleStr)
         else 
             codedStr += "%" + CharToHex(simpleStr[i]);
     }
-
-    // std::cout << codedStr << std::endl;
 
     return codedStr;
 }
