@@ -26,6 +26,8 @@ class Server {
 		std::map<std::string, Location*>		locations; // done.
 		std::vector<int> CheckRepeat;
 
+		int	_listen;
+
 
 	public:
 		void fillLocation(TOKEN_IT &it);
@@ -36,6 +38,8 @@ class Server {
 		void SetHostAndPort(TOKEN_IT &it);
 		void SetErrorPages(TOKEN_IT &it);
 		void Shrink();
+
+		bool	 start();
 
 	//FIX : Just for print 
 		void print();
@@ -60,6 +64,8 @@ class Server {
 		std::string getAccessLog() const;
 		Location	&getLocation(std::string url);
 		std::map<std::string, Location*> getAllLocation();
+
+		int	getListen() const;
 
 };
 

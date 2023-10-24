@@ -259,7 +259,7 @@ Location	&Server::getLocation(std::string url) {
 	return *locations[url];
 }
 
-std::map<std::string, Location*> getAllLocation(){
+std::map<std::string, Location*> Server::getAllLocation(){
 	return locations;
 }
 
