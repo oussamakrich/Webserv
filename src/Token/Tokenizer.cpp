@@ -109,11 +109,11 @@ void Tokenizer::SemiColonSyntax(TOKEN_STRUCTS::iterator &i, TOKEN_STRUCTS &token
 		it--;
 	if (it != tokens.begin() && it->type != SEMICOLON && it->type != OPEN_C_BRACKET && it->type != CLOSE_C_BRACKET)
 		Tokenizer::fatalError(MISSING_SEMICOLON, it, RESET " missing semicolon after ");
-	while (it != tokens.begin() && it->type == SPACE)
-		it--;
-	it--;
-	if (it != tokens.begin() && it->type == SEMICOLON)
-		Tokenizer::fatalError(MISSING_SEMICOLON, it, RESET " Unexpected semicolon.");
+	// while (it != tokens.begin() && it->type == SPACE)
+	// 	it--;
+	// it--;
+	// if (it != tokens.begin() && it->type == SEMICOLON)
+	// 	Tokenizer::fatalError(MISSING_SEMICOLON, it, RESET " Unexpected semicolon.");
 }
 
 void Tokenizer::BlockHandler(TOKEN_OUT &tokenizedFile, TOKEN_STRUCTS &tokens, TOKEN_ITERATOR &i)
