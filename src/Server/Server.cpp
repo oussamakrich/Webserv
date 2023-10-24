@@ -166,7 +166,7 @@ void Server::hostV6(std::string line)
 
 	if (pos == line.npos)
 			error("Listen '[' Should be closed");
-	this->host = line.substr(0, pos + 1);
+	this->host = line.substr(1, pos - 1);
 	if (this->host.find_first_not_of("ABCDEFabcdef0123456789:[]") != host.npos)
 		error("Unexpected Charachter in host");
 	line.erase(0, pos + 1);
