@@ -8,7 +8,8 @@ SRC =	./src/Global/Global.cpp \
 			./src/Server/Server.cpp\
 			./src/Token/Tokenizer.cpp\
 			./src/Utils/trim.cpp\
-			./src//Print/printTokens.cpp
+			./src//Print/printTokens.cpp\
+			./src/Logger/Logger.cpp
 
 
 HEADER =./include/GenerateGlobalClass.hpp \
@@ -17,7 +18,9 @@ HEADER =./include/GenerateGlobalClass.hpp \
 				./include/includes.hpp\
 				./include/Location.hpp\
 				./include/Server.hpp\
-				./include/Tokenizer.hpp
+				./include/Tokenizer.hpp\
+				./include/Logger.hpp
+
 
 OBJ = $(SRC:.cpp=.o)
 
