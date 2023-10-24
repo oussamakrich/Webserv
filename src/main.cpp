@@ -20,7 +20,7 @@ int main (int argc, char **argv)
 		Global *WebServer = GenerateGlobalClass::generateGlobalClass(tokens);
 		WebServer->print();
 
-		//WebServer.run();
+		// WebServer.run();
 
 	}catch (std::exception &e) {
 		std::cout << e.what() << std::endl;
