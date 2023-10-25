@@ -3,6 +3,7 @@
 #include "includes.hpp"
 #include "Location.hpp"
 #include <ostream>
+#include <vector>
 
 class Server {
 
@@ -13,24 +14,31 @@ class Server {
 		Server &operator=(const Server &copy);
 
 	private:
-		int								port; // done.
-		int								clientMaxBodySize; // done.
-		std::string					host; // done.
-		std::string					root; // done.
-		std::string					serverName; // done.
-		std::vector<std::string>	index; // done.
-		std::vector<ERRPAGE_PAIR>	errorPages; // done.
-		std::string 				defaultType; // done.
-		std::string 				accessLog; // done.
-		std::string					errorLog; // done.
-		std::map<std::string, std::string>	mimeType;
+		int										port; // done.
+		int										clientMaxBodySize; // done.
+		std::string								host; // done.
+		std::string								root; // done.
+		std::string								serverName; // done.
+		std::vector<std::string>				index; // done.
+		std::vector<ERRPAGE_PAIR>				errorPages; // done.
+		std::string 							defaultType; // done.
+		std::string 							accessLog; // done.
+		std::string								errorLog; // done.
+		std::map<std::string, std::string>		mimeType;
 		std::map<std::string, Location*>		locations; // done.
 		std::vector<int> CheckRepeat;
 
-		int	_listen;
-
+		int										_listen;
+		struct sockaddr_in						address;
+		std::vector<pollfd>						fds;
 
 	public:
+		int getSocket(){return _listen;};
+		sockaddr_in getAddress(){return this->address;};
+		std::vector<pollfd> getPollFds(){return this->fds;};
+		void SetFds(pollfd poll){this->fds.push_back(poll);};
+		void unsetFD(std::vector<pollfd>::iterator it) {this->fds.erase(it);};
+
 		void fillLocation(TOKEN_IT &it);
 		void SetSingleValue(TOKEN_IT &it);
 		void SetMultiValue(TOKEN_IT &it);

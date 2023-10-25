@@ -16,17 +16,17 @@ std::string hexToChar(std::string hex){
 }
 
 std::string UrlDecode(std::string codedStr){
-    std::string uncodedStr; 
+    std::string UncodedString;
 
     for(unsigned int i=0;i< codedStr.size(); i++){
         if(codedStr[i] == '%'){
-           uncodedStr += hexToChar(codedStr.substr(i + 1, 2));
+           UncodedString += hexToChar(codedStr.substr(i + 1, 2));
            i += 2;
         }
         else
-            uncodedStr += codedStr[i];
+            UncodedString += codedStr[i];
     }
-    return uncodedStr;
+    return UncodedString;
 }
 
 std::string CharToHex(char c){
@@ -43,9 +43,9 @@ std::string UrlEncode(std::string simpleStr)
     std::string codedStr;
     std::string unreserved = "-_.~";
     for (unsigned int i=0;i< simpleStr.size(); i++){
-        if (isalnum(simpleStr[i]) || unreserved.find(simpleStr[i]) != unreserved.npos) 
+        if (isalnum(simpleStr[i]) || unreserved.find(simpleStr[i]) != unreserved.npos)
             codedStr += simpleStr[i];
-        else 
+        else
             codedStr += "%" + CharToHex(simpleStr[i]);
     }
 

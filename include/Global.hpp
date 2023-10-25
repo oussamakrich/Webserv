@@ -6,7 +6,7 @@
 #include <string>
 
 class Global {
-	private:
+	public:
 		std::vector<Server *> servers;
 
 	public:

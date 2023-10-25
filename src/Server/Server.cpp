@@ -116,10 +116,10 @@ void Server::SetSingleValue(TOKEN_IT &it){
 	if (it->first != SEMICOLON)
 		error("Error: " + keyWord +" Accept only one Value");
 	if (key == SERVER_NAME)				serverName = value;
-	else if (key == DEFAULT_TYPE)	defaultType = value;
-	else if (key == ACCESS_LOG)		accessLog = value;
-	else if (key == ERROR_LOG)		errorLog = value;
-	else if (key == ROOT)					root = value;
+	else if (key == DEFAULT_TYPE)		defaultType = value;
+	else if (key == ACCESS_LOG)			accessLog = value;
+	else if (key == ERROR_LOG)			errorLog = value;
+	else if (key == ROOT)				root = value;
 
 }
 
@@ -303,76 +303,46 @@ std::ostream &operator<<(std::ostream &out, const Server &server){
 
 }
 
-
-//  bool Server::start()
-//  {
-
-//     std::stringstream ss_port(port);
-//     addrinfo hinsts, *bind_addr;
-//     memset(&hinsts, 0, sizeof(hinsts));
-//     hinsts.ai_family = AF_INET;
-//     hinsts.ai_socktype = SOCK_STREAM;
-//     hinsts.ai_flags = AI_PASSIVE;
-
-//     getaddrinfo(host.c_str(), ss_port.str().c_str(),&hinsts, &bind_addr);
-//     if (bind_addr == NULL)
-// 	{
-// 		std::cout << "get address info fail!\n";
-//         return false;
-// 	}
-// 	struct  sockaddr_in *in = ( sockaddr_in *)bind_addr->ai_addr;
-// 	std::cerr << "hsot " << host << " port " << port <<"address : "<< in->sin_addr.s_addr << endl;
-//  	_listen  = socket(bind_addr->ai_family, bind_addr->ai_socktype, bind_addr->ai_protocol);
-//     if (_listen < 0)
-//     {
-//         std::cout << "fail creat socket \n";
-//         return freeaddrinfo(bind_addr), false;
-//     }
-//     if (bind(_listen, (struct sockaddr *)bind_addr->ai_addr, bind_addr->ai_addrlen) != 0 )
-//     {
-// 		std::cout << "bin fail !\n";
-//          return false;
-//     }
-//     if (listen(_listen,  SOMAXCONN))
-//     {
-//         std::cout << "fail listen \n";
-// 		 return freeaddrinfo(bind_addr), false;
-//     }
-//     return freeaddrinfo(bind_addr),true;
-//  }
-
- bool Server::start()
+bool Server::start()
 {
-	int sockfd;
-	struct sockaddr_in servaddr;
-
-
-	sockfd = socket(AF_INET, SOCK_STREAM, 0);
-	if (sockfd == -1)
-	{
-		std::cerr << "socket creation failed...\n";
-		return false;
+	int	opt = 1;
+	  this->_listen = socket(AF_INET, SOCK_STREAM, 0);
+	if (this->_listen == -1) {
+		perror("socket");
+		return 1;
 	}
-	bzero(&servaddr, sizeof(servaddr));
 
-	// assign IP, PORT
-	servaddr.sin_family = AF_INET;
-	//servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-	inet_aton(host.c_str(), &servaddr.sin_addr);
-	cout << "ip int " << servaddr.sin_addr.s_addr <<endl;
-	servaddr.sin_port = htons(port);
+	// Set socket options, bind, and start listening.
+	if (setsockopt(this->_listen, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1) {
+		perror("setsockopt");
+		return 1;
+	}
+	// bind.
+	this->address.sin_family = AF_INET;
+	this->address.sin_addr.s_addr = INADDR_ANY;
+	this->address.sin_port = htons(8080);
+	memset(this->address.sin_zero, '\0', sizeof this->address.sin_zero);
+	if (bind(this->_listen, (struct sockaddr *)&this->address, sizeof(this->address)) < 0) {
+		perror("bind");
+		return 1;
+	}
+	// Start listening on the socket.
+	if (listen(this->_listen, 10) == -1) {
+		perror("listen");
+		return 1;
+	}
 
-	// Binding newly created socket to given IP and verification
-	if (bind(sockfd, (sockaddr *)&servaddr, sizeof(servaddr)) != 0)
-	{
-			std::cerr << "socket bind failed...\n";
-		return false;
-	}
-	if ((listen(sockfd, 2)) != 0)
-	{
-		std::cerr << "Listen failed...\n";
-		return false;
-	}
+	// Set the socket to non-blocking mode.
+	fcntl(this->_listen, F_SETFL, O_NONBLOCK);
+
+	// Create a list of file descriptors to poll (including the server socket).
+	this->fds.push_back(
+		(pollfd)
+		{
+			this->_listen,
+			POLLIN,
+			0
+		}
+		);
 	return true;
 }
-

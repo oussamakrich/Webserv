@@ -13,6 +13,12 @@
 # include <netinet/in.h>
 # include <netdb.h>
 # include <unistd.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/poll.h>
+#include <cstring>
 
 
 #define RED "\033[0;31m"
