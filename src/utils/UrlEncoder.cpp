@@ -6,7 +6,7 @@ std::string hexToChar(std::string hex){
     std::string c;
     std::stringstream ss(hex);
 
-    if (hex.size() != 2)
+    if (hex.size() != 2 || hex.find_first_not_of("1234567890abcdefABCDEF") != hex.npos)
         return'%' + hex;
 
     ss >> std::hex >> i;
@@ -33,8 +33,9 @@ std::string CharToHex(char c){
 
     int i = static_cast<int>(c);
     std::stringstream ss;
-
     ss << std::hex  << i;
+    if (ss.str().size() != 2)
+        return  "0" + ss.str();
     return ss.str();
 }
 
@@ -51,4 +52,3 @@ std::string UrlEncode(std::string simpleStr)
 
     return codedStr;
 }
-
