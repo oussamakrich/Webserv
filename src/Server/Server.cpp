@@ -285,16 +285,17 @@ std::ostream &operator<<(std::ostream &out, const Server &server){
 	out << RED"\tdefaultType: " << GREEN << server.getDefaultType() << std::endl;
 	out << RED"\taccessLog: " << GREEN << server.getAccessLog() << std::endl;
 	out << RED"\terrorLog: "  << GREEN<< server.getErrorLog() << std::endl;
-	out << "mimeType: " << std::endl;
+	out << RED"\tmimeType: " << std::endl;
 
 	std::map<std::string, std::string> mime = server.getMimeType();
 	for (std::map<std::string, std::string>::const_iterator it = mime.begin(); it != mime.end(); it++)
-		out << it -> first << " " << it -> second << std::endl;
-	out << "locations: " << std::endl;
+		out << GREEN"\t\t"<< it -> first << " " << it -> second << std::endl;
+	out << RED"\tlocations: " << std::endl;
+	std::cout << RESET;
 	std::map<std::string, Location*> loc = server.getAllLocation();
 	for (std::map<std::string, Location*>::const_iterator it = loc.begin(); it != loc.end(); it++)
 	{
-		out << it -> first << " " ;
+		out <<it -> first << " " ;
 		it -> second->printLocation();
 		std::cout << std::endl;
 	}
