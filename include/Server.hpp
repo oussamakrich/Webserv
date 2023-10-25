@@ -35,7 +35,7 @@ class Server {
 	public:
 		int getSocket(){return _listen;};
 		sockaddr_in getAddress(){return this->address;};
-		std::vector<pollfd> getPollFds(){return this->fds;};
+		std::vector<pollfd> &getPollFds(){return this->fds;};
 		void SetFds(pollfd poll){this->fds.push_back(poll);};
 		void unsetFD(std::vector<pollfd>::iterator it) {this->fds.erase(it);};
 

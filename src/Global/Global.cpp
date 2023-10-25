@@ -25,62 +25,71 @@ void  Global::print(){
 			std::cout << *(*it) << std::endl;
 		}
 }
+// void  Global::run()
+// {
+// 	Server serv = *serv.
+// 	while (true)
+// 	{
+// 		int ready;
+// 			ready = poll(serv.getPollFds().data(),serv.getPollFds().size(),-1);
+// 			std::cout << "ready number"<< ready << endl;
+// 		vector<pollfd> &vec = get
+// (int i)
+// 		{
+// 			/* code */
+// 		}
+		
+// 	}
+	
+
+// }
 
 void  Global::run()
 {
-	std::vector<Server *>::iterator it;
-
-	it = servers.begin();
-
-	for(;it != servers.end(); it++) {std::cout << (*it)->start() << std::endl;}
+	Server serv = *servers[0]
+	serv.start();
 	int clientSocket;
-	it = servers.begin();
+	std::vector<pollfd> &fds = serv.getPollFds();
+	int number = 0;
 	while (true)
 	{
-		std::cout << "polling" << std::endl;
-		int ready = poll(this->servers[0]->getPollFds().data(), this->servers[0]->getPollFds().size(), -1);
-		std::cout << "end polling" << std::endl;
+
+		std::cerr << "wait for new fd " << std::endl;
+		int ready = poll(serv.getPollFds().data(), serv.getPollFds().size(), -1);
+		
 		if (ready == -1) {
 			perror("poll");
 			break;
 		}
-		std::vector<pollfd> fds = servers[0]->getPollFds();
-
 		for (unsigned int i = 0; i < fds.size(); i++) {
 
 			if (fds[i].events & POLLIN) {
 
-				if (fds[i].fd == this->servers[0]->getSocket()) {
+				if (fds[i].fd == serv.getSocket()) {
 					// Accept a new connection.
-					clientSocket = accept(this->servers[0]->getSocket(), NULL, NULL);
+					clientSocket = accept(serv.getSocket(), NULL, NULL);
+					std::cerr << "----> accept connection number "<< number << " >--"<< std::endl;
+					std::cerr<< "accept fd " <<endl;
+					number++;
 					if (clientSocket != -1) {
 						// Set the client socket to non-blocking mode.
-						// fcntl(clientSocket, F_SETFL, O_NONBLOCK);
-
-						this->servers[0]->SetFds((pollfd){clientSocket, (POLLIN | POLLOUT), 0});
+						//fcntl(clientSocket, F_SETFL, O_NONBLOCK);
+						serv.SetFds((pollfd){clientSocket, (POLLIN | POLLOUT), 0});
 					}
-				} else
+				}
+				 else
 				{
-
 					int BUFFER_SIZE = 1024;
 					char buffer[BUFFER_SIZE + 1];
-
-					std::cout << fds[i].fd << std::endl;
 					int bytes = recv(fds[i].fd, buffer, BUFFER_SIZE, 0);
-					if (bytes == -1) {
-						perror("recv");
-						break;
-					}
+					if (bytes == -1) 
+						perror("cant ', read \n");
+					else	
 					std::cout << buffer << std::endl;
-					// close(fds[i].fd);
-					// servers[0]->unsetFD(it);
-
-
+					close(fds[i].fd);
+					std::cerr<< "close fd " << fds[i].fd << endl;
+					 fds.erase(fds.begin() + i);
 				}
-			}
-			if (fds[i].revents & POLLOUT) {
-
-				// Write a response to the client.
 			}
 		}
 	}
