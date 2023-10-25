@@ -1,8 +1,10 @@
 #pragma once
 
+#include "Client.hpp"
 #include "includes.hpp"
 #include "Location.hpp"
 #include <ostream>
+#include <sys/poll.h>
 
 class Server {
 
@@ -29,6 +31,9 @@ class Server {
 
 		int	_listen;
 
+		std::vector<Client *> clients;	
+
+
 
 	public:
 		void fillLocation(TOKEN_IT &it);
@@ -41,6 +46,8 @@ class Server {
 		void Shrink();
 
 		bool	 start();
+		bool	 isMyFd(int fd);
+		void	 handelFd(struct pollfd fd);
 
 
 	private:

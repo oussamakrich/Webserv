@@ -13,6 +13,7 @@
 # include <netinet/in.h>
 # include <netdb.h>
 # include <unistd.h>
+#include <sys/poll.h>
 
 
 #define RED "\033[0;31m"

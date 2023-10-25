@@ -1,5 +1,6 @@
 
 #include "../../include/Global.hpp"
+#include <sys/poll.h>
 
 
 Global::Global(){}
@@ -24,6 +25,7 @@ void  Global::print(){
 			std::cout << *(*it) << std::endl;
 		}
 };
+
 void  Global::run()
 {
 	std::vector<Server *>::iterator it = servers.begin();
@@ -31,5 +33,13 @@ void  Global::run()
 		for(;it != servers.end(); it++){
 			std::cout << (*it)->start() << std::endl;
 		}
+}
 
+void Global::insertFd(int fd){
+
+	struct pollfd pfd;
+
+	pfd.fd = fd;
+	pfd.events = POLLIN | POLLOUT;
+	Global::gPollFds.push_back(pfd);
 }

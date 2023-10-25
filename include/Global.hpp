@@ -8,13 +8,16 @@
 class Global {
 	private:
 		std::vector<Server *> servers;
+		static	std::vector<struct pollfd> gPollFds; 
 
+		// std::vector<Clients *> clients;
+		
 	public:
 		void	addServer(Server *server);
-		void run();
-		// void	openMimeFile(std::string Mimestr);
-		// void	FillMimeType(std::string line);
-
+		void	run();
+		static void	insertFd(int fd);
+		
+		
 		void  print();
 
 		Global();
