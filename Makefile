@@ -6,10 +6,12 @@ SRC =	./src/Global/Global.cpp \
 			./src/Parse/GenerateGlobalClass.cpp \
 			./src/Parse/GenerateLocation.cpp\
 			./src/Server/Server.cpp\
+			./src/Server/ServerFd.cpp\
 			./src/Token/Tokenizer.cpp\
 			./src/Utils/trim.cpp\
 			./src//Print/printTokens.cpp\
-			./src/Logger/Logger.cpp
+			./src/Logger/Logger.cpp\
+			./src/Client/Client.cpp
 
 
 HEADER =./include/GenerateGlobalClass.hpp \
@@ -19,7 +21,8 @@ HEADER =./include/GenerateGlobalClass.hpp \
 				./include/Location.hpp\
 				./include/Server.hpp\
 				./include/Tokenizer.hpp\
-				./include/Logger.hpp
+				./include/Logger.hpp\
+				./include/Client.hpp
 
 
 OBJ = $(SRC:.cpp=.o)

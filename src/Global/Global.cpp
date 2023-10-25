@@ -1,7 +1,9 @@
 
 #include "../../include/Global.hpp"
 #include <sys/poll.h>
+#include <vector>
 
+std::vector<struct pollfd> Global::gPollFds =  std::vector<struct pollfd>();
 
 Global::Global(){}
 
@@ -26,12 +28,42 @@ void  Global::print(){
 		}
 };
 
+void Global::callHandelFds(struct pollfd pfd){
+	Server *server;
+	
+	for (unsigned int i =0; i < servers.size(); i++){
+		server = servers[i];
+		if (server->isMyFd(pfd.fd)){
+			// std::cout << "conn with " + server->getHost() << " port : " << server->getPort()  << "fd : " << server->getListen()  << std::endl;
+			server->handelFd(pfd);
+			break;
+		}
+	}
+}
+
 void  Global::run()
 {
 	std::vector<Server *>::iterator it = servers.begin();
 
 		for(;it != servers.end(); it++){
 			std::cout << (*it)->start() << std::endl;
+		std::cout << "my listen : " << (*it)->getListen() << std::endl;
+		}
+		
+		while(true){
+			std::cout << "Polling" << std::endl;
+			int pollStatus = poll(this->gPollFds.data(), this->gPollFds.size(), -1);
+			if (pollStatus == -1) {
+				perror("poll");
+				break;
+			}
+			for(unsigned int i =0; i < gPollFds.size(); i++){
+				if ((gPollFds[i].events & POLLIN)){
+					// std::cout << "poll fd : "  << gPollFds[i].fd << std::endl;
+					this->callHandelFds(gPollFds[i]);
+					break;
+				}
+			}
 		}
 }
 
@@ -43,3 +75,4 @@ void Global::insertFd(int fd){
 	pfd.events = POLLIN | POLLOUT;
 	Global::gPollFds.push_back(pfd);
 }
+

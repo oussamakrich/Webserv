@@ -265,6 +265,7 @@ std::map<std::string, Location*> Server::getAllLocation() const{
 std::map<std::string, std::string> Server::getMimeType() const{
 	return mimeType;
 }
+int	Server::getListen() const	{return _listen;}
 
 std::ostream &operator<<(std::ostream &out, const Server &server){
 	out << BLUE "serverName: " << U_YELLOW << server.getServerName() << std::endl;
