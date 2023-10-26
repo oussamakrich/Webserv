@@ -6,6 +6,14 @@
 #include <exception>
 #include <fstream>
 #include <vector>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+# include <sys/types.h>
+# include <sys/socket.h>
+# include <netinet/in.h>
+# include <netdb.h>
+# include <unistd.h>
+#include <sys/poll.h>
 
 
 #define RED "\033[0;31m"

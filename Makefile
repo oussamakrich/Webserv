@@ -1,25 +1,33 @@
 NAME = webserver
 
-SRC =	./src/Global/Global.cpp \
-			./src/Location/Location.cpp \
-			./src/main.cpp \
-			./src/Parse/GenerateGlobalClass.cpp \
-			./src/Parse/GenerateLocation.cpp\
-			./src/Server/Server.cpp\
-			./src/Token/Tokenizer.cpp\
-			./src/Utils/trim.cpp\
-			./src//Print/printTokens.cpp\
-			./src/Logger/Logger.cpp
+SRC =	./HttpElement/src/Client.cpp\
+		./HttpElement/src/Global.cpp\
+		./HttpElement/src/Location.cpp\
+		./HttpElement/src/Server.cpp\
+		./HttpElement/src/ServerFd.cpp\
+		./main.cpp\
+		./Parsing/src/GenerateGlobalClass.cpp\
+		./Parsing/src/GenerateLocation.cpp\
+		./Parsing/src/GenerateServer.cpp\
+		./Parsing/src/Tokenizer.cpp\
+		./Utils/src/Logger.cpp\
+		./Utils/src/printTokens.cpp\
+		./Utils/src/trim.cpp\
+		./Utils/src/UrlEncoder.cpp
 
 
-HEADER =./include/GenerateGlobalClass.hpp \
-				./include/GenerateLocation.hpp\
-				./include/Global.hpp\
-				./include/includes.hpp\
-				./include/Location.hpp\
-				./include/Server.hpp\
-				./include/Tokenizer.hpp\
-				./include/Logger.hpp
+
+HEADER =	./HttpElement/include/Client.hpp \
+			./HttpElement/include/Global.hpp \
+			./HttpElement/include/Location.hpp \
+			./HttpElement/include/Server.hpp \
+			./include/includes.hpp \
+			./Parsing/include/GenerateGlobalClass.hpp \
+			./Parsing/include/GenerateLocation.hpp \
+			./Parsing/include/GenerateServer.hpp \
+			./Parsing/include/Tokenizer.hpp \
+			./Utils/include/Logger.hpp
+
 
 
 OBJ = $(SRC:.cpp=.o)

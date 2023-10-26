@@ -1,4 +1,4 @@
-#include "../../include/Tokenizer.hpp"
+#include "../include/Tokenizer.hpp"
 
 std::map<std::string, Token> Tokenizer::SpecialWords = std::map<std::string, Token>();
 std::map<std::string, Token> Tokenizer::SpecialSymbols = std::map<std::string, Token>();
@@ -131,10 +131,7 @@ TOKEN_OUT Tokenizer::tokenGenerator(std::ifstream &file)
 			else if (line[i] == ';') tokens.push_back((t_tokens){SEMICOLON, ";", lineNumber, i});
 			else if (line[i] == '\"' || line[i] == '\'') Tokenizer::QuotesHandler(line, lineNumber, i, tokens, line[i]);
 			else if (line[i] == '#')
-			{
-				
 				break;
-			}
 			else Tokenizer::WordHandler(line, lineNumber, i, tokens);
 		}
 		lineNumber++;

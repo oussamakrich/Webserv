@@ -1,6 +1,6 @@
 #include "../../include/includes.hpp"
-#include "../../include/Server.hpp"
-#include "../../include/Global.hpp"
+#include "../../HttpElement/include/Server.hpp"
+#include "../../HttpElement/include/Global.hpp"
 #include <map>
 
 void printEnam(Token t)

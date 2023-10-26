@@ -1,33 +1,34 @@
-#pragma once 
-#include "includes.hpp"
-#include <vector>
-#include <string>
+#pragma once
+
+#include "../../include/includes.hpp"
+
+
 
 using namespace std;
 
 class Location {
 
 		private:
-			template<class container, class value>	bool Add(container &c, value v); 
-			vector <string>  						Allowed_Method;			
-			vector <string> 						indexes; 
+			template<class container, class value>	bool Add(container &c, value v);
+			vector <string>  						Allowed_Method;
+			vector <string> 						indexes;
 			vector <string> 						try_file;
 			vector <std::pair<int , string> >  		error_page;
-			string		  							root;                       			
+			string		  							root;
 			string 		  							redirection_text;
-			string 									default_type; 			
+			string 									default_type;
 			string									path;
-			int  			 						redirection_code; 	
+			int  			 						redirection_code;
 			bool  									AutoIndex;
-			bool 									_isRedirection;	
+			bool 									_isRedirection;
 		public :
 				Location(string path);
 				~Location();
-				void final(); // this method resize all container 
+				void final(); // this method resize all container
 		/*********************************< adder >*******************/
 				bool             AddErrorPage(const string &page, int code);
 				bool             AddHttpMethod(const string &method);
-				bool             AddTryFile(const string &file); 
+				bool             AddTryFile(const string &file);
 				bool             AddIndex(const string &index);
 
 				/*********************************< setter >*******************/
@@ -38,7 +39,7 @@ class Location {
 						void         setDefaultType(const string &type);
 						void         setRedirectionCode(int  code);
 						void         setRedirectionText(string &text);
-						void         setRedirection(int code , string &text); 
+						void         setRedirection(int code , string &text);
 						void         setPath(string &path);
 
 				/*********************************< getter >*******************/
@@ -53,7 +54,7 @@ class Location {
 				const string                 			getUri() 								const; // uri = root + path;
 		/*********************************< checker >*******************/
 				bool isMethodAllowed(const string &method) 	const;
-				bool isRedirection()						const; 
+				bool isRedirection()						const;
 				bool isAutoIndex()							const;
 		/*********************************< for Debug  >*******************/
 

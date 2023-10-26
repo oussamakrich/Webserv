@@ -1,9 +1,9 @@
 #pragma once
-#include "includes.hpp"
-#include "Location.hpp"
+#include "../../include/includes.hpp"
+#include "../../HttpElement/include/Location.hpp"
 using namespace std;
 
-class GenerateLocation 
+class GenerateLocation
 {
 	typedef std::vector<TOKEN>::iterator  tk_iterator;
 public:
@@ -22,6 +22,6 @@ private:
 
 };
 //***************************** util ***************************************
-		bool isInteger(string &str); // [0-9] one more digit 
+		bool isInteger(string &str); // [0-9] one more digit
 	 	bool isInRange(int start, int end, int value); // if  end < start  throw exception value E[start , end]
 		void SyntaxError(string msg="Fatal Error", int code=1);

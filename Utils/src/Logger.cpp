@@ -1,5 +1,5 @@
 
-#include  "../../include/Logger.hpp"
+#include  "../include/Logger.hpp"
 
     Logger::Logger(const std::string logfile): _log(logfile, std::ios::app){}
     Logger::~Logger()
@@ -20,7 +20,7 @@ bool Logger::logFormat(const std::string &logtype, std::string &msg)
 }
 
 bool Logger::Info(std::string msg)
-{   
+{
 	std::string tmp = "INFO";
     return logFormat(tmp, msg);
 }
@@ -44,9 +44,9 @@ bool Logger::Error(std::string  msg)
 }
 
 bool Logger::isGood()
-{	
+{
 	return _log.good();
-} // return status of open log file; 
+} // return status of open log file;
 bool Logger::fastLog(int type, std::string file, std::string msg)
 {
 	Logger lg(file);
@@ -65,7 +65,7 @@ bool Logger::fastLog(int type,std::string file,std::string msg, Server &serv)
 {
 	std::stringstream strm(" Server { ");
 	strm << "host = " << serv.getHost();
-	strm << " port = " << serv.getPort(); 
+	strm << " port = " << serv.getPort();
 	strm <<   "} : " << msg;
 	std::string resMsg = msg.c_str();
 	return fastLog(type, file , resMsg);
