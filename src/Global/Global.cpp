@@ -33,11 +33,8 @@ void Global::callHandelFds(struct pollfd pfd){
 	
 	for (unsigned int i =0; i < servers.size(); i++){
 		server = servers[i];
-		if (server->isMyFd(pfd.fd)){
-			// std::cout << "conn with " + server->getHost() << " port : " << server->getPort()  << "fd : " << server->getListen()  << std::endl;
-			server->handelFd(pfd);
+		if (server->handelFd(pfd))
 			break;
-		}
 	}
 }
 
@@ -58,10 +55,8 @@ void  Global::run()
 				break;
 			}
 			for(unsigned int i =0; i < gPollFds.size(); i++){
-				if ((gPollFds[i].events & POLLIN)){
-					// std::cout << "poll fd : "  << gPollFds[i].fd << std::endl;
+				if ((gPollFds[i].revents & POLLIN)){
 					this->callHandelFds(gPollFds[i]);
-					break;
 				}
 			}
 		}

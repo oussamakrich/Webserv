@@ -3,23 +3,18 @@
 #include "../../include/GenerateLocation.hpp"
 #include "../../include/Global.hpp"
 
-// void error(std::string error){
-// 	std::cerr << RED"Syntax Error : "<< RESET << error  << std::endl;
-// 	exit(1);
-// }
-
-	Server::Server(){
+Server::Server(){
 	this->host = "localhost";
 	this->port = 80;
 	this->defaultType = "application/octet-stream";
 	this->clientMaxBodySize = 1;
 }
 
-	Server::~Server(){}
+Server::~Server(){}
 
-	Server::Server(const Server &copy){*this = copy;}
+Server::Server(const Server &copy){*this = copy;}
 
-	Server &Server::operator=(const Server &copy){
+Server &Server::operator=(const Server &copy){
 		port = copy.port;
 		clientMaxBodySize = copy.clientMaxBodySize;
 		host = copy.host ;
@@ -39,7 +34,6 @@ void Server::Shrink(){
 		errorPages.shrink_to_fit();
 		CheckRepeat.shrink_to_fit();
 }
-
 
 void Server::setPort(int port) { this->port = port; }
 
@@ -72,7 +66,6 @@ void Server::setLocations(const LOCATION_MAP& locations) { this->locations = loc
 void Server::setSingleLocation(const LOCATION_PAIR& location) {this->locations.insert(location);}
 
 void Server::setItIndex(str_it begin, str_it end){ index.insert(index.end(), begin, end);}
-
 
 //INFO : +++++++++++ implementation of getters++++++++++++++
 
@@ -141,6 +134,3 @@ std::ostream &operator<<(std::ostream &out, const Server &server){
 	}
 	return out;
 }
-
-
-

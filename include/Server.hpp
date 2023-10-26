@@ -64,8 +64,8 @@ class Server {
 		void Shrink();
 
 		bool	 start();
-		bool	 isMyFd(int fd);
-		void	 handelFd(struct pollfd fd);
+		// bool	 isMyFd(int fd);
+		bool	 handelFd(struct pollfd fd);
 
 	public:
 		int	getPort() const;
