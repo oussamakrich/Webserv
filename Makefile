@@ -5,6 +5,7 @@ SRC =	./src/Global/Global.cpp \
 			./src/main.cpp \
 			./src/Parse/GenerateGlobalClass.cpp \
 			./src/Parse/GenerateLocation.cpp\
+			./src/Parse/GenerateServer.cpp\
 			./src/Server/Server.cpp\
 			./src/Server/ServerFd.cpp\
 			./src/Token/Tokenizer.cpp\
@@ -16,6 +17,7 @@ SRC =	./src/Global/Global.cpp \
 
 HEADER =./include/GenerateGlobalClass.hpp \
 				./include/GenerateLocation.hpp\
+				./include/GenerateServer.hpp\
 				./include/Global.hpp\
 				./include/includes.hpp\
 				./include/Location.hpp\
