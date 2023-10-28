@@ -1,11 +1,11 @@
-// #include "RequestBuffer.hpp"
+#include "RequestBuffer.hpp"
 
 // /***************************************************************/
-// RequestBuffer::RequestBuffer(int Max_BodySize){
-// 	this->Max_BodySize = Max_BodySize;
-// 	this->Body = new char[Max_BodySize + 1];
-// 	this->level = 0;
-// }
+RequestBuffer::RequestBuffer(int Max_BodySize){
+	this->Max_BodySize = Max_BodySize;
+	this->Body = new char[Max_BodySize + 1];
+	this->level = 0;
+}
 
 // RequestBuffer::RequestBuffer(const RequestBuffer &x){
 // 	this->Max_BodySize = x.Max_BodySize;

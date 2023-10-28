@@ -3,6 +3,7 @@
 #include "Client.hpp"
 #include "../../include/includes.hpp"
 #include "Location.hpp"
+#include <sys/poll.h>
 
 #define str_it std::vector<std::string>::iterator
 #define LOCATION_PAIR std::pair<std::string, Location*>
@@ -12,6 +13,7 @@
 #define VECT_STR std::vector<std::string>
 #define VECT_ERRORPIR std::vector<ERRPAGE_PAIR>
 #define VECT_CLIENT std::vector<Client*>
+#define ITT_CLIENT	std::vector<Client*>::iterator
 
 class Server {
 
@@ -64,8 +66,11 @@ class Server {
 		void Shrink();
 
 		bool	 start();
-		// bool	 isMyFd(int fd);
 		bool	 handelFd(struct pollfd fd);
+		void	 acceptClient();
+		bool	 handelClient(ITT_CLIENT it);
+		ITT_CLIENT	findClient(pollfd pfd);
+		
 
 	public:
 		int	getPort() const;
@@ -81,9 +86,9 @@ class Server {
 
 		std::vector<std::string> getIndex() const;
 		std::vector<ERRPAGE_PAIR> getErrorPages() const;
-		Location	&getLocation(std::string url);
 		std::map<std::string, Location*> getAllLocation() const;
 		std::map<std::string, std::string> getMimeType() const;
+		Location	&getLocation(std::string url);
 };
 
 

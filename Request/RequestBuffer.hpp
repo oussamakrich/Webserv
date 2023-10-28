@@ -35,7 +35,7 @@ class RequestBuffer{
 
 	public:
 
-		void										insertToBuffer(char *buffer, int size);
+		int											insertToBuffer(char *buffer, int size);
 		char*										getBodyRange(int start, int end);
 		char*										getBodyRange(int start);
 

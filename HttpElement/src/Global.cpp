@@ -38,6 +38,15 @@ void Global::callHandelFds(struct pollfd pfd){
 	}
 }
 
+void Global::removeFd(int fd){
+	for(unsigned int i=0; i < gPollFds.size(); i++){
+			if (gPollFds[i].fd == fd){
+				gPollFds.erase(gPollFds.begin() + i);
+				break ;
+		}
+	}
+}
+
 void  Global::run()
 {
 	std::vector<Server *>::iterator it = servers.begin();
@@ -48,8 +57,8 @@ void  Global::run()
 		}
 
 		while(true){
-			std::cout << "Polling" << std::endl;
 			int pollStatus = poll(this->gPollFds.data(), this->gPollFds.size(), -1);
+			// std::cout << "Polling" << std::endl;
 			if (pollStatus == -1) {
 				perror("poll");
 				break;
@@ -68,6 +77,7 @@ void Global::insertFd(int fd){
 
 	pfd.fd = fd;
 	pfd.events = POLLIN | POLLOUT;
+	pfd.revents = 0;
 	Global::gPollFds.push_back(pfd);
 }
 
