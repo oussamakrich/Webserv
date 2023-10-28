@@ -68,8 +68,8 @@ bool Server::handelFd(struct pollfd pfd){
 		//TODO : Find the client and call readreq
 		for(unsigned int i=0; i < clients.size(); i++){
 			if (pfd.fd == clients[i]->getFd()){
-				std::cout << "client re-connection accepted" << std::endl;
-				return true;
+				close(clients[i]->getFd());
+
 			}
 		}
 	}
