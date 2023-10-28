@@ -9,5 +9,5 @@ int Client::getFd(){
 void Client::setFd(int fd){
 	pfd.fd = fd;
 	pfd.events = POLLIN | POLLOUT;
-
 }
+

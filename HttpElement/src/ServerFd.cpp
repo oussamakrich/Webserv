@@ -42,9 +42,15 @@ bool Server::start(){
 	return true;
 }
 
+		// stringstream head;
+		// head <<  "HTTP/1.1 200 OK\n" << "Content-Length: " << serverName.length() <<  "\n" <<  "Content-Type: text/html\n" <<  "Connection: Closed\n\n" <<  serverName;
+		// send(clientFd, head.str().c_str(), head.str().size(), 0);
+
 bool Server::handelFd(struct pollfd pfd){
+
 	int clientFd;
 	Client	*newClient;
+
 	if (pfd.fd == _listen){
 		//FIX : addr of client is NULL for now
 		clientFd = accept(_listen, NULL, NULL);
@@ -52,10 +58,6 @@ bool Server::handelFd(struct pollfd pfd){
 			std::cerr << "ERROR : Connection failed" << std::endl;
 			return true;
 		}
-		// string res= ; //"HTTP/1.1 200 OK\r\n\r\nservername: " + serverName;
-		stringstream head;
-		head <<  "HTTP/1.1 200 OK\n" << "Content-Length: " << serverName.length() <<  "\n" <<  "Content-Type: text/html\n" <<  "Connection: Closed\n\n" <<  serverName;
-		send(clientFd, head.str().c_str(), head.str().size(), 0);
 
 		std::cout << serverName + " : new connection accepted" << std::endl;
 		newClient = new Client;
