@@ -3,8 +3,11 @@
 #include "../../Parsing/include/GenerateLocation.hpp"
 #include "../include/Global.hpp"
 #include "../../Utils/include/DirListing.hpp"
-#include <sys/poll.h>
+#include <netinet/in.h>
+#include <string>
+#include <sys/socket.h>
 
+#include "../../ErrorResponse/include/GenerateError.hpp"
 
 bool Server::start(){
 	stringstream PortString;
@@ -44,17 +47,21 @@ bool Server::start(){
 	return true;
 }
 
+
+
 void Server::acceptClient(){
 	Client	*newClient = NULL;
-
-	//FIX : addr of client is NULL for now
-	int clientFd = accept(_listen, NULL, NULL);
+	struct sockaddr sockaddr;
+	bzero(&sockaddr, sizeof(sockaddr));
+	socklen_t len = sizeof(sockaddr);
+	int clientFd = accept(_listen, &sockaddr, &len);
 	if (clientFd  == -1){
 		std::cerr << "ERROR : Connection failed" << std::endl;
 		return;
 	}
 	std::cout << serverName + " : new connection accepted" << std::endl;
 	newClient = new Client(this->clientMaxBodySize, clientFd);
+	newClient->setAddr(sockaddr);
 	this->clients.push_back(newClient);
 	Global::insertFd(clientFd);
 }
@@ -65,7 +72,6 @@ ITT_CLIENT Server::findClient(pollfd pfd){
 	for(; it != clients.end(); it++)
 		if (pfd.fd == (*it)->getFd())
 				break ;
-
 	return it;
 }
 
@@ -75,24 +81,29 @@ bool Server::handelClient(ITT_CLIENT it){
 	Client *client = *it;
 	Request req;
 	client->ReadRequest();
-	req = client->getRequest();
-	//TODO :GenerateResponse
-	DirListing dir;
-	std::string  out;
-	dir.getDirlistigHtml("/tmp", out);
 	
-	stringstream head;
-	head << "HTTP/1.1 200 OK\nContent-Length: ";
-	head << out.length();
-	head << "\nContent-Type: text/html\nConnection: Closed\n\n";
-	head << out;
-	std::cout << head.str() << std::endl;
-	send(client->getFd(), head.str().c_str(), head.str().size(), 0);
+	ErrorResponse err = GenerateError::generateError(501, *this);
+	std::string error =  err.getErrorPage(*this);
+	send(client->getFd(), error.c_str(), error.size(), 0);
+
+
+	//TODO :GenerateResponse
+	// DirListing dir;
+	// std::string  out;
+	// dir.getDirlistigHtml("/tmp", out);
+	// 
+	// stringstream head;
+	// head << "HTTP/1.1 200 OK\nContent-Length: ";
+	// head << out.length();
+	// head << "\nContent-Type: text/html\nConnection: Closed\n\n";
+	// head << out;
+	// std::cout << head.str() << std::endl;
+	// send(client->getFd(), head.str().c_str(), head.str().size(), 0);
 	close(client->getFd());
+	delete client;
 	clients.erase(it);
 	Global::removeFd(client->getFd());
 	std::cout << "send iit" << std::endl;
-	// exit(1);
 	return true;
 }
 

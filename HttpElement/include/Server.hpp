@@ -12,6 +12,7 @@
 #define TYPES_PAIR std::pair<std::string, std::string>
 #define VECT_STR std::vector<std::string>
 #define VECT_ERRORPIR std::vector<ERRPAGE_PAIR>
+#define ITT_ERRORPIR std::vector<ERRPAGE_PAIR>::iterator
 #define VECT_CLIENT std::vector<Client*>
 #define ITT_CLIENT	std::vector<Client*>::iterator
 

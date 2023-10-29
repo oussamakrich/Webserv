@@ -19,6 +19,7 @@ class Client{
 		long						lastTime;
 		int							status;
 		std::string			address;
+		sockaddr			sockaddr;
 
 		// RequestBuffer reqBuff;
 
@@ -29,6 +30,8 @@ class Client{
 
 	public: //Geters
 		int getFd();
+		struct sockaddr &getAddr();
+		void setAddr(struct sockaddr &addr);
 
 
 };

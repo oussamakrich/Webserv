@@ -1,8 +1,10 @@
 
 #include "../include/Client.hpp"
+#include <strings.h>
 #include <sys/socket.h>
 
 Client::Client(int bodySize, int fd) {//: reqBuff(bodySize){
+	
 	pfd.fd = fd;
 	pfd.events = POLLIN | POLLOUT;
 	pfd.revents = 0;
@@ -16,10 +18,11 @@ void Client::ReadRequest(){
 	
 	char *buffer;
 
-	// while(1){
-		buffer = new char[1024];
-		status = recv(pfd.fd, buffer, 1024, 0);
-		if (status == -1 || status == 0)
+	while(1){
+		buffer = new char[5024];
+		memset(buffer, 0, 5024);
+		status = recv(pfd.fd, buffer, 5024, 0);
+		if (status == -1 || status == 0 || status < 5024)
 		{
 			delete buffer;
 			return;
@@ -30,7 +33,7 @@ void Client::ReadRequest(){
 		// 	return;
 		// }
 		delete buffer;
-	// }
+	}
 }
 
 bool Client::isRequestAvailable(){
@@ -47,4 +50,11 @@ Request Client::getRequest(){
 	// ParseRequest::Parse(this->reqBuff);
 
 	return req;
+}
+
+struct sockaddr &Client::getAddr(){
+	return sockaddr;
+}
+void Client::setAddr(struct sockaddr &addr){
+	sockaddr = addr;
 }
