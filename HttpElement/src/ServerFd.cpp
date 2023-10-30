@@ -3,11 +3,15 @@
 #include "../../Parsing/include/GenerateLocation.hpp"
 #include "../include/Global.hpp"
 #include "../../Utils/include/DirListing.hpp"
+#include <cstdlib>
 #include <netinet/in.h>
 #include <string>
 #include <sys/socket.h>
-
 #include "../../ErrorResponse/include/GenerateError.hpp"
+
+void fn(){
+	system("leaks webserv");
+}
 
 bool Server::start(){
 	stringstream PortString;
@@ -19,7 +23,7 @@ bool Server::start(){
 	hints.ai_socktype = SOCK_STREAM;
 
 	struct addrinfo *MyAddr;
-
+	// atexit(fn);
 	int	ret = getaddrinfo(this->getHost().c_str(), PortString.str().c_str(), &hints, &MyAddr);
 	if(ret){
 		gai_strerror(ret);
@@ -82,7 +86,7 @@ bool Server::handelClient(ITT_CLIENT it){
 	Request req;
 	client->ReadRequest();
 	
-	ErrorResponse err = GenerateError::generateError(501, *this);
+	ErrorResponse err = GenerateError::generateError(404, *this);
 	std::string error =  err.getErrorPage(*this);
 	send(client->getFd(), error.c_str(), error.size(), 0);
 

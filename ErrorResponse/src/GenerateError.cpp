@@ -38,13 +38,13 @@ std::string	GenerateError::generateMsg(int code){
 	else return "error";
 }
 
-ITT_ERRORPIR findPage(VECT_ERRORPIR errorPage, int code){
+std::string findPage(VECT_ERRORPIR errorPage, int code){
 	ITT_ERRORPIR it = errorPage.begin();
 	for (; it != errorPage.end(); it++){
 		if (it->first == code)
-			return it;
+			return it->second;
 	}
-	return it;
+	return "";
 }
 
 std::string simpleBody(int code){
@@ -61,13 +61,16 @@ std::string	GenerateError::generateBody(int code, VECT_ERRORPIR errorPage){
 	std::string body;
 	std::string page;
 	
-	ITT_ERRORPIR it = findPage(errorPage, code);
-	if (it == errorPage.end())
+	page = findPage(errorPage, code);
+	if (page.empty())
 		return simpleBody(code);
-	page = it->second;
 	std::ifstream file(page.c_str());
 	if (!file.is_open())
+	{
+		std::cout << page.c_str() << std::endl;
+		std::cerr << "Error: file couldn't open " << std::endl;
 		return simpleBody(code);
+	}
 	std::string line;
 	while (getline(file, line))
 		body += line;

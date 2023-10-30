@@ -52,13 +52,16 @@ void  Global::run()
 	std::vector<Server *>::iterator it = servers.begin();
 
 		for(;it != servers.end(); it++){
-			std::cout << (*it)->start() << std::endl;
-		std::cout << "my listen : " << (*it)->getListen() << std::endl;
+			if (!(*it)->start()){
+				// delete *it;
+				servers.erase(it);
+			}
+			if (servers.size() == 0)
+				exit(1);
 		}
 
 		while(true){
 			int pollStatus = poll(this->gPollFds.data(), this->gPollFds.size(), -1);
-			// std::cout << "Polling" << std::endl;
 			if (pollStatus == -1) {
 				perror("poll");
 				break;
@@ -80,4 +83,3 @@ void Global::insertFd(int fd){
 	pfd.revents = 0;
 	Global::gPollFds.push_back(pfd);
 }
-
