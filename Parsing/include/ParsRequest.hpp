@@ -1,4 +1,4 @@
-// 
+ 
 #pragma once
 #include "../../HttpElement/include/Request.hpp"
 #include "../../Parsing/include/GenerateLocation.hpp" // use  for Isinger() function

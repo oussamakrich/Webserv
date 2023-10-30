@@ -14,6 +14,7 @@ class Global {
 		void	addServer(Server *server);
 		void	run();
 		static void	insertFd(int fd);
+		static void removeFd(int fd);
 		void	callHandelFds(struct pollfd pfd);
 
 

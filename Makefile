@@ -13,7 +13,11 @@ SRC =	./HttpElement/src/Client.cpp\
 		./Utils/src/Logger.cpp\
 		./Utils/src/printTokens.cpp\
 		./Utils/src/trim.cpp\
-		./Utils/src/UrlEncoder.cpp
+		./Utils/src/UrlEncoder.cpp\
+		./Utils/src/DirListing.cpp\
+		./ErrorResponse/src/ErrorResponse.cpp\
+		./ErrorResponse/src/GenerateError.cpp\
+
 
 
 
@@ -26,13 +30,16 @@ HEADER =	./HttpElement/include/Client.hpp \
 			./Parsing/include/GenerateLocation.hpp \
 			./Parsing/include/GenerateServer.hpp \
 			./Parsing/include/Tokenizer.hpp \
-			./Utils/include/Logger.hpp
-
+			./Utils/include/Logger.hpp\
+			./Utils/include/DirListing.hpp\
+			./ErrorResponse/include/ErrorResponse.hpp\
+			./ErrorResponse/include/GenerateError.hpp\
+			
 
 
 OBJ = $(SRC:.cpp=.o)
 
-FLAGS = -Wall -Wextra -Werror -std=c++98 -fsanitize=address -g
+FLAGS = -g#-Wall -Wextra -Werror -std=c++98 -fsanitize=address -g
 
 all:  $(NAME)
 
