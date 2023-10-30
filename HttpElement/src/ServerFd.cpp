@@ -95,6 +95,9 @@ bool Server::handelClient(ITT_CLIENT it){
 		send(client->getFd(), error.c_str(), error.size(), 0);
 	}
 	else{
+		std::cout << "request type : " << req->getType() << std::endl;
+		std::cout << "reqBuffer type : " << client->reqBuff.getLevel()  << std::endl;
+		exit(1);
 		return true;
 	}
 
@@ -102,7 +105,7 @@ bool Server::handelClient(ITT_CLIENT it){
 	delete client;
 	clients.erase(it);
 	Global::removeFd(client->getFd());
-	std::cout << "send iit" << std::endl;
+	std::cout << "remove it" << std::endl;
 	return true;
 }
 
@@ -114,7 +117,7 @@ bool Server::handelFd(struct pollfd pfd){
 	}
 	else 
 	{
-		std::cout << "send iit" << std::endl;
+		std::cout << "send it" << std::endl;
 		 return this->handelClient(findClient(pfd));	
 	}
 }

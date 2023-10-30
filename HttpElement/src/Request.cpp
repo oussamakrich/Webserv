@@ -23,6 +23,7 @@ void    Request::setPath(const std::string& path)          { this->path = UrlDec
 void    Request::setQuery(const std::string& query) { this->query = query; }
 void    Request::setContentLength(const int content_length) { this->content_length = content_length; }
 void    Request::setTransferEncoding(const std::string& transfer_encoding) { this->transfer_encoding = transfer_encoding; }
+void    Request::setErrorCode(int code) { this->error_code = code; }
 
 //*****************  GETTERS ********************//
 

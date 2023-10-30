@@ -17,6 +17,9 @@ SRC =	./HttpElement/src/Client.cpp\
 		./Utils/src/DirListing.cpp\
 		./ErrorResponse/src/ErrorResponse.cpp\
 		./ErrorResponse/src/GenerateError.cpp\
+		./Parsing/src/ParsRequest.cpp\
+		./Request/RequestBuffer.cpp\
+		./HttpElement/src/Request.cpp\
 
 
 
@@ -33,6 +36,9 @@ HEADER =	./HttpElement/include/Client.hpp \
 			./Utils/include/DirListing.hpp\
 			./ErrorResponse/include/ErrorResponse.hpp\
 			./ErrorResponse/include/GenerateError.hpp\
+			./Parsing/include/ParsRequest.hpp\
+			./Request/RequestBuffer.hpp\
+			./HttpElement/include/Request.hpp\
 			
 
 

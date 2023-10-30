@@ -17,6 +17,7 @@ class Client{
 		std::string			address;
 		sockaddr			sockaddr;
 
+	public:
 		RequestBuffer reqBuff;
 
 	public: //Utils

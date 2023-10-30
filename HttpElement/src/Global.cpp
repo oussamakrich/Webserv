@@ -62,6 +62,7 @@ void  Global::run()
 
 		while(true){
 			int pollStatus = poll(this->gPollFds.data(), this->gPollFds.size(), -1);
+			// std::cout << "pollStatus " << std::endl;
 			if (pollStatus == -1) {
 				perror("poll");
 				break;

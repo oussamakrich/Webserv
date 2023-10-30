@@ -3,7 +3,7 @@
 #include <strings.h>
 #include <sys/socket.h>
 
-Client::Client(int bodySize, int fd) {//: reqBuff(bodySize){
+Client::Client(int bodySize, int fd) : reqBuff(bodySize){
 	
 	pfd.fd = fd;
 	pfd.events = POLLIN | POLLOUT;
@@ -22,16 +22,17 @@ void Client::ReadRequest(){
 		buffer = new char[5024];
 		memset(buffer, 0, 5024);
 		status = recv(pfd.fd, buffer, 5024, 0);
-		if (status == -1 || status == 0 || status < 5024)
+		if (status == -1 || status == 0)
 		{
 			delete buffer;
 			return;
 		}
-		std::cout << buffer << std::endl;
-		// if (reqBuff.insertToBuffer(buffer, status) > 3){
-		// 	delete buffer;
-		// 	return;
-		// }
+		int level = reqBuff.insertToBuffer(buffer, status);
+		std::cout <<"level : " << level << std::endl;
+		if (level > 3){
+			delete buffer;
+			return;
+		}
 		delete buffer;
 	}
 }

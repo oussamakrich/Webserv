@@ -141,6 +141,8 @@ void RequestBuffer::insertFirstLine(char *buffer, int size)
 	if (i < size && buffer[i] == '\n')
 	{
 		parseFirstLine();
+		if (this->level > 0)
+			return;
 		this->level++;
 		buffer += i + 1;
 		size -= i + 1;
