@@ -26,6 +26,7 @@
 #define U_YELLOW "\033[4;33m"
 #define BLUE "\033[0;34m"
 
+#define IS_METHOD_SUPORTED(method)((method == "GET" || method == "DELETE" || method == "POST" ))
 
 typedef enum {
 	DIRECTIVE_SYNTAX_ERROR,
@@ -90,8 +91,6 @@ typedef struct {
 
 
 std::string trim(const std::string &s);
-
-
 
 void Otrim(std::string &line);
 void error(std::string error);

@@ -13,7 +13,8 @@ SRC =	./HttpElement/src/Client.cpp\
 		./Utils/src/Logger.cpp\
 		./Utils/src/printTokens.cpp\
 		./Utils/src/trim.cpp\
-		./Utils/src/UrlEncoder.cpp
+		./Utils/src/UrlEncoder.cpp \
+		./Utils/src/ft_strdup.cpp
 
 
 
