@@ -93,7 +93,8 @@ typedef struct {
 
 std::string trim(const std::string &s);
 
-
+std::string UrlDecode(std::string codedStr);
+std::string UrlEncode(std::string simpleStr);
 
 void Otrim(std::string &line);
 void error(std::string error);

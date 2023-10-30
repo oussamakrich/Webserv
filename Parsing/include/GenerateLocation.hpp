@@ -13,12 +13,12 @@ private:
 
 //***************************** pars  ***************************************
 
-		static	void ParsReturn(Location &lc, tk_iterator &tokens);
-		static void ParsAllowedMethod(Location &lc, tk_iterator &tokens);
-		static void ParsErrorPage(Location &lc, tk_iterator &tokens);
-		static void ParsMultiValue(Location &lc, tk_iterator &tokens, bool (Location::*f)(const string &)); // index try_files e
-		static void ParsSingleValue(Location &lc, tk_iterator &tokens, void (Location::*set)(const string &), const string& (Location::*get)(void) const);
-		static void ParsAutoIndex(Location &lc, tk_iterator &tokens);
+		static	void	ParsReturn(Location &lc, tk_iterator &tokens);
+		static void		ParsAllowedMethod(Location &lc, tk_iterator &tokens);
+		static void		ParsErrorPage(Location &lc, tk_iterator &tokens);
+		static void		ParsMultiValue(Location &lc, tk_iterator &tokens, bool (Location::*f)(const string &)); // index try_files e
+		static void		ParsSingleValue(Location &lc, tk_iterator &tokens, void (Location::*set)(const string &), const string& (Location::*get)(void) const);
+		static void		ParsAutoIndex(Location &lc, tk_iterator &tokens);
 
 };
 //***************************** util ***************************************
