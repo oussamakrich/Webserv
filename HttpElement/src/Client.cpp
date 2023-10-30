@@ -41,13 +41,13 @@ bool Client::isRequestAvailable(){
 	// int check = reqBuff.getLevel();
 	// if (check > 3)
 	// 	return true;
-	return false;
+	return true;
 }
 
-Request Client::getRequest(){
-	Request req;
+Request *Client::getRequest(){
+	Request *req;
 
-	// ParseRequest::Parse(this->reqBuff);
+	ParsRequest::Pars(this->reqBuff);
 
 	return req;
 }

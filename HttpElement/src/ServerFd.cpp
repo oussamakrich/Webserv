@@ -83,26 +83,21 @@ bool Server::handelClient(ITT_CLIENT it){
 	if (it == clients.end())	return false;
 
 	Client *client = *it;
-	Request req;
+	Request *req;
 	client->ReadRequest();
-	
-	ErrorResponse err = GenerateError::generateError(404, *this);
-	std::string error =  err.getErrorPage(*this);
-	send(client->getFd(), error.c_str(), error.size(), 0);
+	if (!client->isRequestAvailable())
+		return true;
+	req = client->getRequest();
+	if (req->getType() < 0)
+	{
+		ErrorResponse err = GenerateError::generateError(404, *this);
+		std::string error =  err.getErrorPage(*this);
+		send(client->getFd(), error.c_str(), error.size(), 0);
+	}
+	else{
+		return true;
+	}
 
-
-	//TODO :GenerateResponse
-	// DirListing dir;
-	// std::string  out;
-	// dir.getDirlistigHtml("/tmp", out);
-	// 
-	// stringstream head;
-	// head << "HTTP/1.1 200 OK\nContent-Length: ";
-	// head << out.length();
-	// head << "\nContent-Type: text/html\nConnection: Closed\n\n";
-	// head << out;
-	// std::cout << head.str() << std::endl;
-	// send(client->getFd(), head.str().c_str(), head.str().size(), 0);
 	close(client->getFd());
 	delete client;
 	clients.erase(it);

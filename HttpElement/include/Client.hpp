@@ -1,13 +1,9 @@
 #pragma once
 
 #include "../../include/includes.hpp"
-#include "../../Request/RequestBuffer.hpp"
+#include "../../Parsing/include/ParsRequest.hpp"
 
 
-class Request{
-	public:
-		int tmp;
-};
 
 class Client{
 
@@ -21,12 +17,12 @@ class Client{
 		std::string			address;
 		sockaddr			sockaddr;
 
-		// RequestBuffer reqBuff;
+		RequestBuffer reqBuff;
 
 	public: //Utils
 		void		ReadRequest();
 		bool		isRequestAvailable();
-		Request getRequest();
+		Request *getRequest();
 
 	public: //Geters
 		int getFd();
