@@ -1,4 +1,8 @@
 #include "../include/includes.hpp"
+#include <fstream>
+
+
+#define ALLOWED_URL_CHARS "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?#[]@!$&'()*+,;=%"
 
 class RequestBuffer{
 
@@ -7,8 +11,13 @@ class RequestBuffer{
 		std::string									FirstLine;
 		std::string									Headers;
 		int											level;
-		char*										Body;
+		std::string									BodyPath;
 		int											Max_BodySize;
+		bool										Post;
+		int 										Body_offset;
+		int											content_length;
+		int											Body_insertion_type;
+		int											Chunked_size;
 
 	public:
 
@@ -19,10 +28,10 @@ class RequestBuffer{
 
 	public: // Getters.
 
+		std::string									const &getBody() const;
 		std::string									const &getFirstLine() const;
 		std::string									const &getHeaders() const;
 		int											const &getLevel() const;
-		char*										const &getBody() const;
 		int											const &getMax_BodySize() const;
 
 	public: // Setters. Not sure if we need them.
@@ -36,7 +45,16 @@ class RequestBuffer{
 	public:
 
 		int											insertToBuffer(char *buffer, int size);
-		char*										getBodyRange(int start, int end);
-		char*										getBodyRange(int start);
 
+
+	private: // Tools: Those member function will be used inside the class only.
+		void										insertFirstLine(char *buffer, int size);
+		void										insertHeaders(char *buffer, int size);
+		void										insertBody(char *buffer, int size);
+		void										insertBodyChunked(char *buffer, int size);
+		void										insertBodyContentLength(char *buffer, int size);
+		void										insertBodyBoundary(char *buffer, int size);
+		std::string									GenerateBodyPath();
+		void										parseFirstLine();
+		int											getChunkedSize(char *buffer, int size);
 };

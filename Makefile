@@ -20,7 +20,6 @@ SRC =	./HttpElement/src/Client.cpp\
 
 
 
-
 HEADER =	./HttpElement/include/Client.hpp \
 			./HttpElement/include/Global.hpp \
 			./HttpElement/include/Location.hpp \

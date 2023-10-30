@@ -23,8 +23,6 @@
 #define ERR_AUTOINDEX_VAL 	"AutoIndex accept on/off value"
 #define ERR_DIRECTIVE    	"Directive must be followed by value(s)"
 
-#define IS_METHOD_SUPORTED(method)((method == "GET" || method == "DELETE" || method == "POST" ))
-
 Location *GenerateLocation::generateLocation(std::vector<TOKEN>::iterator &tokens)
 {
 	Location *lc = NULL;
