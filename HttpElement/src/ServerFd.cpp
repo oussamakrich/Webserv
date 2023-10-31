@@ -84,7 +84,7 @@ ITT_CLIENT Server::findClient(pollfd pfd){
 
 void Server::closeConnection(ITT_CLIENT it){
 	Client *client = *it;
-	close(client->getFd());
+	// close(client->getFd());
 	clients.erase(it);
 	Global::removeFd(client->getFd());
 	delete client;
@@ -106,12 +106,14 @@ bool Server::handelClient(ITT_CLIENT it){
 		ErrorResponse err = GenerateError::generateError(req->getType(), *this);
 		std::string error =  err.getErrorPage(*this);
 		send(client->getFd(), error.c_str(), error.size(), 0);
+		std::cout << "yes\n";
 		closeConnection(it);
 	}
 	else{
-		std::cout << "request type : " << req->getType() << std::endl;
-		std::cout << req->getMethod() << std::endl;
-		closeConnection(it);
+		ErrorResponse err = GenerateError::generateError(200, *this);
+		std::string error =  err.getErrorPage(*this);
+		send(client->getFd(), error.c_str(), error.size(), 0);
+		// closeConnection(it);
 	}
 	delete req;
 	return true;
@@ -120,7 +122,6 @@ bool Server::handelClient(ITT_CLIENT it){
 bool Server::handelFd(struct pollfd pfd){
 
 	if (pfd.fd == _listen){
-		pfd.revents = 0;
 		this->acceptClient();
 		return true;
 	}

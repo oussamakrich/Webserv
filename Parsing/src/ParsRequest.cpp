@@ -1,4 +1,5 @@
 #include "../include/ParsRequest.hpp"
+#include <iostream>
 
 
 
@@ -16,6 +17,7 @@ Request *ParsRequest::Pars(RequestBuffer &reqBuff)
 	 {
 		if (ParsHeaders(*req, header_vect[i]) == false)
 		{
+			std::cout << header_vect[i] << std::endl;
 			req->setType(Request::INVALID_REQUEST);
 			break;
 		}	
@@ -72,10 +74,13 @@ bool  ParsRequest::isValidKey(std::string key)
 			req.setConnection(value == "keep-alive");
 			req.insertHeader(key, value);
 		}
-		else return false;
+		else
+		 return false;
+
 	}
-	 
+	else	 
 		return  req.insertHeader(key, value); 
+	return true;
 }
 
 //***************************** util  ? moved in other file ***************************************

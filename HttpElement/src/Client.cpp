@@ -16,7 +16,6 @@ void Client::ReadRequest(){
 	
 	char *buffer;
 
-	// while(1)
 		buffer = new char[5024];
 		memset(buffer, 0, 5024);
 		status = recv(pfd.fd, buffer, 5024, 0);
@@ -25,15 +24,14 @@ void Client::ReadRequest(){
 			delete buffer;
 			return;
 		}
+		
 		int level = reqBuff.insertBuffer(buffer, status);
 		delete buffer;
-		// if (level)
-		// 	return;
-	// }
 }
 
 bool Client::isRequestAvailable(){
-
+	if (status == -1)
+		return true;
 	int check = reqBuff.getLevel();
 	if (check)
 		return true;
