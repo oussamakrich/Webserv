@@ -3,10 +3,6 @@
 #include "../../Parsing/include/GenerateLocation.hpp"
 #include "../include/Global.hpp"
 #include "../../Utils/include/DirListing.hpp"
-#include <cstdlib>
-#include <netinet/in.h>
-#include <string>
-#include <sys/socket.h>
 #include "../../ErrorResponse/include/GenerateError.hpp"
 
 void fn(){
@@ -51,8 +47,6 @@ bool Server::start(){
 	return true;
 }
 
-
-
 void Server::acceptClient(){
 	Client	*newClient = NULL;
 	struct sockaddr sockaddr;
@@ -90,7 +84,7 @@ bool Server::handelClient(ITT_CLIENT it){
 	req = client->getRequest();
 	if (req->getType() < 0)
 	{
-		ErrorResponse err = GenerateError::generateError(404, *this);
+		ErrorResponse err = GenerateError::generateError(req->getType(), *this);
 		std::string error =  err.getErrorPage(*this);
 		send(client->getFd(), error.c_str(), error.size(), 0);
 	}
@@ -102,9 +96,10 @@ bool Server::handelClient(ITT_CLIENT it){
 	}
 
 	close(client->getFd());
-	delete client;
 	clients.erase(it);
 	Global::removeFd(client->getFd());
+	delete client;
+	delete req;
 	std::cout << "remove it" << std::endl;
 	return true;
 }

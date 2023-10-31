@@ -6,7 +6,6 @@
 Server::Server(){
 	this->host = "localhost";
 	this->port = 80;
-	this->defaultType = "application/octet-stream";
 	this->clientMaxBodySize = 1;
 }
 
@@ -30,11 +29,13 @@ Server &Server::operator=(const Server &copy)
 	return *this;
 }
 
-void Server::Shrink()
+void Server::final()
 {
-		index.shrink_to_fit();
-		errorPages.shrink_to_fit();
-		CheckRepeat.shrink_to_fit();
+	if (this->defaultType.empty())
+		this->defaultType = "application/octet-stream";
+	index.shrink_to_fit();
+	errorPages.shrink_to_fit();
+	CheckRepeat.shrink_to_fit();
 }
 
 void Server::setPort(int port) { this->port = port; }

@@ -64,7 +64,7 @@ class Server {
 		std::vector<int>		CheckRepeat;
 
 
-		void Shrink();
+		void final();
 
 		bool	 start();
 		bool	 handelFd(struct pollfd fd);

@@ -39,16 +39,16 @@ void Client::ReadRequest(){
 
 bool Client::isRequestAvailable(){
 
-	// int check = reqBuff.getLevel();
-	// if (check > 3)
-	// 	return true;
-	return true;
+	int check = reqBuff.getLevel();
+	if (check > 3)
+		return true;
+	return false;
 }
 
 Request *Client::getRequest(){
 	Request *req;
 
-	ParsRequest::Pars(this->reqBuff);
+	req = ParsRequest::Pars(this->reqBuff);
 
 	return req;
 }

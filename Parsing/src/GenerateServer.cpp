@@ -31,7 +31,7 @@ Server *GenerateServer::NewServer(TOKEN_IT &it){
 	}
 	if (server->getRoot().empty())
 		error("root is required");
-	server->Shrink();
+	server->final();
 	return server;
 }
 
@@ -76,6 +76,7 @@ void GenerateServer::fillLocation(Server &ser, TOKEN_IT &it){
 	Location *location =	GenerateLocation::generateLocation(it);
 	std::string uri = location->getUri();
 	ser.setSingleLocation(std::make_pair(uri, location));
+	it++;
 }
 
 void GenerateServer::SetTypes(Server &ser, TOKEN_IT &it){
@@ -94,10 +95,18 @@ void GenerateServer::SetTypes(Server &ser, TOKEN_IT &it){
 				error("duplicate Type");
 			it++;
 		}
-		if (it->first == CLOSE_C_BRACKET)
+		if (it->first == CLOSE_C_BRACKET){
+			it++;
 			break;
+		}
 		it++;
 	}
+}
+void checkReapeat(Server &ser, Token Key){
+	if (Key == ROOT && !ser.getRoot().empty())
+		error("\"root\" directive is duplicate");
+	if (Key == DEFAULT_TYPE && !ser.getDefaultType().empty())
+		error("\"default_type\" directive is duplicate");
 }
 
 void GenerateServer::SetSingleValue(Server &ser,TOKEN_IT &it){
@@ -113,6 +122,7 @@ void GenerateServer::SetSingleValue(Server &ser,TOKEN_IT &it){
 	it++;
 	if (it->first != SEMICOLON)
 		error("Error: " + keyWord +" Accept only one Value");
+	checkReapeat(ser, key);
 	if (key == SERVER_NAME)				ser.setServerName(value);
 	else if (key == DEFAULT_TYPE)	ser.setDefaultType(value);
 	else if (key == ACCESS_LOG)		ser.setAccessLog(value);

@@ -67,9 +67,10 @@ void  Global::run()
 				perror("poll");
 				break;
 			}
-			for(unsigned int i =0; i < gPollFds.size(); i++){
+			for(unsigned int i =0; i < gPollFds.size() && pollStatus; i++){
 				if ((gPollFds[i].revents & POLLIN)){
 					this->callHandelFds(gPollFds[i]);
+					pollStatus--;
 				}
 			}
 		}
