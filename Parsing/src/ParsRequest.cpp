@@ -4,14 +4,14 @@
 
 Request *ParsRequest::Pars(RequestBuffer &reqBuff)
 {
-	int type = reqBuff.getLevel() > 3 ? Request::INVALID_REQUEST : Request::GET;
+	int type = reqBuff.getLevel() > 1 ? Request::INVALID_REQUEST : Request::GET;
 	Request *req = new(std::nothrow) Request(type);
 	if (req == NULL) return NULL;
 	req->setErrorCode(reqBuff.getLevel());
 	if (req->getType() == Request::INVALID_REQUEST) return req;
-	std::string headers = replaceAll(reqBuff.getHeaders(), "\r\n", "\n");
+	std::string headers = reqBuff.getHeaders();
 	std::vector<std::string> header_vect = split(headers, '\n');
-	ParsFirstLine(*req, reqBuff.getFirstLine());
+	ParsFirstLine(*req, reqBuff);
 	for (size_t i = 0; i < header_vect.size(); i++)
 	 {
 		if (ParsHeaders(*req, header_vect[i]) == false)
@@ -20,18 +20,16 @@ Request *ParsRequest::Pars(RequestBuffer &reqBuff)
 			break;
 		}	
 	}
-	req->setBodyPath(reqBuff.getBody());
+	if (type != Request::GET)
+		req->setBodyPath(reqBuff.getBody());
 	return req;
 }
 
- void  ParsRequest::ParsFirstLine(Request& req, std::string line) 
+ void  ParsRequest::ParsFirstLine(Request& req, RequestBuffer &reqBuff) 
 {
-
-    int sp_pos = line.find(' ');
-    req.setMethod(line.substr(0, sp_pos));
-	req.setType(getMethodCode(req.getMethod()));
-    int location_pos = line.find(' ', sp_pos + 1);
-    std::string location = line.substr(sp_pos + 1, location_pos - sp_pos - 1);
+    req.setMethod(reqBuff.getMethod());
+    req.setType(getMethodCode(req.getMethod()));
+    std::string location = reqBuff.getURI(); 
     size_t query_pos = location.find('?');
     if (query_pos != std::string::npos) {
         req.setPath(location.substr(0, query_pos));

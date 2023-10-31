@@ -12,7 +12,7 @@ class Client{
 
 	private:
 		pollfd					pfd;
-		long						lastTime;
+		std::time_t			lastTime;
 		int							status;
 		std::string			address;
 		sockaddr			sockaddr;
@@ -24,11 +24,12 @@ class Client{
 		void		ReadRequest();
 		bool		isRequestAvailable();
 		Request *getRequest();
+		std::time_t	getLastTime();
 
 	public: //Geters
 		int getFd();
 		struct sockaddr &getAddr();
 		void setAddr(struct sockaddr &addr);
-
+		void setLastTime(std::time_t tm);
 
 };
