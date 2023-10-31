@@ -7,4 +7,5 @@ a.out
 test.cpp
 *.log
 *.conf
-MyLab 
+MyLab
+.gitignore
