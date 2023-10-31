@@ -2,7 +2,7 @@
 #pragma once
 #include "../../HttpElement/include/Request.hpp"
 #include "../../Parsing/include/GenerateLocation.hpp" // use  for Isinger() function
-#include "../../Request/RequestBuffer.hpp"
+#include "../../Request/Buffer/RequestBuffer.hpp"
 
 
 
@@ -45,7 +45,7 @@ class ParsRequest
 {
 public :
 		static Request *Pars(RequestBuffer &reqBuff);
-		static void ParsFirstLine(Request& req, std::string line) ;
+		static void ParsFirstLine(Request& req, RequestBuffer &reqBuff) ;
 		static bool isValidKey(std::string key);
 		static bool ParsHeaders(Request& req, std::string& line);
 };

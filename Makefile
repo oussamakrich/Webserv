@@ -18,7 +18,7 @@ SRC =	./HttpElement/src/Client.cpp\
 		./ErrorResponse/src/ErrorResponse.cpp\
 		./ErrorResponse/src/GenerateError.cpp\
 		./Parsing/src/ParsRequest.cpp\
-		./Request/RequestBuffer.cpp\
+		./Request/Buffer/RequestBuffer.cpp\
 		./HttpElement/src/Request.cpp\
 
 
@@ -37,7 +37,7 @@ HEADER =	./HttpElement/include/Client.hpp \
 			./ErrorResponse/include/ErrorResponse.hpp\
 			./ErrorResponse/include/GenerateError.hpp\
 			./Parsing/include/ParsRequest.hpp\
-			./Request/RequestBuffer.hpp\
+			./Request/Buffer/RequestBuffer.hpp\
 			./HttpElement/include/Request.hpp\
 			
 

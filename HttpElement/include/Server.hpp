@@ -1,9 +1,8 @@
 #pragma once
 
-#include "Client.hpp"
 #include "../../include/includes.hpp"
+#include "Client.hpp"
 #include "Location.hpp"
-#include <sys/poll.h>
 
 #define str_it std::vector<std::string>::iterator
 #define LOCATION_PAIR std::pair<std::string, Location*>
@@ -15,6 +14,8 @@
 #define ITT_ERRORPIR std::vector<ERRPAGE_PAIR>::iterator
 #define VECT_CLIENT std::vector<Client*>
 #define ITT_CLIENT	std::vector<Client*>::iterator
+
+#define TIME_OUT 60
 
 class Server {
 
@@ -71,6 +72,9 @@ class Server {
 		void	 acceptClient();
 		bool	 handelClient(ITT_CLIENT it);
 		ITT_CLIENT	findClient(pollfd pfd);
+		void	 checkTimeOut();
+
+		void closeConnection(ITT_CLIENT it);
 		
 
 	public:

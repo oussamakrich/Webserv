@@ -1,10 +1,8 @@
 
 #include "../include/Client.hpp"
-#include <strings.h>
-#include <sys/socket.h>
 
 Client::Client(int bodySize, int fd) : reqBuff(bodySize){
-	
+	lastTime = std::time(NULL);
 	pfd.fd = fd;
 	pfd.events = POLLIN | POLLOUT;
 	pfd.revents = 0;
@@ -18,7 +16,7 @@ void Client::ReadRequest(){
 	
 	char *buffer;
 
-	while(1){
+	// while(1)
 		buffer = new char[5024];
 		memset(buffer, 0, 5024);
 		status = recv(pfd.fd, buffer, 5024, 0);
@@ -27,20 +25,17 @@ void Client::ReadRequest(){
 			delete buffer;
 			return;
 		}
-		int level = reqBuff.insertToBuffer(buffer, status);
-		std::cout <<"level : " << level << std::endl;
-		if (level > 3){
-			delete buffer;
-			return;
-		}
+		int level = reqBuff.insertBuffer(buffer, status);
 		delete buffer;
-	}
+		// if (level)
+		// 	return;
+	// }
 }
 
 bool Client::isRequestAvailable(){
 
 	int check = reqBuff.getLevel();
-	if (check > 3)
+	if (check)
 		return true;
 	return false;
 }
@@ -59,3 +54,7 @@ struct sockaddr &Client::getAddr(){
 void Client::setAddr(struct sockaddr &addr){
 	sockaddr = addr;
 }
+
+std::time_t Client::getLastTime(){ return lastTime;}
+
+void Client::setLastTime(std::time_t tm){ this->lastTime = tm;}
