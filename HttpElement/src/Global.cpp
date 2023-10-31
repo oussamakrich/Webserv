@@ -77,7 +77,9 @@ void  Global::run()
 		}
 		for(unsigned int i =0; i < gPollFds.size() && pollStatus; i++){
 			if ((gPollFds[i].revents & POLLIN)){
-				this->callHandelFds(gPollFds[i]);
+					std::cout << "status " << pollStatus << std::endl;
+					gPollFds[i].revents = 0;
+				// this->callHandelFds(gPollFds[i]);
 				pollStatus--;
 			}
 		}

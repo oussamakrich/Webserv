@@ -76,7 +76,7 @@ ITT_CLIENT Server::findClient(pollfd pfd){
 	for(; it != clients.end(); it++)
 		if (pfd.fd == (*it)->getFd())
 		{
-				pfd.revents = POLLOUT;
+				pfd.revents = 0;
 				break ;
 		}
 	return it;
@@ -120,7 +120,7 @@ bool Server::handelClient(ITT_CLIENT it){
 bool Server::handelFd(struct pollfd pfd){
 
 	if (pfd.fd == _listen){
-		pfd.revents = POLLOUT;
+		pfd.revents = 0;
 		this->acceptClient();
 		return true;
 	}
