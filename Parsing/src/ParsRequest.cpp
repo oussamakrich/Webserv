@@ -26,6 +26,8 @@ Request *ParsRequest::Pars(RequestBuffer &reqBuff)
 
  void  ParsRequest::ParsFirstLine(Request& req, std::string line) 
 {
+
+	std::cout << "ParsFirstLine::address : " << &req << std::endl;
     int sp_pos = line.find(' ');
     req.setMethod(line.substr(0, sp_pos));
 	req.setType(getMethodCode(req.getMethod()));
@@ -52,6 +54,7 @@ bool  ParsRequest::isValidKey(std::string key)
 
  bool  ParsRequest::ParsHeaders(Request& req, std::string& line) 
 {
+	std::cout << "ParsFirstLine::address : " << &req << std::endl;
 	size_t pos = line.find(':');
 	if (pos == std::string::npos) return false;
 	std::string key = line.substr(0, pos);

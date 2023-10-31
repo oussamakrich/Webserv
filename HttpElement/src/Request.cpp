@@ -3,22 +3,22 @@
 
 Request::Request(int type)
 {
-    type 			= type;
-	error_code 		= 400;
-	content_length 	= -1;
-	method			= "GET";
-	body_path 		= "";
-	path 			= "";
-	query 			= "";
-	transfer_encoding = "";
+	this->type 			= type;
+	this->error_code 		= 200;
+	this->content_length 	= -1;
+	this->method			= "";
+	this->body_path 		= "";	
+	this->path 			= "";
+	this->query 			= "";
+	this->transfer_encoding = "";
 }
 
 Request::~Request(){}
 //******************* SETTERS *****//
 
 void    Request::setType(int type)					    { this->type = type; }
-void    Request::setMethod(const std::string& method)  {  this->method = method; }
-void    Request::setBodyPath(const std::string& body_path) { this->body_path = body_path; }
+void    Request::setMethod(const std::string &method)  {  this->method = method; }
+void    Request::setBodyPath(const std::string &body_path) { this->body_path = body_path; }
 void    Request::setPath(const std::string& path)          { this->path = UrlDecode(path); }
 void    Request::setQuery(const std::string& query) { this->query = query; }
 void    Request::setContentLength(const int content_length) { this->content_length = content_length; }
@@ -31,9 +31,10 @@ std::string 	Request::getPath()              const { return path; }
 std::string 	Request::getQuery()             const { return query; }
 int         	Request::getContentLength()     const { return content_length; }
 std::string 	Request::getTransferEncoding()  const { return transfer_encoding; }
-int             Request::getType() 				const { return type; }
+int             Request::getType() 				const { return this->type; }
 std::string     Request::getMethod()            const { return method; }
 std::string     Request::getBodyPath()          const { return body_path; }
+int   			Request::getErrorCode() 		const { return this->error_code; }
 bool	        Request::insertHeader(std::string key, std::string value)
 {
     if (headers.find(key) != headers.end())  return false;
