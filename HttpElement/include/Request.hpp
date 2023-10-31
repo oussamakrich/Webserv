@@ -16,6 +16,7 @@ private:
 	std::string		path;
 	std::string		query;
 	std::string		transfer_encoding;
+	bool 			connection;
 	std::map<std::string, std::string> headers;
 
 public :
@@ -36,6 +37,8 @@ public :
 	int                 getContentLength()		const;
 	std::string getTransferEncoding()			const;
 	std::map<std::string, std::string> getHeaders() const;
+	bool 				getConnection()			const;  //add connection 
+
 
 /*********************< setter > *******************/
 
@@ -48,6 +51,8 @@ void	setErrorCode(int error_code);
 void	setQuery(const std::string& query);
 void	setContentLength(const int  content_length);
 void	setTransferEncoding(const std::string& transfer_encoding);
+void 	setConnection(bool conn);
+
 bool	insertHeader(std::string key, std::string value);
 std::string getHeader(std::string key);
 
