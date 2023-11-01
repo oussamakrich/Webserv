@@ -21,7 +21,7 @@ void Client::ReadRequest(){
 	status = recv(pfd.fd, buffer, 5024, 0);
 	if (status == -1 || status == 0)
 	{
-		delete buffer;
+		delete [] buffer;
 		return;
 	}
 	

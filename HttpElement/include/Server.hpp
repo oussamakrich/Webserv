@@ -7,7 +7,9 @@
 #define str_it std::vector<std::string>::iterator
 #define LOCATION_PAIR std::pair<std::string, Location*>
 #define LOCATION_MAP std::map<std::string, Location*>
+#define LOCATION_ITT std::map<std::string, Location*>::iterator
 #define TYPES_MAP std::map<std::string, std::string>
+#define TYPES_ITT std::map<std::string, std::string>::iterator
 #define TYPES_PAIR std::pair<std::string, std::string>
 #define VECT_STR std::vector<std::string>
 #define VECT_ERRORPIR std::vector<ERRPAGE_PAIR>
@@ -91,7 +93,7 @@ class Server {
 
 		std::vector<std::string> getIndex() const;
 		std::vector<ERRPAGE_PAIR> getErrorPages() const;
-		std::map<std::string, Location*> getAllLocation() const;
+		LOCATION_MAP getAllLocation() const;
 		std::map<std::string, std::string> getMimeType() const;
 		Location	&getLocation(std::string url);
 };
