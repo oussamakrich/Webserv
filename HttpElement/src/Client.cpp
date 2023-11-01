@@ -16,17 +16,17 @@ void Client::ReadRequest(){
 	
 	char *buffer;
 
-		buffer = new char[5024];
-		memset(buffer, 0, 5024);
-		status = recv(pfd.fd, buffer, 5024, 0);
-		if (status == -1 || status == 0)
-		{
-			delete buffer;
-			return;
-		}
-		
-		int level = reqBuff.insertBuffer(buffer, status);
+	buffer = new char[5024];
+	memset(buffer, 0, 5024);
+	status = recv(pfd.fd, buffer, 5024, 0);
+	if (status == -1 || status == 0)
+	{
 		delete buffer;
+		return;
+	}
+	
+	int level = reqBuff.insertBuffer(buffer, status);
+	delete buffer;
 }
 
 bool Client::isRequestAvailable(){
@@ -56,3 +56,10 @@ void Client::setAddr(struct sockaddr &addr){
 std::time_t Client::getLastTime(){ return lastTime;}
 
 void Client::setLastTime(std::time_t tm){ this->lastTime = tm;}
+
+void Client::switchEvent(){
+	if (pfd.events == POLLIN)
+		pfd.events = POLLOUT;
+	else
+		pfd.events = POLLIN;
+}

@@ -31,5 +31,6 @@ class Client{
 		struct sockaddr &getAddr();
 		void setAddr(struct sockaddr &addr);
 		void setLastTime(std::time_t tm);
+		void switchEvent();
 
 };

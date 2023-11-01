@@ -1,10 +1,5 @@
 
 #include "../include/Global.hpp"
-#include <iostream>
-#include <sys/poll.h>
-#include <sys/socket.h>
-#include <unistd.h>
-#include <vector>
 
 std::vector<struct pollfd> Global::gPollFds =  std::vector<struct pollfd>();
 
@@ -72,8 +67,8 @@ void  Global::run()
 	}
 	while(true){
 		checkTimeOut(servers);
-		// std::cout << "size of gPollFds : " << Global::gPollFds.size() << std::endl;
 		int pollStatus = poll(this->gPollFds.data(), this->gPollFds.size(), -1);
+		// std::cout << "size of gPollFds : " << Global::gPollFds.size() << std::endl;
 		if (pollStatus == -1) {
 			perror("poll");
 			break;
@@ -82,6 +77,9 @@ void  Global::run()
 			if ((gPollFds[i].revents & POLLIN)){
 				this->callHandelFds(gPollFds[i]);
 				pollStatus--;
+			}
+			else if ((gPollFds[i].revents & POLLOUT)){
+				std::cout << "out" << std::endl;
 			}
 		}
 	}
@@ -92,7 +90,7 @@ void Global::insertFd(int fd){
 	struct pollfd pfd;
 
 	pfd.fd = fd;
-	pfd.events = POLLIN | POLLOUT;
+	pfd.events = POLLIN;
 	pfd.revents = 0;
 	Global::gPollFds.push_back(pfd);
 }

@@ -4,7 +4,7 @@
 #include "../include/Global.hpp"
 #include "../../Utils/include/DirListing.hpp"
 #include "../../ErrorResponse/include/GenerateError.hpp"
-#include <sys/poll.h>
+#include <iostream>
 
 void fn(){
 	system("leaks webserv");
@@ -63,6 +63,7 @@ void Server::acceptClient(){
 		std::cerr << "ERROR : Connection failed" << std::endl;
 		return;
 	}
+	// std::cout << "size of client : " << clients.size() << std::endl;
 	std::cout << serverName + " : new connection accepted" << std::endl;
 	newClient = new Client(this->clientMaxBodySize, clientFd);
 	newClient->setAddr(sockaddr);
@@ -106,14 +107,17 @@ bool Server::handelClient(ITT_CLIENT it){
 		ErrorResponse err = GenerateError::generateError(req->getType(), *this);
 		std::string error =  err.getErrorPage(*this);
 		send(client->getFd(), error.c_str(), error.size(), 0);
-		std::cout << "yes\n";
 		closeConnection(it);
 	}
 	else{
+		std::cout << client->reqBuff.getHeaders() << std::endl;
+		client->switchEvent();
 		ErrorResponse err = GenerateError::generateError(200, *this);
 		std::string error =  err.getErrorPage(*this);
 		send(client->getFd(), error.c_str(), error.size(), 0);
-		// closeConnection(it);
+		// std::cout << "yes" << std::endl;
+		client->switchEvent();
+		closeConnection(it);
 	}
 	delete req;
 	return true;
