@@ -4,8 +4,7 @@
 #include "../include/Global.hpp"
 #include "../../Utils/include/DirListing.hpp"
 #include "../../ErrorResponse/include/GenerateError.hpp"
-#include <sys/poll.h>
-#include <fcntl.h>
+#include <iostream>
 
 void fn(){
 	system("leaks webserv");
@@ -65,7 +64,8 @@ void Server::acceptClient(){
 		std::cerr << "ERROR : Connection failed" << std::endl;
 		return;
 	}
-	fcntl(clientFd, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
+	// std::cout << "size of client : " << clients.size() << std::endl;
+	std::cout << serverName + " : new connection accepted" << std::endl;
 	newClient = new Client(this->clientMaxBodySize, clientFd);
 	newClient->setAddr(sockaddr);
 	this->clients.push_back(newClient);
@@ -86,7 +86,7 @@ ITT_CLIENT Server::findClient(pollfd pfd){
 
 void Server::closeConnection(ITT_CLIENT it){
 	Client *client = *it;
-	close(client->getFd());
+	// close(client->getFd());
 	clients.erase(it);
 	Global::removeFd(client->getFd());
 	delete client;
@@ -109,13 +109,15 @@ bool Server::handelClient(ITT_CLIENT it){
 		send(client->getFd(), error.c_str(), error.size(), 0);
 		closeConnection(it);
 	}
-	else
-	{
-		// std::cout << req->getMethod() << std::endl;
-		// closeConnection(it);
-		// std::cout << this->clients.size() << std::endl;
-		close(client->getFd());
-		Global::removeFd(client->getFd());
+	else{
+		std::cout << client->reqBuff.getHeaders() << std::endl;
+		client->switchEvent();
+		ErrorResponse err = GenerateError::generateError(200, *this);
+		std::string error =  err.getErrorPage(*this);
+		send(client->getFd(), error.c_str(), error.size(), 0);
+		// std::cout << "yes" << std::endl;
+		client->switchEvent();
+		closeConnection(it);
 	}
 	delete req;
 	return true;
@@ -124,7 +126,6 @@ bool Server::handelClient(ITT_CLIENT it){
 bool Server::handelFd(struct pollfd pfd){
 
 	if (pfd.fd == _listen){
-		pfd.revents = 0;
 		this->acceptClient();
 		return true;
 	}

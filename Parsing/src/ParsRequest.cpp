@@ -1,4 +1,5 @@
 #include "../include/ParsRequest.hpp"
+#include <iostream>
 
 
 
@@ -16,6 +17,7 @@ Request *ParsRequest::Pars(RequestBuffer &reqBuff)
 	 {
 		if (ParsHeaders(*req, header_vect[i]) == false)
 		{
+			std::cout << header_vect[i] << std::endl;
 			req->setType(Request::INVALID_REQUEST);
 			break;
 		}
@@ -55,7 +57,9 @@ bool  ParsRequest::isValidKey(std::string key)
 	if (pos == std::string::npos) return false;
 	std::string key = line.substr(0, pos);
 	std::string value = line.substr(pos + 1);
+	value = trim(value);
 	if (isValidKey(key) == false) return false;
+
 	if(key == "Content-Length")
 	{
 		if(isInteger(value) == false) return false;
@@ -63,9 +67,19 @@ bool  ParsRequest::isValidKey(std::string key)
 	}
 	else if (key == "Transfer-Encoding")
 		req.setTransferEncoding(value);
+	else if (key == "Connection")
+	{
+		if (value == "keep-alive" || value == "close")
+		{
+			req.setConnection(value == "keep-alive");
+			req.insertHeader(key, value);
+		}
+		else
+		 return false;
+
+	}
 	else
-		if (req.insertHeader(key, value) == false)
-			return false;
+		return  req.insertHeader(key, value);
 	return true;
 }
 
