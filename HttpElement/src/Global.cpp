@@ -51,7 +51,7 @@ void checkTimeOut(vector<Server*> &servers){
 	vector<Server*>::iterator it  = servers.begin();
 	for(;it != servers.end(); it++){
 		(*it)->checkTimeOut();
-	}	
+	}
 }
 
 void  Global::run()
@@ -67,7 +67,7 @@ void  Global::run()
 			exit(1);
 	}
 	while(true){
-		checkTimeOut(servers);
+		// checkTimeOut(servers);
 		// std::cout << "size of gPollFds : " << Global::gPollFds.size() << std::endl;
 
 		int pollStatus = poll(this->gPollFds.data(), this->gPollFds.size(), -1);
@@ -76,10 +76,12 @@ void  Global::run()
 			break;
 		}
 		for(unsigned int i =0; i < gPollFds.size() && pollStatus; i++){
+
+
 			if ((gPollFds[i].revents & POLLIN)){
-					std::cout << "status " << pollStatus << std::endl;
-					gPollFds[i].revents = 0;
-				// this->callHandelFds(gPollFds[i]);
+				char buf[1024];
+				// while (read(gPollFds[i].fd, buf, 1024) > 0);
+				this->callHandelFds(gPollFds[i]);
 				pollStatus--;
 			}
 		}

@@ -336,6 +336,23 @@ int	RequestBuffer::InsertBody(char *buffer, int size)
 	return 1;
 }
 
+void RequestBuffer::clear()
+{
+	if (this->t_buffer.buffer != NULL)
+		delete[] this->t_buffer.buffer;
+	this->t_buffer.buffer = NULL;
+	this->t_buffer.size = 0;
+	this->Level = 0;
+	this->Success = 0;
+	this->bodyType = -1;
+	this->firstLine.clear();
+	this->Headers.clear();
+	this->Method.clear();
+	this->URI.clear();
+	this->Protocol.clear();
+	this->contentLength = 0;
+	this->boundary.clear();
+}
 
 
 
