@@ -50,7 +50,7 @@ void checkTimeOut(vector<Server*> &servers){
 	vector<Server*>::iterator it  = servers.begin();
 	for(;it != servers.end(); it++){
 		(*it)->checkTimeOut();
-	}	
+	}
 }
 
 void  Global::run()
@@ -74,6 +74,8 @@ void  Global::run()
 			break;
 		}
 		for(unsigned int i =0; i < gPollFds.size() && pollStatus; i++){
+
+
 			if ((gPollFds[i].revents & POLLIN)){
 				this->callHandelFds(gPollFds[i]);
 				pollStatus--;

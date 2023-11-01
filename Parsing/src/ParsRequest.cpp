@@ -20,23 +20,23 @@ Request *ParsRequest::Pars(RequestBuffer &reqBuff)
 			std::cout << header_vect[i] << std::endl;
 			req->setType(Request::INVALID_REQUEST);
 			break;
-		}	
+		}
 	}
 	if (type != Request::GET)
 		req->setBodyPath(reqBuff.getBody());
 	return req;
 }
 
- void  ParsRequest::ParsFirstLine(Request& req, RequestBuffer &reqBuff) 
+ void  ParsRequest::ParsFirstLine(Request& req, RequestBuffer &reqBuff)
 {
     req.setMethod(reqBuff.getMethod());
     req.setType(getMethodCode(req.getMethod()));
-    std::string location = reqBuff.getURI(); 
+    std::string location = reqBuff.getURI();
     size_t query_pos = location.find('?');
     if (query_pos != std::string::npos) {
         req.setPath(location.substr(0, query_pos));
         req.setQuery(location.substr(query_pos + 1));
-    } else 
+    } else
         req.setPath(location);
 }
 
@@ -51,7 +51,7 @@ bool  ParsRequest::isValidKey(std::string key)
 	return true;
 }
 
- bool  ParsRequest::ParsHeaders(Request& req, std::string& line) 
+ bool  ParsRequest::ParsHeaders(Request& req, std::string& line)
 {
 	size_t pos = line.find(':');
 	if (pos == std::string::npos) return false;
@@ -60,16 +60,16 @@ bool  ParsRequest::isValidKey(std::string key)
 	value = trim(value);
 	if (isValidKey(key) == false) return false;
 
-	if(key == "Content-Length") 
+	if(key == "Content-Length")
 	{
 		if(isInteger(value) == false) return false;
 		req.setContentLength(std::atoi(value.c_str()));
 	}
-	else if (key == "Transfer-Encoding") 
+	else if (key == "Transfer-Encoding")
 		req.setTransferEncoding(value);
 	else if (key == "Connection")
 	{
-		if (value == "keep-alive" || value == "close") 
+		if (value == "keep-alive" || value == "close")
 		{
 			req.setConnection(value == "keep-alive");
 			req.insertHeader(key, value);
@@ -78,8 +78,8 @@ bool  ParsRequest::isValidKey(std::string key)
 		 return false;
 
 	}
-	else	 
-		return  req.insertHeader(key, value); 
+	else
+		return  req.insertHeader(key, value);
 	return true;
 }
 
@@ -107,7 +107,7 @@ std::vector<std::string> split(const std::string& str, char delimiter) {
 int getMethodCode(std::string  method)
 {
 	if (method == "GET")	return 		Request::GET;
-	if(method == "DELETE") 	return	 	Request::DELETE;	 
+	if(method == "DELETE") 	return	 	Request::DELETE;
 	if(method == "POST") 	return 		Request::POST;
 	if(method == "PUT") 	return 		Request::NOT_SUPPORTED;
 	if(method == "HEAD") 	return 		Request::NOT_SUPPORTED;

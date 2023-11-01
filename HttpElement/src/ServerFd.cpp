@@ -49,6 +49,7 @@ bool Server::start(){
 		std::cerr << "listen : failed " << std::endl;
 		return false;
 	}
+	fcntl(_listen, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
 	Global::insertFd(_listen);
 	return true;
 }
@@ -89,7 +90,6 @@ void Server::closeConnection(ITT_CLIENT it){
 	clients.erase(it);
 	Global::removeFd(client->getFd());
 	delete client;
-	std::cout << "remove it" << std::endl;
 }
 
 bool Server::handelClient(ITT_CLIENT it){
@@ -129,15 +129,15 @@ bool Server::handelFd(struct pollfd pfd){
 		this->acceptClient();
 		return true;
 	}
-	else 
+	else
 	{
-		 return this->handelClient(findClient(pfd));	
+		 return this->handelClient(findClient(pfd));
 		std::cout << "send it" << std::endl;
 	}
 }
 
 void Server::checkTimeOut(){
-	ITT_CLIENT it = clients.begin(); 		
+	ITT_CLIENT it = clients.begin();
 	Client *client;
 	for (; it != clients.end(); it++){
 		client = *it;

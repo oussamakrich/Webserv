@@ -79,7 +79,7 @@ class RequestBuffer
 
 	public:
 		int											insertBuffer(char *buffer, int size);
-
+		void										clear();
 };
 
 
