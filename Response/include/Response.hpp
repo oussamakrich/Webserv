@@ -1,10 +1,10 @@
 #pragma once
 
 #include "../../include/includes.hpp"
-#include <string>
-#include <sys/_types/_size_t.h>
 
-#define R_READ 1
+#define R_READ 5024
+
+class Server;
 
 class Response{
 
@@ -46,8 +46,10 @@ class Response{
 		void setBuffer(char *buffer, int size);
 		void setHeaderAndStart(std::string header);
 
-		void sendResponse();
-		void ReminderResponse();
+		bool sendResponse();
+		bool ReminderResponse();
+
+		void sendErrorResponse(Server &ser, int fd);
 
 		char *strjoin(const char *s1, char *s2, size_t size1, size_t size2)
 		{

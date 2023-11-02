@@ -76,7 +76,6 @@ bool  Location::isMatch(string uri)    const
 	if (uri.size() < this->path.size())  return false;
 	else if (uri == path) return true;
 	size_t pos = uri.find(this->path ,0);
-	cout << pos << std::endl;
 	if (pos != 0) return false;
 	if (this->path.find_last_of("/") == this->path.size() - 1) return true;
 	return uri.at(this->path.size()) == '/' ;

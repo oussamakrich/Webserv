@@ -85,11 +85,11 @@ void GenerateServer::SetTypes(Server &ser, TOKEN_IT &it){
 	if (it->first == OPEN_C_BRACKET)
 		it++;
 	if (it->first != WORD)	error("Types should be followd by WORD");
-	value = it->second;
-	if ((++it)->first != WORD)	error("Types Expect Key and Value");
 
 	while (it->first != CLOSE_C_BRACKET){
 		value = it->second;
+		it++;
+		if (it->first != WORD)	error("Types Expect Key and Value");
 		while (it->first != SEMICOLON && it->first != CLOSE_C_BRACKET){
 			key = it->second;
 			if (!ser.setMimeType(std::make_pair(key, value)))

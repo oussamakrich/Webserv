@@ -1,8 +1,7 @@
 
 #include "../include/GetMethod.hpp"
-#include <cstddef>
-#include <fstream>
-#include <sys/_types/_size_t.h>
+#include "../../Utils/include/DirListing.hpp"
+#include <string>
 
 GetMethod::GetMethod(Server &ser, Request &req, Response &res) : ser(ser), req(req), res(res)
 {
@@ -19,6 +18,7 @@ bool GetMethod::isLocation()
 	std::string path = req.getPath();
 	LOCATION_MAP locations = ser.getAllLocation();
 	LOCATION_ITT it = locations.begin();
+
 	for (;it != locations.end(); it++)
 	{
 		if (it->second->isMatch(path))
@@ -30,6 +30,7 @@ bool GetMethod::isLocation()
 int GetMethod::isFile(std::string path, size_t &size)
 {
 	struct stat buffer;
+
 	if (stat(path.c_str(), &buffer) == 0){
 		size = buffer.st_size;
 		if (S_ISREG(buffer.st_mode))
@@ -53,6 +54,7 @@ std::string findMimeType(std::string path, Server &ser){
 
 void GetMethod::serveFile(std::string path, size_t size){
 		std::ifstream file(path.c_str());
+
 		if (file.is_open()){
 			char *buffer = new char[R_READ];
 			file.read(buffer, R_READ);
@@ -71,23 +73,64 @@ void GetMethod::serveFile(std::string path, size_t size){
 		}
 }
 
-void GetMethod::simpleGet(){
-	std::string path = ser.getRoot() + '/' + req.getPath();
+void copy(char *buffer, std::string out){
+	for (size_t i = 0; i < out.size(); i++)
+		buffer[i] = out[i];
+}
+
+void GetMethod::serveDirectory(){
 	size_t size;
-	int type = isFile(path, size);
-	if (type == FILE){ // TODO ::Read the file and serv it 
-		res.path = path;
-		serveFile(path, size);
+	int type;
+	VECT_STR indexs = ser.getIndex(); //TODO : try indexs and  check if index.html exist
+	indexs.push_back("index.html");
+	std::vector<std::string>::iterator it = indexs.begin();
+	for (; it != indexs.end(); it++){
+		std::string path = res.path + '/' + *it;
+		type = isFile(path, size);
+		if (type == FILE){
+			std::cout << "Dir : " << path << std::endl;
+			serveFile(path, size);
+			return;
+		}
+	}
+	if (ser.getAutoIndex()){ //TODO : List Dir if auto index on
+		std::string output;
+		if (DirListing::getDirlistigHtml(res.path, output)){
+			char *buffer = new char[output.size()];
+			copy(buffer , output);
+			res.setBuffer(buffer, output.size());
+			res.stillSend = false;
+			res.setHeadr("Content-Length: " + convertCode(output.size()));
+			res.setHeadr("Content-Type: text/html");
+			res.setCode(200);
+		}
+		else
+			res.setCode(403);
+	}
+	else{
+		res.setCode(403);
+	}
+}
+
+void GetMethod::simpleGet(){
+	res.path = ser.getRoot() + '/' + req.getPath();
+	size_t size;
+	int type = isFile(res.path, size);
+
+	if (type == FILE){
+		serveFile(res.path, size);
 	}
 	else if (type == DIRECTORY){ //TODO :  try index.html || check auto index
+		serveDirectory();
 	}
 	else if (type == NOT_FOUND) {//TODO : Generate 404
-		// res.setCode(404);
+		res.setCode(404);
 	}
 }
 
 void GetMethod::GetMethode(Server &ser, Request &req, Response &res)
 {
+
 	if (isLocation()){
 		std::cout << "locationGet" << std::endl;
 		// locationGet();

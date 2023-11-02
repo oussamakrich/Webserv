@@ -1,8 +1,9 @@
 #pragma once
 
 #include "../../include/includes.hpp"
-#include "Client.hpp"
 #include "Location.hpp"
+#include "Client.hpp"
+
 
 #define str_it std::vector<std::string>::iterator
 #define LOCATION_PAIR std::pair<std::string, Location*>
