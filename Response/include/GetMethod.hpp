@@ -29,6 +29,7 @@ class GetMethod
 
 		int	isFile(std::string path, size_t &size);
 		void serveFile(std::string path, size_t size);
+		void sendReminder();
 
 		
 

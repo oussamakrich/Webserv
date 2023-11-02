@@ -9,8 +9,24 @@ GetMethod::GetMethod(Server &ser, Request &req, Response &res) : ser(ser), req(r
 	GetMethode(ser, req, res);
 }
 
-GetMethod::~GetMethod()
-{
+GetMethod::~GetMethod(){}
+
+void GetMethod::sendReminder(){
+	std::ifstream file(res.path.c_str());
+	if (file.is_open()){
+		char *buffer = new char[5024];
+		file.seekg(res.pos);
+		file.read(buffer, 5024);
+		res.setBuffer(buffer, file.gcount());	
+		res.stillSend = true;
+		if (file.eof())
+			res.stillSend = false;
+		file.close();
+		res.ReminderResponse();
+	}
+	else{
+		res.setCode(404);
+	}
 }
 
 bool GetMethod::isLocation()
@@ -87,24 +103,10 @@ void GetMethod::simpleGet(){
 	}
 }
 
-	// std::string path = req.getPath();
-	// std::string root = ser.getRoot();
-	// std::string fullPath = root + path;
-	// std::ifstream file(fullPath.c_str());
-	// if (file.is_open()){
-	// 	std::string line;
-	// 	while (getline(file, line)){
-	// 		res.setBody(line);
-	// 	}
-	// 	file.close();
-	// }
-	// else{
-	// 	res.setCode(404);
-	// 	res.setBody("404 Not Found");
-	// }
-
 void GetMethod::GetMethode(Server &ser, Request &req, Response &res)
 {
+	if (res.stillSend)
+		sendReminder();
 	if (isLocation()){
 		std::cout << "locationGet" << std::endl;
 		// locationGet();

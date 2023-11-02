@@ -1,6 +1,8 @@
 #pragma once
 
 #include "../../include/includes.hpp"
+#include <string>
+#include <sys/_types/_size_t.h>
 
 
 class Response{
@@ -15,14 +17,15 @@ class Response{
 		std::string HeaderAndStart;
 	
 	public:
-		bool stillSend;
-		std::string path;
-		int pos;
-		int lastSend;
+		bool stillSend;// sttll send the reminder
+		std::string path; // path of file to serv it when we send the reminder
+		int pos; // pos in the file to sek it when we send the reminder
+		int lastSend; // Not now
 		
 
 	public:
-		Response();
+		Response(int fd);
+		int fd; // fd of client
 
 	public:
 		int getCode();
@@ -31,6 +34,7 @@ class Response{
 		std::vector<std::string> getHeaders();
 		char *getBuffer();
 		int getBufferSize();
+		std::string *getHeaderAndStart();
 
 		void setCode(int code);
 		void setVersion(std::string version);
@@ -39,6 +43,33 @@ class Response{
 		void setHeadr(std::string header);
 		void setBuffer(char *buffer, int size);
 		void setHeaderAndStart(std::string header);
+
+		void sendResponse();
+		void ReminderResponse();
+
+		char *strjoin(const char *s1, char *s2, size_t size1, size_t size2)
+		{
+			char	*tmp;
+			int		i;
+			int		j;
+
+			i = 0;
+			j = 0;
+			tmp = new char[size1 + size2 + 1];
+			while (i < size1)
+			{
+				tmp[i] = s1[i];
+				i++;
+			}
+			while (j < size2)
+			{
+				tmp[i + j] = s2[j];
+				j++;
+			}
+			if (size1 > 0)
+				delete[] s1;
+			return (tmp);
+		}
 
 
 };

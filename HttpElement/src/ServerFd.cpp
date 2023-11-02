@@ -4,7 +4,7 @@
 #include "../include/Global.hpp"
 #include "../../Utils/include/DirListing.hpp"
 #include "../../ErrorResponse/include/GenerateError.hpp"
-#include <iostream>
+#include "../../Response/include/GenerateResponse.hpp"
 
 void fn(){
 	system("leaks webserv");
@@ -110,12 +110,26 @@ bool Server::handelClient(ITT_CLIENT it){
 		closeConnection(it);
 	}
 	else{
-		std::cout << client->reqBuff.getHeaders() << std::endl;
-		client->switchEvent();
-		ErrorResponse err = GenerateError::generateError(200, *this);
-		std::string error =  err.getErrorPage(*this);
-		send(client->getFd(), error.c_str(), error.size(), 0);
+		// std::cout << client->reqBuff.getHeaders() << std::endl;
+		// client->switchEvent();
+		// ErrorResponse err = GenerateError::generateError(200, *this);
+		// std::string error =  err.getErrorPage(*this);
+		// send(client->getFd(), error.c_str(), error.size(), 0);
 		// std::cout << "yes" << std::endl;
+		if (client->IhaveResponse){
+		 client->response->ReminderResponse();
+		}
+		else{
+			client->response = GenerateResponse::generateResponse(*this, *req, client->getFd());
+			client->response->sendResponse();
+			client->IhaveResponse = client->response->stillSend;
+			if (!client->IhaveResponse){
+				delete [] client->response; 
+				client->response = NULL;
+			}
+
+
+		}
 		client->switchEvent();
 		closeConnection(it);
 	}

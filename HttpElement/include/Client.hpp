@@ -2,6 +2,8 @@
 
 #include "../../include/includes.hpp"
 #include "../../Parsing/include/ParsRequest.hpp"
+#include "../../Response/include/Response.hpp"
+
 
 
 
@@ -9,6 +11,7 @@ class Client{
 
 	public :
 		Client(int bodySize, int fd);
+		~Client();
 
 	private:
 		pollfd					pfd;
@@ -19,6 +22,8 @@ class Client{
 
 	public:
 		RequestBuffer reqBuff;
+		Response *response;
+		bool			IhaveResponse;
 
 	public: //Utils
 		void		ReadRequest();

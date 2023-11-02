@@ -4,16 +4,15 @@
 
 
 
-Response GenerateResponse::generateResponse(Server &ser, Request &req){
-	Response res;
+Response *GenerateResponse::generateResponse(Server &ser, Request &req, int fd){
+	Response *res = new Response(fd);
 
 	if (req.getMethod() == "GET") GetMethod GetHandler(ser, req, res);
 	else if (req.getMethod() == "POST") std::cout << "POST" << std::endl;
 	else if (req.getMethod() == "DELETE") std::cout << "DELETE" << std::endl;
 
 	res.setMsg(generateMsg(res.getCode()));
-
-
+	res.setHeaderAndStart(generateHeaderAndSt(res));
 
 	return res;
 }
@@ -26,7 +25,6 @@ std::string generateHeaderAndSt(Response &res){
 	std::vector<std::string> headers = res.getHeaders();
 	for (unsigned int i = 0;i < headers.size();i++)
 		str += headers[i] + "\r\n";
-
 	return str;
 }
 

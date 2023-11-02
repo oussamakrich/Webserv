@@ -8,6 +8,10 @@ Client::Client(int bodySize, int fd) : reqBuff(bodySize){
 	pfd.revents = 0;
 }
 
+Client::~Client(){
+	delete [] this->response;
+}
+
 int Client::getFd(){
 	return pfd.fd;
 }
