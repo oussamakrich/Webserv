@@ -30,6 +30,7 @@ class Server {
 	private:
 		int									port; // done.
 		int    							clientMaxBodySize; // done.
+		bool								autoIndex; // done.
 		std::string					host; // done.
 		std::string					root; // done.
 		std::string					serverName; // done.
@@ -48,6 +49,7 @@ class Server {
 		public:
 			void setPort(int port);
 		  void setClientMaxBodySize(int size);
+			void setAutoIndex(bool autoIndex);
 		  void setHost(const std::string& host);
 		  void setRoot(const std::string& root);
 		  void setServerName(const std::string& name);
@@ -83,6 +85,8 @@ class Server {
 		int	getPort() const;
 		int	getClientMaxBodySize() const;
 		int	getListen() const;
+
+		bool	getAutoIndex() const;
 
 		std::string getErrorLog() const;
 		std::string	getHost() const;

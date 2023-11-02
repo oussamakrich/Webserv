@@ -14,6 +14,7 @@
 # include <unistd.h>
 #include <sys/poll.h>
 #include <sys/stat.h>
+#include <fcntl.h>
 
 
 #define RED "\033[0;31m"

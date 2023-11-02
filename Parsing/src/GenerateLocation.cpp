@@ -82,6 +82,7 @@ void	GenerateLocation::ParsReturn(Location &lc, tk_iterator &tokens)
 		tokens++;
 		if (tokens->first != SEMICOLON || (tokens + 1)->first != CLOSE_C_BRACKET)
 			 throw std::runtime_error(tokens->first != SEMICOLON ? ERR_MESS_SEMICOLON : "in return directive");
+		tokens++;
 		lc.setRedirection(true);
 
 	}
