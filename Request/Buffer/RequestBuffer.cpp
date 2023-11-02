@@ -318,7 +318,6 @@ int	RequestBuffer::InsertBody(char *buffer, int size)
 		case 1:
 			if (contentLength > MaxBodySize)
 			{
-				std::cout << size << std::endl;
 				RequestBuffer::Success = 413; // Request Entity Too Large
 			}
 			else

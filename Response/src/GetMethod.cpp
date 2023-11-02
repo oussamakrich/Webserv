@@ -32,7 +32,6 @@ int GetMethod::isFile(std::string path, size_t &size)
 	struct stat buffer;
 	if (stat(path.c_str(), &buffer) == 0){
 		size = buffer.st_size;
-		std::cout << "size : " << size << std::endl;
 		if (S_ISREG(buffer.st_mode))
 			return FILE;
 		else if (S_ISDIR(buffer.st_mode))
@@ -65,7 +64,6 @@ void GetMethod::serveFile(std::string path, size_t size){
 			file.close();
 		res.setHeadr("Content-Length: " + convertCode(size));
 		res.setHeadr("Content-Type: " + findMimeType(path, ser));
-		std::cout << findMimeType(path, ser) << std::endl;
 		res.setCode(200);
 		}
 		else{
