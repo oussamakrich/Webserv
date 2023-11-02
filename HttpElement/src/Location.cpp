@@ -61,7 +61,7 @@ void	Location::setPath(string &path)                        {  this->path = path
 const vector<std::pair<int,string> >    &Location::getErrorPageList()   const    { return    error_page;          }
 const vector<string>					&Location::getIndexesList()		const 	 { return indexes; 				  }
 const vector<string>					&Location::getTryFiles()		const	 { return try_file;				  }
-const string                         	&Location::getDefaultTypes()    const    { return    default_type;        }
+const string                	      	&Location::getDefaultTypes()    const    { return    default_type;        }
 const string                			&Location::getRoot()            const    { return    root;                }
 const string                      		&Location::getPath() 		    const    { return    path;                }
 const string                 			Location::getUri() 		        const    { return    root + path;         }
@@ -71,6 +71,17 @@ const string                 			Location::getUri() 		        const    { return  
 bool Location::isMethodAllowed(const string &method) const          {   return (std::find(Allowed_Method.begin(), Allowed_Method.end() , method) != Allowed_Method.end()); }
 bool Location::isRedirection()                       const          {   return _isRedirection; }
 bool Location::isAutoIndex()                         const          {   return AutoIndex; }
+bool  Location::isMatch(string uri)    const
+{
+	if (uri.size() < this->path.size())  return false;
+	else if (uri == path) return true;
+	size_t pos = uri.find(this->path ,0);
+	cout << pos << std::endl;
+	if (pos != 0) return false;
+	if (this->path.find_last_of("/") == this->path.size() - 1) return true;
+	return uri.at(this->path.size()) == '/' ;
+}
+
 /*********************************< for Debug >*******************/
     void Location::printLocation() {
         std::cout << "Allowed_Method: ";

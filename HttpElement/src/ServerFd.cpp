@@ -5,6 +5,7 @@
 #include "../../Utils/include/DirListing.hpp"
 #include "../../ErrorResponse/include/GenerateError.hpp"
 #include <iostream>
+#include <fcntl.h>
 
 void fn(){
 	system("leaks webserv");
