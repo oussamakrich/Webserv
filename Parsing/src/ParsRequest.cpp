@@ -22,8 +22,8 @@ Request *ParsRequest::Pars(RequestBuffer &reqBuff)
 			break;
 		}
 	}
-	if (type != Request::GET)
-		req->setBodyPath(reqBuff.getBody());
+	req->setBodyBuff(reqBuff.getBody());
+	req->setBodySize(reqBuff.getBodySize());
 	return req;
 }
 

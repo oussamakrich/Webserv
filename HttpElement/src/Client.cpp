@@ -1,15 +1,18 @@
 
 #include "../include/Client.hpp"
+#include "../include/Global.hpp"
 
 Client::Client(int bodySize, int fd) : reqBuff(bodySize){
 	lastTime = std::time(NULL);
+	IhaveResponse = false;
+	this->response = NULL;
 	pfd.fd = fd;
 	pfd.events = POLLIN | POLLOUT;
 	pfd.revents = 0;
 }
 
 Client::~Client(){
-	delete [] this->response;
+	delete this->response;
 }
 
 int Client::getFd(){
@@ -61,9 +64,7 @@ std::time_t Client::getLastTime(){ return lastTime;}
 
 void Client::setLastTime(std::time_t tm){ this->lastTime = tm;}
 
-void Client::switchEvent(){
-	if (pfd.events == POLLIN)
-		pfd.events = POLLOUT;
-	else
-		pfd.events = POLLIN;
+void Client::switchEvent(int fd, int Flag){
+	pfd.events = Flag;
+	Global::switchEvent(fd, Flag);
 }

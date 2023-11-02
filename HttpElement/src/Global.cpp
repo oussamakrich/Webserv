@@ -1,5 +1,6 @@
 
 #include "../include/Global.hpp"
+#include <sys/poll.h>
 
 std::vector<struct pollfd> Global::gPollFds =  std::vector<struct pollfd>();
 
@@ -74,15 +75,22 @@ void  Global::run()
 			break;
 		}
 		for(unsigned int i =0; i < gPollFds.size() && pollStatus; i++){
-
-
-			if ((gPollFds[i].revents & POLLIN)){
+			if (pollStatus && ((gPollFds[i].revents & POLLIN) || (gPollFds[i].revents & POLLOUT))){
 				this->callHandelFds(gPollFds[i]);
 				pollStatus--;
 			}
-			else if ((gPollFds[i].revents & POLLOUT)){
-				std::cout << "out" << std::endl;
-			}
+			// else if ((gPollFds[i].revents & POLLOUT)){
+			// 	std::cout << "out" << std::endl;
+			// }
+		}
+	}
+}
+
+void Global::switchEvent(int fd, int Flag){
+	for (unsigned int i = 0; i < gPollFds.size(); i++){
+		if (gPollFds[i].fd == fd){
+			gPollFds[i].events = Flag;
+			break ;
 		}
 	}
 }

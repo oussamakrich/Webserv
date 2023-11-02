@@ -28,6 +28,10 @@ Server &Server::operator=(const Server &copy)
 		errorLog = copy.errorLog;
 		mimeType = copy.mimeType;
 		autoIndex = copy.autoIndex;
+		locations = copy.locations;
+		_listen = copy._listen;
+		clients	= copy.clients;
+
 		
 	return *this;
 }

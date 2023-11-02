@@ -56,6 +56,7 @@ class Location {
 				bool isMethodAllowed(const string &method) 	const;
 				bool isRedirection()						const;
 				bool isAutoIndex()							const;
+				bool isMatch(string uri)					const;
 		/*********************************< for Debug  >*******************/
 
 		void printLocation();

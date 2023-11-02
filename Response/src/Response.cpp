@@ -1,4 +1,6 @@
 #include "../include/Response.hpp"
+#include <iostream>
+#include <sys/socket.h>
 
 
 Response::Response(int fd){
@@ -9,6 +11,10 @@ Response::Response(int fd){
 	this->headers = std::vector<std::string>();
 	this->buffer = NULL;
 	this->bufferSize = 0;
+}
+
+Response::~Response(){
+
 }
 
 int Response::getCode(){ return this->code;}
@@ -37,12 +43,36 @@ void Response::setBuffer(char *buffer, int size){ this->buffer = buffer; this->b
 
 void Response::setHeadr(std::string header){ this->headers.push_back(header);}
 
+void Response::setHeaderAndStart(std::string header){this->HeaderAndStart = header;}
+
 
 void Response::sendResponse(){
 
 	const char *resp = this->strjoin(HeaderAndStart.c_str(), buffer, HeaderAndStart.size(), bufferSize);
-
 	int ret = send(fd, resp, HeaderAndStart.size() + bufferSize, 0);
 	if (ret == -1) std::cout << "Error send" << std::endl;
-	delete [] resp;
+	delete  resp;
+}
+
+void Response::ReminderResponse(){
+
+	std::ifstream file(path.c_str());
+	if (file.is_open()){
+		char *buffer = new char[R_READ];
+		file.seekg(pos);
+		file.read(buffer, R_READ);
+		setBuffer(buffer, file.gcount());
+		pos += file.gcount();
+		stillSend = true;
+		if (file.eof())
+			stillSend = false;
+		file.close();
+	}
+	else{
+		setCode(404);
+	}
+
+	int ret = send(fd, buffer, bufferSize, 0);
+	if (ret == -1) std::cout << "Error send" << std::endl; //FIX : error Response
+	delete  buffer;
 }

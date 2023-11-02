@@ -13,8 +13,8 @@ class GetMethod
 {
 
 		public:
-			GetMethod(Server &ser, Request &req, Response &res);
-			~GetMethod();
+		GetMethod(Server &ser, Request &req, Response &res);
+		~GetMethod();
 	private:
 		Server &ser;
 		Request &req;
@@ -29,7 +29,7 @@ class GetMethod
 
 		int	isFile(std::string path, size_t &size);
 		void serveFile(std::string path, size_t size);
-		void sendReminder();
+		// static void sendReminder(Response &req);
 
 		
 

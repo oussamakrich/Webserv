@@ -76,10 +76,7 @@ ITT_CLIENT Server::findClient(pollfd pfd){
 
 	for(; it != clients.end(); it++)
 		if (pfd.fd == (*it)->getFd())
-		{
-				pfd.revents = 0;
 				break ;
-		}
 	return it;
 }
 
@@ -96,12 +93,23 @@ bool Server::handelClient(ITT_CLIENT it){
 
 	Client *client = *it;
 	client->setLastTime(time(NULL));
+	if (client->IhaveResponse){
+		client->response->ReminderResponse();
+		client->IhaveResponse = client->response->stillSend;
+		if (!client->IhaveResponse){
+			delete  client->response; 
+			client->response = NULL;
+			client->switchEvent(client->getFd(), POLLIN);
+		}
+		return true;
+	}
 	Request *req;
 	client->ReadRequest();
 	if (!client->isRequestAvailable())
 		return true;
-	client->reqBuff.clear();
+	client->switchEvent(client->getFd(), POLLOUT);
 	req = client->getRequest();
+	client->reqBuff.clear();
 	if (req->getType() < 0)
 	{
 		ErrorResponse err = GenerateError::generateError(req->getType(), *this);
@@ -110,28 +118,14 @@ bool Server::handelClient(ITT_CLIENT it){
 		closeConnection(it);
 	}
 	else{
-		// std::cout << client->reqBuff.getHeaders() << std::endl;
-		// client->switchEvent();
-		// ErrorResponse err = GenerateError::generateError(200, *this);
-		// std::string error =  err.getErrorPage(*this);
-		// send(client->getFd(), error.c_str(), error.size(), 0);
-		// std::cout << "yes" << std::endl;
-		if (client->IhaveResponse){
-		 client->response->ReminderResponse();
+		client->response = GenerateResponse::generateResponse(*this, *req, client->getFd());
+		client->response->sendResponse();
+		client->IhaveResponse = client->response->stillSend;
+		if (!client->IhaveResponse){
+			delete  client->response; 
+			client->response = NULL;
+			client->switchEvent(client->getFd(), POLLIN);
 		}
-		else{
-			client->response = GenerateResponse::generateResponse(*this, *req, client->getFd());
-			client->response->sendResponse();
-			client->IhaveResponse = client->response->stillSend;
-			if (!client->IhaveResponse){
-				delete [] client->response; 
-				client->response = NULL;
-			}
-
-
-		}
-		client->switchEvent();
-		closeConnection(it);
 	}
 	delete req;
 	return true;

@@ -11,42 +11,28 @@ GetMethod::GetMethod(Server &ser, Request &req, Response &res) : ser(ser), req(r
 
 GetMethod::~GetMethod(){}
 
-void GetMethod::sendReminder(){
-	std::ifstream file(res.path.c_str());
-	if (file.is_open()){
-		char *buffer = new char[5024];
-		file.seekg(res.pos);
-		file.read(buffer, 5024);
-		res.setBuffer(buffer, file.gcount());	
-		res.stillSend = true;
-		if (file.eof())
-			res.stillSend = false;
-		file.close();
-		res.ReminderResponse();
-	}
-	else{
-		res.setCode(404);
-	}
-}
+// void GetMethod::sendReminder(Response &res){
+// }
 
 bool GetMethod::isLocation()
 {
 	std::string path = req.getPath();
 	LOCATION_MAP locations = ser.getAllLocation();
 	LOCATION_ITT it = locations.begin();
-	// for (;it != locations.end(); it++)
-	// {
-	// 	if (it->second.isMatch(path))
-	// 		return true;
-	// }
+	for (;it != locations.end(); it++)
+	{
+		if (it->second->isMatch(path))
+			return true;
+	}
 	return false;
 }
 
-int isFile(std::string path, size_t &size)
+int GetMethod::isFile(std::string path, size_t &size)
 {
 	struct stat buffer;
 	if (stat(path.c_str(), &buffer) == 0){
 		size = buffer.st_size;
+		std::cout << "size : " << size << std::endl;
 		if (S_ISREG(buffer.st_mode))
 			return FILE;
 		else if (S_ISDIR(buffer.st_mode))
@@ -69,15 +55,17 @@ std::string findMimeType(std::string path, Server &ser){
 void GetMethod::serveFile(std::string path, size_t size){
 		std::ifstream file(path.c_str());
 		if (file.is_open()){
-			char *buffer = new char[5024];
-			file.read(buffer, 5024);
+			char *buffer = new char[R_READ];
+			file.read(buffer, R_READ);
 			res.setBuffer(buffer, file.gcount());	
+		res.pos = file.gcount();
 			res.stillSend = true;
 			if (file.eof())
 				res.stillSend = false;
 			file.close();
 		res.setHeadr("Content-Length: " + convertCode(size));
 		res.setHeadr("Content-Type: " + findMimeType(path, ser));
+		std::cout << findMimeType(path, ser) << std::endl;
 		res.setCode(200);
 		}
 		else{
@@ -89,24 +77,19 @@ void GetMethod::simpleGet(){
 	std::string path = ser.getRoot() + '/' + req.getPath();
 	size_t size;
 	int type = isFile(path, size);
-	if (type == FILE){
-		// TODO ::Read the file and serv it 
+	if (type == FILE){ // TODO ::Read the file and serv it 
 		res.path = path;
 		serveFile(path, size);
 	}
-	else if (type == DIRECTORY){
-		//TODO :  try index.html || check auto index
+	else if (type == DIRECTORY){ //TODO :  try index.html || check auto index
 	}
-	else if (type == NOT_FOUND){
-		//TODO : Generate 404
+	else if (type == NOT_FOUND) {//TODO : Generate 404
 		// res.setCode(404);
 	}
 }
 
 void GetMethod::GetMethode(Server &ser, Request &req, Response &res)
 {
-	if (res.stillSend)
-		sendReminder();
 	if (isLocation()){
 		std::cout << "locationGet" << std::endl;
 		// locationGet();

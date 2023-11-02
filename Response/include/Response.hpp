@@ -4,6 +4,7 @@
 #include <string>
 #include <sys/_types/_size_t.h>
 
+#define R_READ 1
 
 class Response{
 
@@ -25,6 +26,7 @@ class Response{
 
 	public:
 		Response(int fd);
+		~Response();
 		int fd; // fd of client
 
 	public:
@@ -66,8 +68,8 @@ class Response{
 				tmp[i + j] = s2[j];
 				j++;
 			}
-			if (size1 > 0)
-				delete[] s1;
+			if (size2 > 0)
+				delete[] s2;
 			return (tmp);
 		}
 

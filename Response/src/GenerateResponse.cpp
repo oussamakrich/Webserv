@@ -1,35 +1,37 @@
 
 #include "../include/GenerateResponse.hpp"
 #include "../include/GetMethod.hpp"
+#include "../include/Response.hpp"
 
 
 
 Response *GenerateResponse::generateResponse(Server &ser, Request &req, int fd){
 	Response *res = new Response(fd);
 
-	if (req.getMethod() == "GET") GetMethod GetHandler(ser, req, res);
+	if (req.getMethod() == "GET") GetMethod GetHandler(ser, req, *res);
 	else if (req.getMethod() == "POST") std::cout << "POST" << std::endl;
 	else if (req.getMethod() == "DELETE") std::cout << "DELETE" << std::endl;
 
-	res.setMsg(generateMsg(res.getCode()));
-	res.setHeaderAndStart(generateHeaderAndSt(res));
+	res->setMsg(generateMsg(res->getCode()));
+	res->setHeaderAndStart(generateHeaderAndSt(*res));
 
 	return res;
 }
 
 
-std::string generateHeaderAndSt(Response &res){
+std::string GenerateResponse::generateHeaderAndSt(Response &res){
 	std::string str;
 
 	str = res.getVersion() + " " + convertCode(res.getCode()) + " " + res.getMsg() + "\r\n";
 	std::vector<std::string> headers = res.getHeaders();
 	for (unsigned int i = 0;i < headers.size();i++)
 		str += headers[i] + "\r\n";
+	str += "\n";
 	return str;
 }
 
 
-std::string generateMsg(int Code)
+std::string GenerateResponse::generateMsg(int Code)
 {
 	if (Code == 100) return "Continue";
 	else if (Code == 101) return "Switching Protocols";

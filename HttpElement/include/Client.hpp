@@ -12,9 +12,9 @@ class Client{
 	public :
 		Client(int bodySize, int fd);
 		~Client();
+		pollfd					pfd;
 
 	private:
-		pollfd					pfd;
 		std::time_t			lastTime;
 		int							status;
 		std::string			address;
@@ -36,6 +36,6 @@ class Client{
 		struct sockaddr &getAddr();
 		void setAddr(struct sockaddr &addr);
 		void setLastTime(std::time_t tm);
-		void switchEvent();
+		void switchEvent(int fd, int Flag);
 
 };
