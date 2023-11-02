@@ -1,8 +1,12 @@
 //############### ALPHABEN ##################
 #pragma once
 #include "../../include/includes.hpp"
+<<<<<<< HEAD
 #include "../../Request/Buffer/RequestBuffer.hpp"
 #include <map>
+=======
+
+>>>>>>> f092b10bc010d578df14b0a64aa2ad95eca6b52c
 
 class Request
 {

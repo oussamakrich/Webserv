@@ -65,7 +65,6 @@ void Server::acceptClient(){
 		std::cerr << "ERROR : Connection failed" << std::endl;
 		return;
 	}
-	// std::cout << "size of client : " << clients.size() << std::endl;
 	std::cout << serverName + " : new connection accepted" << std::endl;
 	newClient = new Client(this->clientMaxBodySize, clientFd);
 	newClient->setAddr(sockaddr);
@@ -102,6 +101,7 @@ bool Server::handelClient(ITT_CLIENT it){
 	client->ReadRequest();
 	if (!client->isRequestAvailable())
 		return true;
+	client->reqBuff.clear();
 	req = client->getRequest();
 	if (req->getType() < 0)
 	{

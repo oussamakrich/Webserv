@@ -7,6 +7,7 @@ Server::Server(){
 	this->host = "localhost";
 	this->port = 80;
 	this->clientMaxBodySize = 1;
+	this->autoIndex = false;
 }
 
 Server::~Server(){}
@@ -26,6 +27,8 @@ Server &Server::operator=(const Server &copy)
 		accessLog = copy.accessLog;
 		errorLog = copy.errorLog;
 		mimeType = copy.mimeType;
+		autoIndex = copy.autoIndex;
+		
 	return *this;
 }
 
@@ -41,6 +44,8 @@ void Server::final()
 void Server::setPort(int port) { this->port = port; }
 
 void Server::setClientMaxBodySize(int size) { this->clientMaxBodySize = size; }
+
+void Server::setAutoIndex(bool autoIndex) { this->autoIndex = autoIndex; }
 
 void Server::setHost(const std::string& host) { this->host = host; }
 
@@ -75,6 +80,8 @@ void Server::setItIndex(str_it begin, str_it end){ index.insert(index.end(), beg
 int		Server::getPort() const{return port;}
 
 int		Server::getListen() const	{return _listen;}
+
+bool Server::getAutoIndex() const{return autoIndex;}
 
 int		Server::getClientMaxBodySize() const{return clientMaxBodySize;}
 

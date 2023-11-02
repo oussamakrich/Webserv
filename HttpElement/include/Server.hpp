@@ -7,7 +7,9 @@
 #define str_it std::vector<std::string>::iterator
 #define LOCATION_PAIR std::pair<std::string, Location*>
 #define LOCATION_MAP std::map<std::string, Location*>
+#define LOCATION_ITT std::map<std::string, Location*>::iterator
 #define TYPES_MAP std::map<std::string, std::string>
+#define TYPES_ITT std::map<std::string, std::string>::iterator
 #define TYPES_PAIR std::pair<std::string, std::string>
 #define VECT_STR std::vector<std::string>
 #define VECT_ERRORPIR std::vector<ERRPAGE_PAIR>
@@ -28,6 +30,7 @@ class Server {
 	private:
 		int									port; // done.
 		int    							clientMaxBodySize; // done.
+		bool								autoIndex; // done.
 		std::string					host; // done.
 		std::string					root; // done.
 		std::string					serverName; // done.
@@ -46,6 +49,7 @@ class Server {
 		public:
 			void setPort(int port);
 		  void setClientMaxBodySize(int size);
+			void setAutoIndex(bool autoIndex);
 		  void setHost(const std::string& host);
 		  void setRoot(const std::string& root);
 		  void setServerName(const std::string& name);
@@ -82,6 +86,8 @@ class Server {
 		int	getClientMaxBodySize() const;
 		int	getListen() const;
 
+		bool	getAutoIndex() const;
+
 		std::string getErrorLog() const;
 		std::string	getHost() const;
 		std::string	getServerName() const;
@@ -91,7 +97,7 @@ class Server {
 
 		std::vector<std::string> getIndex() const;
 		std::vector<ERRPAGE_PAIR> getErrorPages() const;
-		std::map<std::string, Location*> getAllLocation() const;
+		LOCATION_MAP getAllLocation() const;
 		std::map<std::string, std::string> getMimeType() const;
 		Location	&getLocation(std::string url);
 };

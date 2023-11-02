@@ -13,7 +13,8 @@
 # include <netdb.h>
 # include <unistd.h>
 #include <sys/poll.h>
-#include <string>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 
 #define RED "\033[0;31m"
@@ -101,3 +102,11 @@ void error(std::string error);
 // Printers: this section will be removed its for debugging purposes only.
 void printTokens(std::vector<TOKEN> tokens);
 void printEnam(Token t);
+
+
+std::string convertCode(int code);
+
+
+
+
+
