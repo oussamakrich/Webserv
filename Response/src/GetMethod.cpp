@@ -13,11 +13,11 @@ GetMethod::~GetMethod(){}
 // void GetMethod::sendReminder(Response &res){
 // }
 
-bool GetMethod::isLocation()
+bool GetMethod::isLocation(LOCATION_ITT &it)
 {
 	std::string path = req.getPath();
 	LOCATION_MAP locations = ser.getAllLocation();
-	LOCATION_ITT it = locations.begin();
+	it = locations.begin();
 
 	for (;it != locations.end(); it++)
 	{
@@ -128,12 +128,80 @@ void GetMethod::simpleGet(){
 	}
 }
 
+
+void GetMethod::serveDirectoryLoc(Location &loc){
+	size_t size;
+	int type;
+	VECT_STR indexs = ser.getIndex(); //TODO : try indexs and  check if index.html exist
+	indexs.push_back("index.html");
+	std::vector<std::string>::iterator it = indexs.begin();
+	for (; it != indexs.end(); it++){
+		std::string path = res.path + '/' + *it;
+		type = isFile(path, size);
+		if (type == FILE){
+			std::cout << "Dir : " << path << std::endl;
+		// if (fileIsCGI(loc)){
+		//		handelCgi(loc);
+		//		return;
+		// }
+			serveFile(path, size);
+			return;
+		}
+	}
+	if (ser.getAutoIndex()){ //TODO : List Dir if auto index on
+		std::string output;
+		if (DirListing::getDirlistigHtml(res.path, output)){
+			char *buffer = new char[output.size()];
+			copy(buffer , output);
+			res.setBuffer(buffer, output.size());
+			res.stillSend = false;
+			res.setHeadr("Content-Length: " + convertCode(output.size()));
+			res.setHeadr("Content-Type: text/html");
+			res.setCode(200);
+		}
+		else
+			res.setCode(403);
+	}
+	else{
+		res.setCode(403);
+	}
+}
+
+//FIX :  if is loc we will get index and eror page and auto index from loc
+
+void GetMethod::locationGet(Location *loc){
+	res.path = loc->getRoot() + '/' + req.getPath();
+	size_t size;
+
+	if (!loc->isMethodAllowed(req.getMethod())) {// NOTE :Check if method allowed or Not
+		res.setCode(405);
+		return;
+	}
+	if (loc->isRedirection())
+	{
+		// res.setCode(loc->getRedirectionCode());
+		return;
+	}
+	int type = isFile(res.path, size);
+	if (type == FILE){ //TODO : check cgi
+		// if (fileIsCGI(loc))
+		// 	handelCgi(loc);
+		serveFile(res.path, size);
+	}
+	else if (type == DIRECTORY){ //TODO :  try index.html || check auto index + check cgi
+		serveDirectoryLoc(*loc);
+	}
+	else if (type == NOT_FOUND) {//TODO : Generate 404
+		res.setCode(404);
+	}
+}
+
+
 void GetMethod::GetMethode(Server &ser, Request &req, Response &res)
 {
-
-	if (isLocation()){
-		std::cout << "locationGet" << std::endl;
-		// locationGet();
+	LOCATION_ITT it;
+	if (isLocation(it)){
+		locationGet(it->second);
 	}
 	else
 		simpleGet();
