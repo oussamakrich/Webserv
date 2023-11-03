@@ -2,8 +2,15 @@
 #include "Parsing/include/Tokenizer.hpp"
 #include "Parsing/include/GenerateGlobalClass.hpp"
 
+void ff(void)
+{
+	system("leaks webserver");
+}
+
+
 int main (int argc, char **argv)
 {
+	atexit(ff);
 	if (argc != 2){
 		std::cerr << "Error: required a config file" << std::endl;
 		return 1;

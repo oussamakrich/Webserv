@@ -23,5 +23,5 @@ private:
 };
 //***************************** util ***************************************
 		bool isInteger(string &str); // [0-9] one more digit
-	 	bool isInRange(int start, int end, int value); // if  end < start  throw exception value E[start , end]
+		bool isInRange(int start, int end, int value); // if  end < start  throw exception value E[start , end]
 		void SyntaxError(string msg="Fatal Error", int code=1);

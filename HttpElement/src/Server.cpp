@@ -10,7 +10,13 @@ Server::Server(){
 	this->autoIndex = false;
 }
 
-Server::~Server(){}
+Server::~Server()
+{
+	
+	for (std::map<std::string, Location*>::iterator it = locations.begin(); it != locations.end(); it++)
+		delete it->second;
+	locations.clear();
+}
 
 Server::Server(const Server &copy){*this = copy;}
 
@@ -32,7 +38,7 @@ Server &Server::operator=(const Server &copy)
 		_listen = copy._listen;
 		clients	= copy.clients;
 
-		
+
 	return *this;
 }
 

@@ -28,11 +28,10 @@ void  Global::print(){
 };
 
 void Global::callHandelFds(struct pollfd pfd){
-	Server *server;
 
-	for (unsigned int i =0; i < servers.size(); i++){
-		server = servers[i];
-		if (server->handelFd(pfd))
+	for (unsigned int i =0; i < servers.size(); i++)
+	{
+		if (servers[i]->handelFd(pfd))
 			break;
 	}
 }
@@ -58,7 +57,7 @@ void  Global::run()
 {
 	std::vector<Server *>::iterator it = servers.begin();
 
-	for(;it != servers.end(); it++){
+	for(;it != servers.end(); it++) {
 		if (!(*it)->start()){
 			delete *it;
 			servers.erase(it);

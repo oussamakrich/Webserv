@@ -74,5 +74,5 @@ void Response::ReminderResponse(){
 
 	int ret = send(fd, buffer, bufferSize, 0);
 	if (ret == -1) std::cout << "Error send" << std::endl; //FIX : error Response
-	delete  buffer;
+	delete  buffer;//TODO: not always allocated if the file is not open you should not delete this.
 }

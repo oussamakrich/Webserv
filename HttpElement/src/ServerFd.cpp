@@ -93,11 +93,13 @@ bool Server::handelClient(ITT_CLIENT it){
 
 	Client *client = *it;
 	client->setLastTime(time(NULL));
-	if (client->IhaveResponse){
+	if (client->IhaveResponse)
+	{
 		client->response->ReminderResponse();
 		client->IhaveResponse = client->response->stillSend;
-		if (!client->IhaveResponse){
-			delete  client->response; 
+		if (!client->IhaveResponse)
+		{
+			delete  client->response;
 			client->response = NULL;
 			client->switchEvent(client->getFd(), POLLIN);
 		}
@@ -110,19 +112,20 @@ bool Server::handelClient(ITT_CLIENT it){
 	client->switchEvent(client->getFd(), POLLOUT);
 	req = client->getRequest();
 	client->reqBuff.clear();
-	if (req->getType() < 0)
+	if (req->getType() > 1)
 	{
 		ErrorResponse err = GenerateError::generateError(req->getType(), *this);
 		std::string error =  err.getErrorPage(*this);
 		send(client->getFd(), error.c_str(), error.size(), 0);
 		closeConnection(it);
 	}
-	else{
+	else
+	{
 		client->response = GenerateResponse::generateResponse(*this, *req, client->getFd());
 		client->response->sendResponse();
 		client->IhaveResponse = client->response->stillSend;
 		if (!client->IhaveResponse){
-			delete  client->response; 
+			delete  client->response;
 			client->response = NULL;
 			client->switchEvent(client->getFd(), POLLIN);
 		}
