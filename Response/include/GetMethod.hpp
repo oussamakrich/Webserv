@@ -4,7 +4,6 @@
 
 #include "GenerateResponse.hpp"
 #include "Response.hpp"
-// #include "../../HttpElement/include/Server.hpp"
 
 #define FILE 0
 #define DIRECTORY 1

@@ -28,6 +28,9 @@ void Tokenizer::generateTokenMap(void){
 	SpecialWords["rewrite"] = REWRITE;
 	SpecialWords["autoindex"] = AUTO_INDEX;
 	SpecialWords["allowed_methods"] = ALLOWED_METHOD;
+	SpecialWords["upload"] = UPLOAD_PATH;
+	SpecialWords["upload_path"] = UPLOAD;
+	SpecialWords["cgi"] = CGI;
 	SpecialSymbols["["] = OPEN_S_BRACKET;
 	SpecialSymbols["]"] = CLOSE_S_BRACKET;
 	SpecialSymbols["{"] = OPEN_C_BRACKET;
@@ -48,7 +51,7 @@ void Tokenizer::validateTokens(TOKEN_STRUCTS &tokens)
 			if (i < size && (tokens[i].type == SEMICOLON || tokens[i].type == OPEN_C_BRACKET))
 			{
 				std::cout << SYNTAX_ERROR << tokens[i].column << ":" << tokens[i].row << RESET" expected word or quotes after semicolon.\n";
-				std::cout << RED"\n\t\tError code: ("<< (MISSING_SEMICOLON + 1) << ")\n" << RESET;
+				std::cout << RED"\n\t\tError code: ("<< (MISSING_SEMICOLON + 1) <<  ")" << RESET <<"\n";
 				exit(1);
 			}
 		}
@@ -60,13 +63,13 @@ void Tokenizer::validateTokens(TOKEN_STRUCTS &tokens)
 			if (i < size && tokens[i].type == CLOSE_C_BRACKET)
 			{
 				std::cout << SYNTAX_ERROR << tokens[i].column << ":" << tokens[i].row << RESET" empty blocks are not allowed.\n";
-				std::cout << RED"\n\t\tError code: ("<< (EMPTY_BLOCK + 1) << ")\n" << RESET;
+				std::cout << RED"\n\t\tError code: ("<< (EMPTY_BLOCK + 1)  <<  ")" << RESET <<"\n";
 				exit(1);
 			}
 			if (i < size && tokens[i].type == SEMICOLON)
 			{
 				std::cout << SYNTAX_ERROR << tokens[i].column << ":" << tokens[i].row << RESET" expected word or quotes before semicolon.\n";
-				std::cout << RED"\n\t\tError code: ("<< (MISSING_SEMICOLON + 1) << ")\n" << RESET;
+				std::cout << RED"\n\t\tError code: ("<< (MISSING_SEMICOLON + 1)  <<  ")" << RESET <<"\n";
 				exit(1);
 			}
 		}

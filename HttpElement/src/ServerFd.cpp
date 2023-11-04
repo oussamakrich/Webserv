@@ -4,10 +4,6 @@
 #include "../include/Global.hpp"
 #include "../../Response/include/GenerateResponse.hpp"
 
-void fn(){
-	system("leaks webserv");
-}
-
 bool Server::start(){
 	stringstream PortString;
 	PortString << this->port;

@@ -3,12 +3,14 @@
 #include "../../include/includes.hpp"
 #include "Location.hpp"
 #include "Client.hpp"
+#include <functional>
+#include <string>
 
 
 #define str_it std::vector<std::string>::iterator
 #define LOCATION_PAIR std::pair<std::string, Location*>
-#define LOCATION_MAP std::map<std::string, Location*>
-#define LOCATION_ITT std::map<std::string, Location*>::iterator
+#define LOCATION_MAP std::map<std::string, Location*, std::greater<std::string> >
+#define LOCATION_ITT std::map<std::string, Location*, std::greater<std::string> >::iterator
 #define TYPES_MAP std::map<std::string, std::string>
 #define TYPES_ITT std::map<std::string, std::string>::iterator
 #define TYPES_PAIR std::pair<std::string, std::string>

@@ -70,7 +70,10 @@ typedef enum {
 	COLON,
 	SPACE,
 	WORD,
-	QUOTES
+	QUOTES,
+	UPLOAD,
+	CGI,
+	UPLOAD_PATH
 }Token;
 
 typedef struct {

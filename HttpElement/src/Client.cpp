@@ -4,6 +4,8 @@
 #include "../include/Server.hpp"
 #include "../../Response/include/GenerateResponse.hpp"
 
+#define N_READ 1
+
 Client::Client(int bodySize, int fd) : reqBuff(bodySize){
 	lastTime = std::time(NULL);
 	IhaveResponse = false;
@@ -25,9 +27,9 @@ bool Client::ReadRequest(){
 	
 	char *buffer;
 
-	buffer = new char[5024];
-	memset(buffer, 0, 5024);
-	status = recv(pfd.fd, buffer, 5024, 0);
+	buffer = new char[N_READ];
+	memset(buffer, 0, N_READ);
+	status = recv(pfd.fd, buffer, N_READ, 0);
 	if (status == -1 || status == 0)
 	{
 		delete  buffer;
@@ -104,6 +106,7 @@ bool Client::NewRequest(ITT_CLIENT it, Server &ser){
 	reqBuff.clear();
 	if (req->getType() < 0)
 	{
+		this->response = new Response(this->pfd.fd);
 		response->setCode(req->getType());
 		delete req;
 		return false;

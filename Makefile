@@ -45,12 +45,12 @@ HEADER =	./HttpElement/include/Client.hpp \
 			./Response/include/Response.hpp\
 			./Response/include/GenerateResponse.hpp\
 			./Response/include/GetMethod.hpp\
-			
+
 
 
 OBJ = $(SRC:.cpp=.o)
 
-FLAGS = -fsanitize=address -g#-Wall -Wextra -Werror -std=c++98 
+FLAGS = -fsanitize=address -g# -Wall -Wextra -Werror -std=c++98
 
 all:  $(NAME)
 

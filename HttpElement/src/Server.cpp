@@ -10,7 +10,13 @@ Server::Server(){
 	this->autoIndex = false;
 }
 
-Server::~Server(){}
+Server::~Server()
+{
+	
+	for (std::map<std::string, Location*>::iterator it = locations.begin(); it != locations.end(); it++)
+		delete it->second;
+	locations.clear();
+}
 
 Server::Server(const Server &copy){*this = copy;}
 
@@ -32,7 +38,7 @@ Server &Server::operator=(const Server &copy)
 		_listen = copy._listen;
 		clients	= copy.clients;
 
-		
+
 	return *this;
 }
 
@@ -107,7 +113,7 @@ std::vector<ERRPAGE_PAIR> Server::getErrorPages() const{return errorPages;}
 
 Location	&Server::getLocation(std::string url){ return *locations[url]; }
 
-std::map<std::string, Location*> &Server::getAllLocation() { return locations; }
+LOCATION_MAP &Server::getAllLocation() { return locations; }
 
 std::map<std::string, std::string>	Server::getMimeType() const{return mimeType;}
 
@@ -139,7 +145,7 @@ std::ostream &operator<<(std::ostream &out, Server &server){
 		out << GREEN"\t\t"<< it -> first << " " << it -> second << std::endl;
 	out << RED"\tlocations: " << std::endl;
 	std::cout << RESET;
-	std::map<std::string, Location*> loc = server.getAllLocation();
+	LOCATION_MAP loc = server.getAllLocation();
 	for (std::map<std::string, Location*>::const_iterator it = loc.begin(); it != loc.end(); it++)
 	{
 		out <<it -> first << " " ;

@@ -14,9 +14,7 @@ Response::Response(int fd){
 	this->bufferSize = 0;
 }
 
-Response::~Response(){
-
-}
+Response::~Response(){}
 
 int Response::getCode(){ return this->code;}
 

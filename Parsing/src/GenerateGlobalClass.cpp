@@ -35,6 +35,7 @@ Global *GenerateGlobalClass::generateGlobalClass(std::vector<TOKEN> tokens){
 		if (it->first == SERVER){
 			server = GenerateServer::NewServer(++it);
 			if (checkHostAndPort(server, portAndHost)) global->addServer(server);
+			else delete server;
 		}
 	}
 	return global;

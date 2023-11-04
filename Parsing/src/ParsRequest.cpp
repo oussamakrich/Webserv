@@ -17,7 +17,7 @@ Request *ParsRequest::Pars(RequestBuffer &reqBuff)
 	 {
 		if (ParsHeaders(*req, header_vect[i]) == false)
 		{
-			// std::cout << header_vect[i] << std::endl;
+			// std::cout << "Header : " <<  header_vect[i] << std::endl;
 			req->setType(Request::INVALID_REQUEST);
 			break;
 		}
@@ -58,7 +58,9 @@ bool  ParsRequest::isValidKey(std::string key)
 	std::string key = line.substr(0, pos);
 	std::string value = line.substr(pos + 1);
 	value = trim(value);
+	if (key.empty() || value.empty()) return true;
 	if (isValidKey(key) == false) return false;
+
 
 	if(key == "Content-Length")
 	{
