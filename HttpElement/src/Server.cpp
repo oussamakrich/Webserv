@@ -6,13 +6,13 @@
 Server::Server(){
 	this->host = "localhost";
 	this->port = 80;
-	this->clientMaxBodySize = 1;
+	this->clientMaxBodySize = 1000000;
 	this->autoIndex = false;
 }
 
 Server::~Server()
 {
-	
+
 	for (std::map<std::string, Location*>::iterator it = locations.begin(); it != locations.end(); it++)
 		delete it->second;
 	locations.clear();

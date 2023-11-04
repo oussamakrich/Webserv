@@ -35,7 +35,7 @@ bool Client::ReadRequest(){
 		delete  buffer;
 		return false;
 	}
-	
+
 	int level = reqBuff.insertBuffer(buffer, status);
 	delete buffer;
 	return true;

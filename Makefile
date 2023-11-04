@@ -23,6 +23,7 @@ SRC =	./HttpElement/src/Client.cpp\
 		./Response/src/Response.cpp\
 		./Response/src/GenerateResponse.cpp\
 		./Response/src/GetMethod.cpp\
+		./Response/src/PostMethod.cpp\
 
 
 
@@ -45,12 +46,13 @@ HEADER =	./HttpElement/include/Client.hpp \
 			./Response/include/Response.hpp\
 			./Response/include/GenerateResponse.hpp\
 			./Response/include/GetMethod.hpp\
+			./Response/include/PostMethod.hpp\
 
 
 
 OBJ = $(SRC:.cpp=.o)
 
-FLAGS = -fsanitize=address -g# -Wall -Wextra -Werror -std=c++98
+FLAGS = -fsanitize=address -g#-Wall -Wextra -Werror -std=c++98
 
 all:  $(NAME)
 
