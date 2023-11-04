@@ -1,15 +1,21 @@
 
 #include "../include/GenerateResponse.hpp"
 #include "../include/GetMethod.hpp"
+#include "../include/PostMethod.hpp"
 #include "../include/Response.hpp"
+#include <fstream>
 
 
 
 Response *GenerateResponse::generateResponse(Server &ser, Request &req, int fd){
 	Response *res = new Response(fd);
 
+	// std::cout << "method: " << req.getMethod() << std::endl; // DEBUG:
 	if (req.getMethod() == "GET") GetMethod GetHandler(ser, req, *res);
-	else if (req.getMethod() == "POST") std::cout << "POST" << std::endl;
+	else if (req.getMethod() == "POST")
+	{
+		PostMethod PostHandler(ser, req, *res);
+	}
 	else if (req.getMethod() == "DELETE") std::cout << "DELETE" << std::endl;
 
 	res->setMsg(generateMsg(res->getCode()));

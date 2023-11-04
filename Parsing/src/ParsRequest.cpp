@@ -9,6 +9,7 @@ Request *ParsRequest::Pars(RequestBuffer &reqBuff)
 	Request *req = new(std::nothrow) Request(type);
 	if (req == NULL) return NULL;
 	req->setErrorCode(reqBuff.getLevel());
+	// std::cout  << "request: " << reqBuff.getLevel()  << "type: " << req->getType() << "version: " << reqBuff.getProtocol() << std::endl; // DEBUG:
 	if (req->getType() == Request::INVALID_REQUEST) return req;
 	std::string headers = reqBuff.getHeaders();
 	std::vector<std::string> header_vect = split(headers, '\n');
@@ -17,13 +18,14 @@ Request *ParsRequest::Pars(RequestBuffer &reqBuff)
 	 {
 		if (ParsHeaders(*req, header_vect[i]) == false)
 		{
-			// std::cout << header_vect[i] << std::endl;
+			// std::cout << header_vect[i] << std::endl;K
 			req->setType(Request::INVALID_REQUEST);
 			break;
 		}
 	}
 	req->setBodyBuff(reqBuff.getBody());
 	req->setBodySize(reqBuff.getBodySize());
+
 	return req;
 }
 
@@ -64,6 +66,7 @@ bool  ParsRequest::isValidKey(std::string key)
 	{
 		if(isInteger(value) == false) return false;
 		req.setContentLength(std::atoi(value.c_str()));
+		return  req.insertHeader(key, value);
 	}
 	else if (key == "Transfer-Encoding")
 		req.setTransferEncoding(value);

@@ -192,10 +192,13 @@ int RequestBuffer::InsertFirstLine(char *buffer, int size)
 			else if (URI.empty())		URI = tmp;
 			else if (Protocol.empty())	Protocol = tmp;
 		}
-		if (Method.empty() || URI.empty() || Protocol.empty()) RequestBuffer::Success = 405;
+		if (Method.empty() || URI.empty() || Protocol.empty()) RequestBuffer::Success = 406;
 		if (Protocol.find_first_not_of(ALLOWED_CHARS) != std::string::npos) RequestBuffer::Success = 400;
-		if (IS_METHOD_SUPORTED(Method) == false) RequestBuffer::Success = 405;
-		if (Protocol != "HTTP/1.1") RequestBuffer::Success = 405;
+		if (IS_METHOD_SUPORTED(Method) == false) RequestBuffer::Success = 407;
+		if (Protocol != "HTTP/1.1") {
+			std::cout << Protocol << std::endl;
+			RequestBuffer::Success = 408;
+		}
 
 		size -= pos + 2;
 		if (size <= 0)
@@ -267,7 +270,10 @@ int	RequestBuffer::InsertHeaders(char *buffer, int size)
 			Headers.erase(std::remove(Headers.begin(), Headers.end(), '\r'), Headers.end());
 			RequestBuffer::Level++;
 			if (this->Method != "POST")
+			{
 				return (RequestBuffer::Success = 1, 1);
+			}
+
 			return (1);
 		}
 		Headers.erase(std::remove(Headers.begin(), Headers.end(), '\r'), Headers.end());
@@ -285,6 +291,7 @@ int	RequestBuffer::InsertHeaders(char *buffer, int size)
 int	RequestBuffer::GenerateBodyType()
 {
 	int pos;
+
 	if ((pos = this->Headers.find("Content-Length: ")) != std::string::npos)
 	{
 		this->contentLength = std::atoi(
@@ -293,7 +300,10 @@ int	RequestBuffer::GenerateBodyType()
 		return (1);
 	}
 	else if ((pos = this->Headers.find("Transfer-Encoding: chunked")) != std::string::npos)
+	{
+		std::cout << "chunked" << std::endl;
 		return (2);
+	}
 	else if ((pos = this->Headers.find("Transfer-Encoding: ")))
 		return (Success = 505, -1);
 	return (Success = 400, -1);
@@ -343,6 +353,7 @@ int	RequestBuffer::InsertBody(char *buffer, int size)
 		case 1:
 			if (contentLength > MaxBodySize)
 			{
+				std::cout << MaxBodySize << std::endl;
 				std::cout << size << std::endl;
 				RequestBuffer::Success = 413; // Request Entity Too Large
 			}
@@ -350,6 +361,7 @@ int	RequestBuffer::InsertBody(char *buffer, int size)
 				RequestBuffer::InsertContentLengthBody(buffer, size);
 			break;
 		case 2:
+
 			RequestBuffer::InsertTransferEncodingBody(buffer, size);
 			break;
 		default:
@@ -435,7 +447,9 @@ int RequestBuffer::InsertTransferEncodingBody(char *buffer,int size)
 	if ((pos = find(t_tmp.tmp, "\r\n0\r\n\r\n", t_tmp.size, 7)) != -1)
 	{
 		if (pos != 0)
+		{
 			return (Success = ParseChunkedBodyAndFillBuffer(), Success);
+		}
 		return (Success = 1, Success);
 	}
 

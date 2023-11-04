@@ -58,7 +58,7 @@ void GetMethod::serveFile(std::string path, size_t size){
 		if (file.is_open()){
 			char *buffer = new char[R_READ];
 			file.read(buffer, R_READ);
-			res.setBuffer(buffer, file.gcount());	
+			res.setBuffer(buffer, file.gcount());
 		res.pos = file.gcount();
 			res.stillSend = true;
 			if (file.eof())
@@ -88,7 +88,7 @@ void GetMethod::serveDirectory(){
 		std::string path = res.path + '/' + *it;
 		type = isFile(path, size);
 		if (type == FILE){
-			std::cout << "Dir : " << path << std::endl;
+			// std::cout << "Dir : " << path << std::endl;
 			serveFile(path, size);
 			return;
 		}
@@ -139,7 +139,7 @@ void GetMethod::serveDirectoryLoc(Location &loc){
 		std::string path = res.path + '/' + *it;
 		type = isFile(path, size);
 		if (type == FILE){
-			std::cout << "Dir : " << path << std::endl;
+			// std::cout << "Dir : " << path << std::endl;
 		// if (fileIsCGI(loc)){
 		//		handelCgi(loc);
 		//		return;

@@ -12,7 +12,7 @@
 class GetMethod
 {
 
-		public:
+	public:
 		GetMethod(Server &ser, Request &req, Response &res);
 		~GetMethod();
 	private:
@@ -34,10 +34,6 @@ class GetMethod
 
 
 		void serveDirectoryLoc(Location &loc);
-
-		
-
-
 };
 
 

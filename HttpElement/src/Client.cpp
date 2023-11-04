@@ -20,7 +20,7 @@ int Client::getFd(){
 }
 
 void Client::ReadRequest(){
-	
+
 	char *buffer;
 
 	buffer = new char[5024];
