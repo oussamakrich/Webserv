@@ -98,10 +98,10 @@ class Server {
 
 		std::vector<std::string> getIndex() const;
 		std::vector<ERRPAGE_PAIR> getErrorPages() const;
-		LOCATION_MAP getAllLocation() const;
+		LOCATION_MAP &getAllLocation();
 		std::map<std::string, std::string> getMimeType() const;
 		Location	&getLocation(std::string url);
 };
 
 
-std::ostream &operator<<(std::ostream &out, const Server &server);
+std::ostream &operator<<(std::ostream &out, Server &server);

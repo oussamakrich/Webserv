@@ -1,5 +1,6 @@
 
 #include "../include/Global.hpp"
+#include <sys/poll.h>
 
 std::vector<struct pollfd> Global::gPollFds =  std::vector<struct pollfd>();
 
@@ -74,6 +75,9 @@ void  Global::run()
 		}
 		for(unsigned int i =0; i < gPollFds.size() && pollStatus; i++){
 			if (pollStatus && ((gPollFds[i].revents & POLLIN) || (gPollFds[i].revents & POLLOUT))){
+				std::cout << "fd : " << gPollFds[i].fd << " ";
+				std::cout << ((gPollFds[i].revents & POLLIN) ? "is readeabel" : "is writibale");
+				std::cout 	<< std::endl;
 				this->callHandelFds(gPollFds[i]);
 				pollStatus--;
 			}

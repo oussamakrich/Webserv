@@ -5,6 +5,9 @@
 #include "../../Response/include/Response.hpp"
 
 
+#define ITT_CLIENT	std::vector<Client*>::iterator
+
+class Server;
 
 
 class Client{
@@ -24,6 +27,7 @@ class Client{
 		RequestBuffer reqBuff;
 		Response *response;
 		bool			IhaveResponse;
+		bool			keepAlive;
 
 	public: //Utils
 		void		ReadRequest();
@@ -31,11 +35,17 @@ class Client{
 		Request *getRequest();
 		std::time_t	getLastTime();
 
+		bool NewRequest(ITT_CLIENT	it, Server &ser);
+		bool OldRequest(ITT_CLIENT it, Server &ser);
+		void Error();
+
 	public: //Geters
 		int getFd();
 		struct sockaddr &getAddr();
 		void setAddr(struct sockaddr &addr);
 		void setLastTime(std::time_t tm);
 		void switchEvent(int fd, int Flag);
+
+
 
 };
