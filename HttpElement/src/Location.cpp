@@ -15,8 +15,9 @@ Location::Location(string path): path(path)
 	this->redirection_code = 200;
 	this->redirection_text = "ok";
 	this->AutoIndex = false;
-	this->default_type = "";
-
+	this->default_type = "application/octet-stream";
+	this->upload = false;
+	this->upload_path = "";
 }
 Location::~Location(){}
 void Location::final()
@@ -51,10 +52,11 @@ void	Location::setRedirectionText(string &text)             {   this->redirectio
 void	Location::setRedirection(int code, string &text)       {   setRedirectionCode(code) , setRedirectionText(text);  }
 void	Location::setPath(string &path)                        {   this->path = path;                                     }
 void	Location::setUploadOn(bool b)						   {   this->upload = b;                                      }
+void	Location::setUploadPath(const string	&upload_path)	{	this->upload_path = upload_path;}
 
 /*********************************< getter >*******************/
 
-	bool     Location::getErrorPage(int code, string  &page)   const
+	bool	Location::getErrorPage(int code, string  &page)   const
 	{
 		std::vector<std::pair<int,string> >::const_iterator it = error_page.begin();
 		page = "";
@@ -63,7 +65,6 @@ void	Location::setUploadOn(bool b)						   {   this->upload = b;                
 				break;
 		page = it->second;
 		return   it == error_page.end() ?  false  :  true;
-
 	}
 
 const vector<std::pair<int,string> >    &Location::getErrorPageList()   const    { return    error_page;          }
@@ -86,6 +87,8 @@ const string							Location::getCgiBinFor(string file) const
 		else
 			return "";
 }
+
+const string							&Location::getUploadPath()	const{ return  this->upload_path; }
 /*********************************< checker >*******************/
 
 bool Location::isMethodAllowed(const string &method) const          {   return (std::find(Allowed_Method.begin(), Allowed_Method.end() , method) != Allowed_Method.end()); }
