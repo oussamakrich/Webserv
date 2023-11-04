@@ -137,10 +137,14 @@ bool GetMethod::checkRedirectionAndAllowed(){
 		return true;
 	}
 	if (location->isRedirection()){
-		// res.setCode(location->getRedirectionCode());
-		// TODO : Redirection if betwen 100 200 400  -> text html else -> header location 
-		// if (res.getCode() == 200)
-		
+		res.setCode(location->getRedirectionCode());	
+		if (res.getCode() >= 300 && res.getCode() < 400){
+			res.setHeadr("Location: " + location->getRedirectionText());	
+		}
+		else {
+			res.setHeadr("Content-Length: " + convertCode(location->getRedirectionText().size()));
+			res.setHeadr("Content-Type: text/plain");
+		}
 		return true;
 	}
 	return false;
