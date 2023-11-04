@@ -5,21 +5,31 @@
 PostMethod::PostMethod(Server &ser, Request &req, Response &res) : ser(ser), req(req), res(res)
 {
 	LOCATION_ITT it;
-	if (isLocation(it))
+	if (isLocation(it)) //--> : is location exist
 	{
 		if (it->second->isMethodAllowed("POST"))
 		{
-			
+			if (it->second->isUploadOn())
+			{
+
+			}
+			else
+				FillResponse(403);
 		}
 		else
-		{
-			res.setCode(405);
-			res.setMsg(GenerateResponse::generateMsg(res.getCode()));
-			res.setHeaderAndStart(GenerateResponse::generateHeaderAndSt(res));
-		}
+			FillResponse(405);
 	}
+	else
+		FillResponse(404);
 }
 
+
+void PostMethod::FillResponse(int code)
+{
+	res.setCode(code);
+	res.setMsg(GenerateResponse::generateMsg(res.getCode()));
+	res.setHeaderAndStart(GenerateResponse::generateHeaderAndSt(res));
+}
 
 bool PostMethod::isLocation(LOCATION_ITT &it)
 {

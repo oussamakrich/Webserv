@@ -63,5 +63,7 @@ std::string GenerateResponse::generateMsg(int Code)
 	else if (Code == 305) return "Use Proxy";
 	else if (Code == 307) return "Temporary Redirect";
 	else if (Code == 308) return "Permanent Redirect";
+	else if (Code == 405) return "Method Not Allowed";
+	else if (Code == 403) return "Forbidden";
 	else return "Not Found";
 }

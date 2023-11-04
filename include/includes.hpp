@@ -72,7 +72,8 @@ typedef enum {
 	WORD,
 	QUOTES,
 	UPLOAD,
-	CGI
+	CGI,
+	UPLOAD_PATH
 }Token;
 
 typedef struct {

@@ -102,7 +102,7 @@ int RequestBuffer::find(char *str, const char *to_find, int strSize, int to_find
 	{
 		if (str[i] == to_find[j])
 		{
-			while (str[i + j] == to_find[j] && j < to_findSize)
+			while (i + j < strSize && str[i + j] == to_find[j] && j < to_findSize)
 				j++;
 			if (j == to_findSize)
 				return (i);

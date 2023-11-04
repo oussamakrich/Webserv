@@ -14,6 +14,7 @@ class PostMethod {
 
 	private:
 		bool isLocation(LOCATION_ITT &it);
+		void FillResponse(int code);
 		// void simplePost();
 		// void locationPost(Location *loc);
 		// int isFile(std::string path, size_t &size);
