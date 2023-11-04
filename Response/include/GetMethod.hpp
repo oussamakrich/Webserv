@@ -23,13 +23,17 @@ class GetMethod
 
 	private:
 		void GetMethode(Server &ser, Request &req, Response &res);
-		bool isLocation();
+		bool isLocation(LOCATION_ITT &it);
 		void simpleGet();
-		void locationGet();
+		void locationGet(Location *loc);
 
 		int	isFile(std::string path, size_t &size);
 		void serveFile(std::string path, size_t size);
-		// static void sendReminder(Response &req);
+
+		void serveDirectory();
+
+
+		void serveDirectoryLoc(Location &loc);
 
 		
 

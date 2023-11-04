@@ -52,6 +52,8 @@ class Location {
 				const string                			&getRoot() 								const;
 				const string                      		&getPath() 								const;
 				const string                 			getUri() 								const; // uri = root + path;
+				const int 									getRedirectionCode()					const;
+				const string 							&getRedirectionText()					const;
 		/*********************************< checker >*******************/
 				bool isMethodAllowed(const string &method) 	const;
 				bool isRedirection()						const;

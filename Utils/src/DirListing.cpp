@@ -33,13 +33,13 @@ std::string DirListing::MakeHtml(std::string DirName, std::string HtmlContent)
 {
 	std::stringstream html;
 	html << "<html>\n<head>";
-	html <<  "<style>\nbody{ \n text-indent: 10%; \n color : rgb(200, 200, 255); \n background-color :black;}";
+	html <<  "<style>\nbody{ \n ;text-indent: 10%; \n color : rgb(200, 200, 255); \n background-color :black;}";
 	html <<  "th, td{\npadding-left: 50px;\npadding-bottom: 10px;\ncolor : rgb(200, 200, 200);\n}\n</style>";
-	html <<  "<title> Index of " << DirName << "</title>\n</head>\n<body>";
+	html <<  "<title> Index of " << DirName << "</title>\n</head>\n<body><center>\n";
 	html << "<h1> Index of " << DirName <<"</h1>";
 	html <<   "<hr>\n<table>\n<tr>\n<th> Name </th>\n<th> Size  </th>\n<th>Last Modified </th>\n</tr>";
 	html << HtmlContent;
-	html << "   </table>\n<h2>Hustlers Server 1.0 [beta] </h2>\n</body></html>";
+	html << "   </table>\n<h2>Hustlers Server 1.0 [beta] </h2>\n</center>\n</body></html>";
 	return html.str();
 }
 

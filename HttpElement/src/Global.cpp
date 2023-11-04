@@ -1,6 +1,5 @@
 
 #include "../include/Global.hpp"
-#include <sys/poll.h>
 
 std::vector<struct pollfd> Global::gPollFds =  std::vector<struct pollfd>();
 

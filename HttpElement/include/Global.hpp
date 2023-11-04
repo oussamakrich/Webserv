@@ -2,7 +2,7 @@
 
 #include "../../include/includes.hpp"
 #include "Server.hpp"
-#include "Global.hpp"
+
 
 class Global {
 	private:

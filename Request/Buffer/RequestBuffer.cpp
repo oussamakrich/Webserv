@@ -193,7 +193,7 @@ int RequestBuffer::InsertFirstLine(char *buffer, int size)
 			else if (Protocol.empty())	Protocol = tmp;
 		}
 		if (Method.empty() || URI.empty() || Protocol.empty()) RequestBuffer::Success = 405;
-		if (Protocol.find_first_not_of(ALLOWED_CHARS) != std::string::npos) RequestBuffer::Success = 405;
+		if (Protocol.find_first_not_of(ALLOWED_CHARS) != std::string::npos) RequestBuffer::Success = 400;
 		if (IS_METHOD_SUPORTED(Method) == false) RequestBuffer::Success = 405;
 		if (Protocol != "HTTP/1.1") RequestBuffer::Success = 405;
 
@@ -294,7 +294,9 @@ int	RequestBuffer::GenerateBodyType()
 	}
 	else if ((pos = this->Headers.find("Transfer-Encoding: chunked")) != std::string::npos)
 		return (2);
-	return (-1);
+	else if ((pos = this->Headers.find("Transfer-Encoding: ")))
+		return (Success = 505, -1);
+	return (Success = 400, -1);
 }
 
 int	RequestBuffer::InsertContentLengthBody(char *buffer, int size)

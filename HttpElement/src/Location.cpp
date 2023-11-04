@@ -44,6 +44,7 @@ void	Location::setRedirectionText(string &text)             {   this->redirectio
 void	Location::setRedirection(int code, string &text)       {   setRedirectionCode(code) , setRedirectionText(text);  }
 void	Location::setPath(string &path)                        {  this->path = path;                                     }
 
+
 /*********************************< getter >*******************/
 
 	bool     Location::getErrorPage(int code, string  &page)   const
@@ -65,6 +66,9 @@ const string							&Location::getDefaultTypes()    const    { return    default_
 const string							&Location::getRoot()            const    { return    root;                }
 const string                      		&Location::getPath() 		    const    { return    path;                }
 const string                 			Location::getUri() 		        const    { return    root + path;         }
+const int 								    Location::getRedirectionCode()       const { return redirection_code;     }
+const string 						             &Location::getRedirectionText()  const   {  return redirection_text;}
+
 
 /*********************************< checker >*******************/
 

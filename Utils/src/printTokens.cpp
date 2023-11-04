@@ -57,6 +57,10 @@ void printEnam(Token t)
 		std::cout << "REWRITE";
 	else if (t == AUTO_INDEX)
 		std::cout << "AUTO_INDEX";
+	else if (t == UPLOAD)
+		std::cout << "UPLOAD";
+	else if (t == CGI)
+		std::cout << "CGI";
 	else
 		std::cout << "UNKNOWN";
 

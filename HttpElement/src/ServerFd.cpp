@@ -1,14 +1,8 @@
 
 #include "../include/Server.hpp"
-#include "../../Parsing/include/GenerateLocation.hpp"
-#include "../include/Global.hpp"
 #include "../../Utils/include/DirListing.hpp"
-#include "../../ErrorResponse/include/GenerateError.hpp"
+#include "../include/Global.hpp"
 #include "../../Response/include/GenerateResponse.hpp"
-
-void fn(){
-	system("leaks webserv");
-}
 
 bool Server::start(){
 	stringstream PortString;
@@ -93,9 +87,12 @@ bool Server::handelClient(ITT_CLIENT it){
 
 	Client *client = *it;
 	client->setLastTime(time(NULL));
-	if (client->IhaveResponse)
-	{
-		client->response->ReminderResponse();
+	if (client->IhaveResponse){
+		if (client->response->ReminderResponse()){
+			client->response->sendErrorResponse(*this, client->getFd());
+			closeConnection(it);
+			return true;
+		}
 		client->IhaveResponse = client->response->stillSend;
 		if (!client->IhaveResponse)
 		{
@@ -114,15 +111,21 @@ bool Server::handelClient(ITT_CLIENT it){
 	client->reqBuff.clear();
 	if (req->getType() > 1)
 	{
-		ErrorResponse err = GenerateError::generateError(req->getType(), *this);
-		std::string error =  err.getErrorPage(*this);
-		send(client->getFd(), error.c_str(), error.size(), 0);
+		client->response->setCode(req->getType());
+		client->response->sendErrorResponse(*this, client->getFd());
+		delete req;
 		closeConnection(it);
+		return true;
 	}
 	else
 	{
 		client->response = GenerateResponse::generateResponse(*this, *req, client->getFd());
-		client->response->sendResponse();
+		if (!client->response->sendResponse()){
+			client->response->sendErrorResponse(*this, client->getFd());
+			delete req;
+			closeConnection(it);
+			return true;
+		}
 		client->IhaveResponse = client->response->stillSend;
 		if (!client->IhaveResponse){
 			delete  client->response;

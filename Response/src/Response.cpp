@@ -1,6 +1,7 @@
 #include "../include/Response.hpp"
-#include <iostream>
-#include <sys/socket.h>
+#include "../../ErrorResponse/include/ErrorResponse.hpp"
+#include "../../ErrorResponse/include/GenerateError.hpp"
+#include "../../HttpElement/include/Server.hpp"
 
 
 Response::Response(int fd){
@@ -45,16 +46,25 @@ void Response::setHeadr(std::string header){ this->headers.push_back(header);}
 
 void Response::setHeaderAndStart(std::string header){this->HeaderAndStart = header;}
 
+void Response::sendErrorResponse(Server &ser ,int fd){
+		stillSend = false;
+		ErrorResponse err = GenerateError::generateError(this->code, ser);
+		std::string error =  err.getErrorPage(ser);
+		send(fd, error.c_str(), error.size(), 0);
+}
 
-void Response::sendResponse(){
+bool Response::sendResponse(){
 
+	if (this->code >= 400)
+		return false;
 	const char *resp = this->strjoin(HeaderAndStart.c_str(), buffer, HeaderAndStart.size(), bufferSize);
 	int ret = send(fd, resp, HeaderAndStart.size() + bufferSize, 0);
 	if (ret == -1) std::cout << "Error send" << std::endl;
 	delete  resp;
+	return true;
 }
 
-void Response::ReminderResponse(){
+bool Response::ReminderResponse(){
 
 	std::ifstream file(path.c_str());
 	if (file.is_open()){
@@ -70,9 +80,11 @@ void Response::ReminderResponse(){
 	}
 	else{
 		setCode(404);
+		return false;
 	}
 
 	int ret = send(fd, buffer, bufferSize, 0);
 	if (ret == -1) std::cout << "Error send" << std::endl; //FIX : error Response
-	delete  buffer;//TODO: not always allocated if the file is not open you should not delete this.
+	delete  buffer;
+	return true;
 }

@@ -10,7 +10,7 @@ void ff(void)
 
 int main (int argc, char **argv)
 {
-	atexit(ff);
+	// atexit(ff);
 	if (argc != 2){
 		std::cerr << "Error: required a config file" << std::endl;
 		return 1;
@@ -24,10 +24,10 @@ int main (int argc, char **argv)
 
 		// printTokens(tokens);
 
-		Global *WebServer = GenerateGlobalClass::generateGlobalClass(tokens);
+		// Global *WebServer = GenerateGlobalClass::generateGlobalClass(tokens);
 		// WebServer->print();
 
-		WebServer->run();
+		// WebServer->run();
 
 	}catch (std::exception &e) {
 		std::cout << e.what() << std::endl;
