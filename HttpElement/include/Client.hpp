@@ -30,7 +30,7 @@ class Client{
 		bool			keepAlive;
 
 	public: //Utils
-		void		ReadRequest();
+		bool		ReadRequest();
 		bool		isRequestAvailable();
 		Request *getRequest();
 		std::time_t	getLastTime();

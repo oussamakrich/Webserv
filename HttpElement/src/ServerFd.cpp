@@ -67,7 +67,6 @@ void Server::acceptClient(){
 	newClient->setAddr(sockaddr);
 	this->clients.push_back(newClient);
 	Global::insertFd(clientFd);
-	std::cout << "client added : " << clientFd << std::endl;
 }
 
 ITT_CLIENT Server::findClient(pollfd pfd){
@@ -81,7 +80,7 @@ ITT_CLIENT Server::findClient(pollfd pfd){
 
 void Server::closeConnection(ITT_CLIENT it){
 	Client *client = *it;
-	// close(client->getFd());
+	std::cout << "connection closed : " << client->getFd() << std::endl;
 	clients.erase(it);
 	Global::removeFd(client->getFd());
 	delete client;
@@ -92,77 +91,28 @@ bool Server::handelClient(ITT_CLIENT it){
 
 	Client *client = *it;
 	client->setLastTime(time(NULL));
-	// if (client->IhaveResponse){
-		// if (client->response->ReminderResponse()){
-		// 	client->response->sendErrorResponse(*this, client->getFd());
-		// 	closeConnection(it);
-		// 	return true;
-		// }
-		// client->IhaveResponse = client->response->stillSend;
-		// if (!client->IhaveResponse){
-		// 	delete  client->response; 
-		// 	client->response = NULL;
-		// 	client->switchEvent(client->getFd(), POLLIN);
-		// }
-		// return true;
-	// }	
-	// Request *req;
-	// client->ReadRequest();
-	// if (!client->isRequestAvailable())
-	// 	return true;
-	// client->switchEvent(client->getFd(), POLLOUT);
-	// req = client->getRequest();
-	// client->reqBuff.clear();
-	// if (req->getType() < 0)
-	// {
-	// 	client->response->setCode(req->getType());
-	// 	client->response->sendErrorResponse(*this, client->getFd());
-	// 	delete req;
-	// 	closeConnection(it);
-	// 	return true;
-	// }
-	// else{
-	// 	client->response = GenerateResponse::generateResponse(*this, *req, client->getFd());
-	// 	if (!client->response->sendResponse()){
-	// 		client->response->sendErrorResponse(*this, client->getFd());
-	// 		delete req;
-	// 		closeConnection(it);
-	// 		return true;
-	// 	}
-	// 	client->IhaveResponse = client->response->stillSend;
-	// 	if (!client->IhaveResponse){
-	// 		delete  client->response; 
-	// 		client->response = NULL;
-	// 		client->switchEvent(client->getFd(), POLLIN);
-	// 	}
-	// }
-	// delete req;
 	if (client->IhaveResponse)
-		return client->OldRequest(it, *this);
-	if (!client->NewRequest(it, *this))
-	{
+		client->OldRequest(it, *this);
+	else if (!client->NewRequest(it, *this)){
 		client->response->sendErrorResponse(*this, client->getFd());
 		closeConnection(it);
-
+		return true;
 	}
+	if (!client->keepAlive && !client->IhaveResponse)
+		closeConnection(it);
 	return true;
 }
 
 bool Server::handelFd(struct pollfd pfd){
 
 	if (pfd.fd == _listen){
-		if (pfd.revents & POLLOUT){
-			std::cout << "listen fd is writable" << std::endl;
+		if (pfd.revents & POLLOUT)
 			return false;
-		}
 		this->acceptClient();
 		return true;
 	}
 	else
-	{
 		 return this->handelClient(findClient(pfd));
-		std::cout << "send it" << std::endl;
-	}
 }
 
 void Server::checkTimeOut(){
@@ -172,7 +122,6 @@ void Server::checkTimeOut(){
 		client = *it;
 		std::time_t tm = client->getLastTime();
 		std::time_t now = std::time(NULL);
-		// std::cout << " time-out : " << now - tm  << " : " << TIME_OUT<< std::endl;
 		if(now - tm >= TIME_OUT){
 			std::cout << "client deleted" << std::endl;
 			closeConnection(it);

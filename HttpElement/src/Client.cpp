@@ -21,7 +21,7 @@ int Client::getFd(){
 	return pfd.fd;
 }
 
-void Client::ReadRequest(){
+bool Client::ReadRequest(){
 	
 	char *buffer;
 
@@ -31,11 +31,12 @@ void Client::ReadRequest(){
 	if (status == -1 || status == 0)
 	{
 		delete  buffer;
-		return;
+		return false;
 	}
 	
 	int level = reqBuff.insertBuffer(buffer, status);
 	delete buffer;
+	return true;
 }
 
 bool Client::isRequestAvailable(){
@@ -73,7 +74,7 @@ void Client::switchEvent(int fd, int Flag){
 
 bool Client::OldRequest(ITT_CLIENT it, Server &ser){
 
-	if (response->ReminderResponse()){
+	if (!response->ReminderResponse()){
 		response->sendErrorResponse(ser, getFd());
 		ser.closeConnection(it);
 		return true;
@@ -89,9 +90,13 @@ bool Client::OldRequest(ITT_CLIENT it, Server &ser){
 
 
 bool Client::NewRequest(ITT_CLIENT it, Server &ser){
-	std::cout << "NewRequest" << std::endl;
 	Request *req;
-	ReadRequest();
+
+	this->keepAlive = true;
+	if (!ReadRequest()){
+		ser.closeConnection(it);
+		return true;
+	}
 	if (!isRequestAvailable())
 		return true;
 	switchEvent(this->pfd.fd, POLLOUT);
@@ -103,21 +108,19 @@ bool Client::NewRequest(ITT_CLIENT it, Server &ser){
 		delete req;
 		return false;
 	}
-	else{
-		response = GenerateResponse::generateResponse(ser, *req, this->pfd.fd);
-		if (!response->sendResponse()){
-			delete req;
-			return false;
-		}
-		IhaveResponse = response->stillSend;
-		if (!IhaveResponse){
-			delete  response; 
-			response = NULL;
-			switchEvent(this->pfd.fd, POLLIN);
-			// if (!req->getConnection())
-			// 	ser.closeConnection(it);
-		}
+
+	response = GenerateResponse::generateResponse(ser, *req, this->pfd.fd);
+	if (!response->sendResponse()){
+		delete req;
+		return false;
 	}
+	IhaveResponse = response->stillSend;
+	if (!IhaveResponse){
+		delete  response; 
+		response = NULL;
+		switchEvent(this->pfd.fd, POLLIN);
+	}
+	this->keepAlive = req->getConnection();
 	delete req;
 	return true;
 }

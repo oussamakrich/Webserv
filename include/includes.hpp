@@ -105,6 +105,7 @@ void printEnam(Token t);
 
 
 std::string convertCode(int code);
+int isClientValid(int fd);
 
 
 
