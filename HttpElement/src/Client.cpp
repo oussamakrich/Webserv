@@ -4,7 +4,7 @@
 #include "../include/Server.hpp"
 #include "../../Response/include/GenerateResponse.hpp"
 
-#define N_READ 1
+#define N_READ 5024
 
 Client::Client(int bodySize, int fd) : reqBuff(bodySize){
 	lastTime = std::time(NULL);
@@ -87,7 +87,8 @@ bool Client::NewRequest(ITT_CLIENT it, Server &ser){
 
 	this->keepAlive = true;
 	if (!ReadRequest()){
-		ser.closeConnection(it);
+		this->keepAlive = false;
+		this->IhaveResponse = false;
 		return true;
 	}
 	if (!isRequestAvailable())

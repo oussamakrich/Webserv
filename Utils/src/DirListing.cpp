@@ -1,11 +1,6 @@
 #include "../include/DirListing.hpp"
-#include  <time.h>
-#include <sys/stat.h>
+#include "../../include/includes.hpp"
 #include <dirent.h>
-#include <cstdlib>
-#include <string>
-#include <iostream>
-#include <sstream>
 
 std::string DirListing::GenerateFileRow(const std::string &parent, const std::string &name)
 {

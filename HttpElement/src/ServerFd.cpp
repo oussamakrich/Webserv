@@ -114,15 +114,15 @@ bool Server::handelFd(struct pollfd pfd){
 void Server::checkTimeOut(){
 	ITT_CLIENT it = clients.begin();
 	Client *client;
-	for (; it != clients.end(); it++){
+	while (it != clients.end()){
 		client = *it;
 		std::time_t tm = client->getLastTime();
 		std::time_t now = std::time(NULL);
 		if(now - tm >= TIME_OUT){
 			std::cout << "client deleted" << std::endl;
 			closeConnection(it);
+			continue;
 		}
-		if (clients.size() == 0)
-			return;
+		it++;
 	}
 }
