@@ -35,7 +35,7 @@ class GetMethod
 		bool isLocation(LOCATION_ITT &it);
 		void simpleGet();
 		std::string findMimeType(std::string path, Server &ser);
-		bool checkRedirectionAndAllowed();
+		bool checkRedirection();
 
 		int	isFile(std::string path, size_t &size);
 		void serveFile(std::string path, size_t size);

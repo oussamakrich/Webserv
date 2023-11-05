@@ -3,14 +3,13 @@
 #include "../include/GetMethod.hpp"
 #include "../include/PostMethod.hpp"
 #include "../include/Response.hpp"
-#include <fstream>
 
 
 
 Response *GenerateResponse::generateResponse(Server &ser, Request &req, int fd){
 	Response *res = new Response(fd);
 
-	// std::cout << "method: " << req.getMethod() << std::endl; // DEBUG:
+	res->errorPage = ser.getErrorPages();
 	if (req.getMethod() == "GET") GetMethod GetHandler(ser, req, *res);
 	else if (req.getMethod() == "POST")
 	{
@@ -19,17 +18,21 @@ Response *GenerateResponse::generateResponse(Server &ser, Request &req, int fd){
 	else if (req.getMethod() == "DELETE") std::cout << "DELETE" << std::endl;
 
 	res->setMsg(generateMsg(res->getCode()));
-	res->setHeaderAndStart(generateHeaderAndSt(*res));
+	res->setHeaderAndStart(generateHeaderAndSt(*res, req));
 
 	return res;
 }
 
 
-std::string GenerateResponse::generateHeaderAndSt(Response &res){
+std::string GenerateResponse::generateHeaderAndSt(Response &res, Request &req){
 	std::string str;
+	std::string connection = "Connection: close";
 
 	str = res.getVersion() + " " + convertCode(res.getCode()) + " " + res.getMsg() + "\r\n";
 	std::vector<std::string> headers = res.getHeaders();
+	if (req.getConnection() == 1)
+		connection = "Connection: keep-alive";
+	headers.push_back(connection);
 	for (unsigned int i = 0;i < headers.size();i++)
 		str += headers[i] + "\r\n";
 	str += "\n";

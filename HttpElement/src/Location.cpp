@@ -15,13 +15,14 @@ Location::Location(string path): path(path)
 	this->redirection_code = 200;
 	this->redirection_text = "ok";
 	this->AutoIndex = false;
-	this->default_type = "application/octet-stream";
 	this->upload = false;
 	this->upload_path = "";
 }
 Location::~Location(){}
 void Location::final()
 {
+	if (this->default_type.empty())
+		this->default_type = "application/octet-stream";
 	Allowed_Method.shrink_to_fit();
 	indexes.shrink_to_fit();
 	try_file.shrink_to_fit();

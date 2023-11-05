@@ -119,6 +119,7 @@ bool GetMethod::checkCGI(){
 
 void GetMethod::simpleGet(){
 	res.path = this->root + '/' + req.getPath();
+	std::cout << RED"path: "<<RESET << res.path << std::endl;
 	size_t size;
 	int type = isFile(res.path, size);
 
@@ -131,11 +132,8 @@ void GetMethod::simpleGet(){
 	
 }
 
-bool GetMethod::checkRedirectionAndAllowed(){
-	if (!location->isMethodAllowed(req.getMethod())){ // NOTE :Check if method allowed or Not
-		res.setCode(405);
-		return true;
-	}
+bool GetMethod::checkRedirection(){
+	char *buffer;
 	if (location->isRedirection()){
 		res.setCode(location->getRedirectionCode());	
 		if (res.getCode() >= 300 && res.getCode() < 400){
@@ -143,7 +141,10 @@ bool GetMethod::checkRedirectionAndAllowed(){
 		}
 		else {
 			res.setHeadr("Content-Length: " + convertCode(location->getRedirectionText().size()));
-			res.setHeadr("Content-Type: text/plain");
+			res.setHeadr("Content-Type: text/html");
+			buffer = new char[location->getRedirectionText().size()];	
+			copy(buffer, location->getRedirectionText());
+			res.setBuffer(buffer, location->getRedirectionText().size());
 		}
 		return true;
 	}
@@ -157,12 +158,17 @@ void GetMethod::GetMethode(Server &ser, Request &req, Response &res)
 	if (isLocation(it)){
 		isLoacation = true;
 		location = it->second;
-		if (checkRedirectionAndAllowed())
+		if (checkRedirection())
 			return;
+		if (!location->isMethodAllowed(req.getMethod())){
+			res.setCode(405);
+			return ;
+		}
+		defaultType = location->getDefaultTypes();
 		autoindex = location->isAutoIndex();
 		root = location->getRoot();
 		indexes = location->getIndexesList();
-		defaultType = location->getDefaultTypes();
+		res.errorPage = location->getErrorPageList();
 	}
 	else{
 		isLoacation = false;
@@ -170,6 +176,7 @@ void GetMethod::GetMethode(Server &ser, Request &req, Response &res)
 		root = ser.getRoot();
 		indexes = ser.getIndex();
 		defaultType = ser.getDefaultType();
+		res.errorPage = ser.getErrorPages();
 	}
 	indexes.push_back("index.html");
 	simpleGet();

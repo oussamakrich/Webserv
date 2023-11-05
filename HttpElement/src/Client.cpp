@@ -4,7 +4,7 @@
 #include "../include/Server.hpp"
 #include "../../Response/include/GenerateResponse.hpp"
 
-#define N_READ 5024
+#define N_READ 1 
 
 Client::Client(int bodySize, int fd) : reqBuff(bodySize){
 	lastTime = std::time(NULL);
@@ -19,14 +19,11 @@ Client::~Client(){
 	delete this->response;
 }
 
-int Client::getFd(){
-	return pfd.fd;
-}
+int Client::getFd(){return pfd.fd; }
 
 bool Client::ReadRequest(){
 	
 	char *buffer;
-
 	buffer = new char[N_READ];
 	memset(buffer, 0, N_READ);
 	status = recv(pfd.fd, buffer, N_READ, 0);
@@ -35,7 +32,6 @@ bool Client::ReadRequest(){
 		delete  buffer;
 		return false;
 	}
-
 	int level = reqBuff.insertBuffer(buffer, status);
 	delete buffer;
 	return true;
@@ -52,18 +48,13 @@ bool Client::isRequestAvailable(){
 
 Request *Client::getRequest(){
 	Request *req;
-
 	req = ParsRequest::Pars(this->reqBuff);
-
 	return req;
 }
 
-struct sockaddr &Client::getAddr(){
-	return sockaddr;
-}
-void Client::setAddr(struct sockaddr &addr){
-	sockaddr = addr;
-}
+struct sockaddr &Client::getAddr(){ return sockaddr;}
+
+void Client::setAddr(struct sockaddr &addr){ sockaddr = addr;}
 
 std::time_t Client::getLastTime(){ return lastTime;}
 
@@ -107,6 +98,7 @@ bool Client::NewRequest(ITT_CLIENT it, Server &ser){
 	if (req->getType() < 0)
 	{
 		this->response = new Response(this->pfd.fd);
+		response->errorPage = ser.getErrorPages();
 		response->setCode(req->getType());
 		delete req;
 		return false;

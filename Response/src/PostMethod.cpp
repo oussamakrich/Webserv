@@ -28,7 +28,7 @@ void PostMethod::FillResponse(int code)
 {
 	res.setCode(code);
 	res.setMsg(GenerateResponse::generateMsg(res.getCode()));
-	res.setHeaderAndStart(GenerateResponse::generateHeaderAndSt(res));
+	res.setHeaderAndStart(GenerateResponse::generateHeaderAndSt(res, req));
 }
 
 bool PostMethod::isLocation(LOCATION_ITT &it)
