@@ -28,7 +28,7 @@ std::string ErrorResponse::getErrorPage(Server &serv){
 	errorPage += "Server: webserver\r\n";
 	errorPage += "Content-Type: text/html\r\n";
 	errorPage += "Content-Length: " + convertCode(errorBody.length()) + "\r\n";
-	errorPage += "Connection: Closed\r\n\r\n";
+	errorPage += "Connection: Close\r\n\r\n";
 	errorPage += errorBody;
 	return 	errorPage;
 }

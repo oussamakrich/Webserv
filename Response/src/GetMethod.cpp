@@ -10,20 +10,15 @@ GetMethod::GetMethod(Server &ser, Request &req, Response &res) : ser(ser), req(r
 
 GetMethod::~GetMethod(){}
 
-// void GetMethod::sendReminder(Response &res){
-// }
-
 bool GetMethod::isLocation(LOCATION_ITT &it)
 {
 	std::string path = req.getPath();
-	LOCATION_MAP locations = ser.getAllLocation();
+	LOCATION_MAP &locations = ser.getAllLocation();
 	it = locations.begin();
 
 	for (;it != locations.end(); it++)
-	{
 		if (it->second->isMatch(path))
 			return true;
-	}
 	return false;
 }
 
@@ -41,25 +36,66 @@ int GetMethod::isFile(std::string path, size_t &size)
 	return NOT_FOUND;
 }
 
-std::string findMimeType(std::string path, Server &ser){
+std::string GetMethod::findMimeType(std::string path, Server &ser){
 	std::string extention = path.substr(path.find_last_of('.') + 1);
 	if (extention.empty())
-		return ser.getDefaultType();
+		return defaultType;
 	TYPES_MAP types = ser.getMimeType();
 	TYPES_ITT it = types.find(extention);
 	if (it != types.end())
 		return it->second;
-	return ser.getDefaultType();
+	return defaultType;
+}
+
+void copy(char *buffer, std::string out){
+	for (size_t i = 0; i < out.size(); i++)
+		buffer[i] = out[i];
+}
+
+void GetMethod::serveDirectory(){
+	size_t size;
+	int type;
+	std::vector<std::string>::iterator it = indexes.begin();
+	for (; it != indexes.end(); it++){
+		std::string path = res.path + '/' + *it;
+		type = isFile(path, size);
+		if (type == FILE){
+			serveFile(path, size);
+			return;
+		}
+	}
+	if (autoindex){ //TODO : List Dir if auto index on
+		std::string output;
+		if (DirListing::getDirlistigHtml(res.path, output)){
+			char *buffer = new char[output.size()];
+			copy(buffer , output);
+			res.setBuffer(buffer, output.size());
+			res.stillSend = false;
+			res.setHeadr("Content-Length: " + convertCode(output.size()));
+			res.setHeadr("Content-Type: text/html");
+			res.setCode(200);
+		}
+		else
+			res.setCode(403);
+	}
+	else{
+		res.setCode(403);
+	}
 }
 
 void GetMethod::serveFile(std::string path, size_t size){
+
+		if (checkCGI()){
+			// handelCgi();
+			return;
+		}
 		std::ifstream file(path.c_str());
 
 		if (file.is_open()){
 			char *buffer = new char[R_READ];
 			file.read(buffer, R_READ);
 			res.setBuffer(buffer, file.gcount());	
-		res.pos = file.gcount();
+			res.pos = file.gcount();
 			res.stillSend = true;
 			if (file.eof())
 				res.stillSend = false;
@@ -73,136 +109,75 @@ void GetMethod::serveFile(std::string path, size_t size){
 		}
 }
 
-void copy(char *buffer, std::string out){
-	for (size_t i = 0; i < out.size(); i++)
-		buffer[i] = out[i];
-}
-
-void GetMethod::serveDirectory(){
-	size_t size;
-	int type;
-	VECT_STR indexs = ser.getIndex(); //TODO : try indexs and  check if index.html exist
-	indexs.push_back("index.html");
-	std::vector<std::string>::iterator it = indexs.begin();
-	for (; it != indexs.end(); it++){
-		std::string path = res.path + '/' + *it;
-		type = isFile(path, size);
-		if (type == FILE){
-			std::cout << "Dir : " << path << std::endl;
-			serveFile(path, size);
-			return;
-		}
-	}
-	if (ser.getAutoIndex()){ //TODO : List Dir if auto index on
-		std::string output;
-		if (DirListing::getDirlistigHtml(res.path, output)){
-			char *buffer = new char[output.size()];
-			copy(buffer , output);
-			res.setBuffer(buffer, output.size());
-			res.stillSend = false;
-			res.setHeadr("Content-Length: " + convertCode(output.size()));
-			res.setHeadr("Content-Type: text/html");
-			res.setCode(200);
-		}
-		else
-			res.setCode(403);
-	}
-	else{
-		res.setCode(403);
-	}
+bool GetMethod::checkCGI(){
+	if (isLoacation)
+		// return location->isCGI();
+		return false;
+	else
+		return false;
 }
 
 void GetMethod::simpleGet(){
-	res.path = ser.getRoot() + '/' + req.getPath();
+	res.path = this->root + '/' + req.getPath();
+	std::cout << RED"path: "<<RESET << res.path << std::endl;
 	size_t size;
 	int type = isFile(res.path, size);
 
-	if (type == FILE){
+	if (type == FILE)
 		serveFile(res.path, size);
-	}
-	else if (type == DIRECTORY){ //TODO :  try index.html || check auto index
+	else if (type == DIRECTORY) //TODO :  try index.html || check auto index
 		serveDirectory();
-	}
-	else if (type == NOT_FOUND) {//TODO : Generate 404
+	else if (type == NOT_FOUND) //TODO : Generate 404
 		res.setCode(404);
-	}
+	
 }
 
-
-void GetMethod::serveDirectoryLoc(Location &loc){
-	size_t size;
-	int type;
-	VECT_STR indexs = ser.getIndex(); //TODO : try indexs and  check if index.html exist
-	indexs.push_back("index.html");
-	std::vector<std::string>::iterator it = indexs.begin();
-	for (; it != indexs.end(); it++){
-		std::string path = res.path + '/' + *it;
-		type = isFile(path, size);
-		if (type == FILE){
-			std::cout << "Dir : " << path << std::endl;
-		// if (fileIsCGI(loc)){
-		//		handelCgi(loc);
-		//		return;
-		// }
-			serveFile(path, size);
-			return;
+bool GetMethod::checkRedirection(){
+	char *buffer;
+	if (location->isRedirection()){
+		res.setCode(location->getRedirectionCode());	
+		if (res.getCode() >= 300 && res.getCode() < 400){
+			res.setHeadr("Location: " + location->getRedirectionText());	
 		}
-	}
-	if (ser.getAutoIndex()){ //TODO : List Dir if auto index on
-		std::string output;
-		if (DirListing::getDirlistigHtml(res.path, output)){
-			char *buffer = new char[output.size()];
-			copy(buffer , output);
-			res.setBuffer(buffer, output.size());
-			res.stillSend = false;
-			res.setHeadr("Content-Length: " + convertCode(output.size()));
+		else {
+			res.setHeadr("Content-Length: " + convertCode(location->getRedirectionText().size()));
 			res.setHeadr("Content-Type: text/html");
-			res.setCode(200);
+			buffer = new char[location->getRedirectionText().size()];	
+			copy(buffer, location->getRedirectionText());
+			res.setBuffer(buffer, location->getRedirectionText().size());
 		}
-		else
-			res.setCode(403);
+		return true;
 	}
-	else{
-		res.setCode(403);
-	}
+	return false;
 }
-
-//FIX :  if is loc we will get index and eror page and auto index from loc
-
-void GetMethod::locationGet(Location *loc){
-	res.path = loc->getRoot() + '/' + req.getPath();
-	size_t size;
-
-	if (!loc->isMethodAllowed(req.getMethod())) {// NOTE :Check if method allowed or Not
-		res.setCode(405);
-		return;
-	}
-	if (loc->isRedirection())
-	{
-		// res.setCode(loc->getRedirectionCode());
-		return;
-	}
-	int type = isFile(res.path, size);
-	if (type == FILE){ //TODO : check cgi
-		// if (fileIsCGI(loc))
-		// 	handelCgi(loc);
-		serveFile(res.path, size);
-	}
-	else if (type == DIRECTORY){ //TODO :  try index.html || check auto index + check cgi
-		serveDirectoryLoc(*loc);
-	}
-	else if (type == NOT_FOUND) {//TODO : Generate 404
-		res.setCode(404);
-	}
-}
-
 
 void GetMethod::GetMethode(Server &ser, Request &req, Response &res)
 {
 	LOCATION_ITT it;
+
 	if (isLocation(it)){
-		locationGet(it->second);
+		isLoacation = true;
+		location = it->second;
+		if (checkRedirection())
+			return;
+		if (!location->isMethodAllowed(req.getMethod())){
+			res.setCode(405);
+			return ;
+		}
+		defaultType = location->getDefaultTypes();
+		autoindex = location->isAutoIndex();
+		root = location->getRoot();
+		indexes = location->getIndexesList();
+		res.errorPage = location->getErrorPageList();
 	}
-	else
-		simpleGet();
+	else{
+		isLoacation = false;
+		autoindex = ser.getAutoIndex();
+		root = ser.getRoot();
+		indexes = ser.getIndex();
+		defaultType = ser.getDefaultType();
+		res.errorPage = ser.getErrorPages();
+	}
+	indexes.push_back("index.html");
+	simpleGet();
 }

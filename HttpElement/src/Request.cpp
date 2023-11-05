@@ -43,6 +43,7 @@ int 			Request::getBodySize() 			const { return this->bodySize; }
 char 			*Request::getBodyBuff() 		const { return this->bodyBuff;}
 const std::map<std::string, std::string> &Request::getHeaders() const { return this->headers;}
 
+//std::map<std::string, std::string> Request::getHeaders() const { return headers; }
 bool	        Request::insertHeader(std::string key, std::string value)
 {
     if (headers.find(key) != headers.end())  return false;

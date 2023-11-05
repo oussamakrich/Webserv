@@ -23,7 +23,8 @@ SRC =	./HttpElement/src/Client.cpp\
 		./Response/src/Response.cpp\
 		./Response/src/GenerateResponse.cpp\
 		./Response/src/GetMethod.cpp\
-		./HttpElement/src/Cgi.cpp
+		./HttpElement/src/Cgi.cpp\
+		./Response/src/PostMethod.cpp
 
 
 
@@ -46,7 +47,8 @@ HEADER =	./HttpElement/include/Client.hpp \
 			./Response/include/Response.hpp\
 			./Response/include/GenerateResponse.hpp\
 			./Response/include/GetMethod.hpp\
-			./HttpElement/include/Cgi.hpp
+			./HttpElement/include/Cgi.hpp\
+			./Response/include/PostMethod.hpp\
 
 
 
