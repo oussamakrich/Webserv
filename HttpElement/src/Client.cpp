@@ -20,18 +20,18 @@ int Client::getFd(){
 }
 
 void Client::ReadRequest(){
-	
+
 	char *buffer;
 
-	buffer = new char[5024];
-	memset(buffer, 0, 5024);
-	status = recv(pfd.fd, buffer, 5024, 0);
+	buffer = new char[1];
+	memset(buffer, 0, 1);
+	status = recv(pfd.fd, buffer, 1, 0);
 	if (status == -1 || status == 0)
 	{
 		delete [] buffer;
 		return;
 	}
-	
+
 	int level = reqBuff.insertBuffer(buffer, status);
 	delete buffer;
 }

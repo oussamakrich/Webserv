@@ -35,8 +35,8 @@ public :
 	std::string         getQuery() 				const;
 	int                 getContentLength()		const;
 	std::string 		getTransferEncoding()	const;
-	std::map<std::string, std::string> getHeaders() const;
-	bool 				getConnection()			const;  //add connection 
+	const std::map<std::string, std::string> &getHeaders() const;
+	bool 				getConnection()			const;  //add connection
 	int 				getBodySize() 			const;
 	char 				*getBodyBuff()			const;
 

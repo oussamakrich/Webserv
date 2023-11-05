@@ -1,6 +1,7 @@
 #include "include/includes.hpp"
 #include "Parsing/include/Tokenizer.hpp"
 #include "Parsing/include/GenerateGlobalClass.hpp"
+#include "HttpElement/include/Cgi.hpp"
 
 void ff(void)
 {
@@ -10,30 +11,44 @@ void ff(void)
 
 int main (int argc, char **argv)
 {
-	// atexit(ff);
-	if (argc != 2){
-		std::cerr << "Error: required a config file" << std::endl;
-		return 1;
-	}
-	try
-	{
-		std::ifstream file(argv[1]);
-
-		std::vector<TOKEN> tokens = Tokenizer::tokenGenerator(file);//
 
 
-		// printTokens(tokens);
+		Request req(0);
+		req.setBodyBuff(0);
+		req.setBodySize(0);
+		req.insertHeader("host", "test");
+		req.insertHeader("Port", "test");
+		req.insertHeader("Content-type", "test");
+		req.insertHeader("Protoco", "test");
+		string bin = "/bin/bash";
+		string path = "./hi.sh";
+		Cgi::Run(req, bin , path);
 
-		// Global *WebServer = GenerateGlobalClass::generateGlobalClass(tokens);
-		// WebServer->print();
+	// out << "HIE";
+// atexit(ff);
+	// if (argc != 2){
+	// 	std::cerr << "Error: required a config file" << std::endl;
+	// 	return 1;
+	// }
+	// try
+	// {
+	// 	std::ifstream file(argv[1]);
 
-		// WebServer->run();
+	// 	std::vector<TOKEN> tokens = Tokenizer::tokenGenerator(file);//
 
-	}catch (std::exception &e) {
-		std::cout << e.what() << std::endl;
-	}
 
-	// int x;cin >> x;
+	// 	// printTokens(tokens);
+
+	// 	Global *WebServer = GenerateGlobalClass::generateGlobalClass(tokens);
+	// 	// WebServer->print();
+
+	// 	 WebServer->run();
+
+	// }catch (std::exception &e) {
+	// 	std::cout << e.what() << std::endl;
+	// }
+
+	// // int x;cin >> x;
 
 	return (0);
 }

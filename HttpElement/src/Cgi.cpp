@@ -1,0 +1,220 @@
+//
+# include "../include/Cgi.hpp"
+#include <cstring>
+#include <unistd.h>
+#define SERVER_NAME = "Hustler SERVER";
+
+
+
+t_cgiInfo Cgi::INTERNAL_ERROR = {500, -1, "", ""};
+
+t_cgiInfo  Cgi::Run(Request &req, std::string  &bin, std::string &path)
+{
+
+	char **env = makeEnv(req, path);
+	char **args = NULL;
+	t_cgiInfo info;
+	if (env == NULL) return Cgi::INTERNAL_ERROR;
+	args = MakeArgs(bin , path);
+	if(args == NULL)
+	{
+		deleteDP(env, INT_MAX);
+		return Cgi::INTERNAL_ERROR;
+	}
+
+	info.output = getRandomName("/tmp/", "-cgi-output"); //TODO: select root , default rot is /tmp
+	info.input  = getRandomName("/tmp/", "-cgi-input"); //TODO: select root , default rot is /tmp
+	info.code  	= 0;
+	info.pid =  fork();
+	if (info.pid == -1)
+	{
+		deleteDP(env  , INT_MAX);
+		deleteDP(args , INT_MAX);
+		std::cout << "Fork FAIL : ";
+		return Cgi::INTERNAL_ERROR;
+	}
+	else if (info.pid == 0)
+		cgiProcess(info, req, env, args);
+	deleteDP(env  , INT_MAX);
+	deleteDP(args , INT_MAX);
+	return info;
+}
+
+string Cgi::getRandomName(string root, string postfix)
+{
+	try
+	{
+		time_t tm;
+		time(&tm);
+		std::stringstream ss;
+		ss <<root;
+
+		ss << "/tmp-";
+		ss << tm;
+		ss << postfix;
+		ss << ".bin";
+		return ss.str();
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+		return "";
+	}
+
+}
+
+
+char **Cgi::deleteDP(char **pt, size_t pos)
+{
+	for(size_t i = 0; i < pos && pt[i] != NULL; i++)
+		delete  pt[i];
+	delete [] pt;
+	return NULL;
+}
+
+void Cgi::cgiProcess(t_cgiInfo &info, Request &req, char **env,  char **args)
+{
+	try
+	{
+		int ifd = 0;
+		int ofd = 0;
+		if (req.getBodySize() > 0)
+		{
+			int ifd = open(info.input.c_str(),O_CREAT | O_TRUNC | O_RDWR, 0777);
+			if (ifd == -1)	throw std::runtime_error("cgi  process can't creat input file");
+			int wr = write(ifd, req.getBodyBuff(), req.getBodySize());
+			if (wr != req.getBodySize())	throw std::runtime_error("cgi can't write input file");
+				lseek(ifd, SEEK_SET, 0);
+			if (dup2(ifd, 0) == -1)			throw std::runtime_error("cgi poress cant dup stdinput wth input file");
+			close(ifd);
+		}
+		ofd = open(info.output.c_str(),O_CREAT | O_RDWR | O_TRUNC,  0777);
+		if (ofd == -1) 					throw std::runtime_error("cgi  process can't creat output File file");
+		if (dup2(ofd, 1) == -1)			throw std::runtime_error("cgi poress cant dup staOutoutndrad : wth input file");
+		if (execve(args[0], args, env) == -1)  throw std::runtime_error("cgi poress cant -> run ");
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+		std::cerr << info.input <<std::endl;
+		std::cerr << info.output << std::endl;
+			perror("erro : ");
+		exit(-1);
+	}
+	exit(-1);
+}
+
+bool Cgi::makeStaticVariable(char **env, Request &req, string &path)
+{
+	try
+	{
+		string PATH_INFO = "PATH_INFO=";
+		string CONTENT_LENGTH = "CONTENT_LENGTH=";
+		string REQUEST_METHOD = "REQUEST_METHOD=";
+		string QUERY_STRING = "QUERY_STRING=";
+		string CONTENT_TYPE = "CONTENT_TYPE=";
+		PATH_INFO += path;
+		REQUEST_METHOD += req.getMethod();
+		QUERY_STRING += req.getQuery();
+		QUERY_STRING += req.getHeader("Content-Type");
+		CONTENT_TYPE += req.getHeader("Content-Length");
+		env[0] = strdup(PATH_INFO.c_str());
+		env[1] = strdup(CONTENT_LENGTH.c_str());
+		env[2] = strdup(CONTENT_TYPE.c_str());
+		env[3] = strdup(QUERY_STRING.c_str());
+		env[4] = strdup(REQUEST_METHOD.c_str());
+		for(int i = 0; i < 5;i++)
+			if(env[i] == NULL)
+				return true;
+		}
+	catch(std::exception &ex)
+	{
+		std::cout << ex.what() << std::endl;
+		return false;
+	}
+	return true;
+}
+
+
+bool Cgi::toEnvVariable(const string &name, const string &value, string &tmp)
+{
+		try
+		{
+			tmp = "HTTP_";
+			tmp += name;
+			for (std::string::iterator it = tmp.begin(); it != tmp.end(); ++it)
+			{
+				if (*it == '-')
+					*it = '_';
+				else
+					*it = std::toupper(*it);
+			}
+			tmp += "=";
+			tmp += value;
+			return true;
+		}
+		catch(const std::exception& e)
+		{
+			std::cerr << e.what() << '\n';
+				return false;
+		}
+}
+
+char **Cgi::makeEnv(Request &req,std::string &path)
+{
+	char **env  = NULL;
+	size_t pos = 0;
+	size_t size = req.getHeaders().size() + 5 + 1;
+
+	try
+	{
+
+		string tmp;
+		env = new(std::nothrow) char *[size];
+		if (env == NULL) return NULL;
+		map<string, string> header = req.getHeaders(); // TODO: use refernce ??
+		map<string, string>::iterator it = header.begin();
+		if (makeStaticVariable(env, req, path) == false)
+			return deleteDP(env, pos);
+
+		pos = 5;
+		for(; it != header.end(); it++, pos++)
+		{
+			toEnvVariable(it->first, it->second, tmp);
+			env[pos] = strdup(tmp.c_str());
+			if (env[pos] == NULL)
+				return deleteDP(env, pos);
+		}
+		env[size - 1] = NULL;
+		return env;
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+			return deleteDP(env, pos);
+	}
+
+}
+
+
+char **Cgi::MakeArgs(string &bin, string &path)
+{
+	try
+	{
+		char **args = new char*[3];
+		args[0] = strdup(bin.c_str());
+		if (args[0] == NULL) return NULL;
+		args[1] = strdup(path.c_str());
+		if(args[1] == NULL) return deleteDP(args, 1);
+		args[0] = NULL;
+		return args;
+	}
+	catch(std::exception &ex)
+	{
+		 std::cout << ex.what();
+		return NULL;
+	}
+
+}
+
+
