@@ -4,13 +4,14 @@
 
 #include <string>
 using namespace std;
-
+#define STATIC_VAR_NUM 7
 struct s_cgiInfo
 {
 	int code;
 	int pid;
 	string output;
 	string input;
+	long long time;
 };
 
 typedef struct s_cgiInfo t_cgiInfo;
@@ -29,6 +30,11 @@ public:
 	static	void cgiProcess(t_cgiInfo &info, Request &req, char **env,  char **args);
 	static	string getRandomName(string root="/tmp/", string postfix="-file");
 	static	char **deleteDP(char **pt, size_t pos);
+	static bool isFinished(t_cgiInfo &info, int &status);
+	static void CgiUnlink(t_cgiInfo info);
+	static bool  isTimeOut(t_cgiInfo &info);
+	static bool KillCgi(t_cgiInfo &info);
+
 };
 
 

@@ -13,15 +13,18 @@ int main (int argc, char **argv)
 {
 
 
-		Request req(0);
-		req.setBodyBuff(0);
-		req.setBodySize(0);
+		Request req(Request::GET);
+		req.setBodyBuff("hi");
+		req.setBodySize(2);
 		req.insertHeader("host", "test");
 		req.insertHeader("Port", "test");
-		req.insertHeader("Content-type", "test");
+		req.insertHeader("Content-type", "");
+		req.setQuery("name=dataddffdsfdsf");
+		req.setContentLength(0);
+		req.setTransferEncoding("shunked");
 		req.insertHeader("Protoco", "test");
-		string bin = "/bin/bash";
-		string path = "./hi.sh";
+		string bin = "./cgi-bin/php-cgi";
+		string path = "/Users/ebennamr/Desktop/WebServer/index.php";
 		Cgi::Run(req, bin , path);
 
 	// out << "HIE";

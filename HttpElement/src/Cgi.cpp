@@ -2,8 +2,12 @@
 # include "../include/Cgi.hpp"
 #include <cstring>
 #include <unistd.h>
-#define SERVER_NAME = "Hustler SERVER";
+#include <sys/wait.h>
+#include <sys/time.h>
+#include <signal.h>
 
+#define SERVER_NAME  "Hustler SERVER"
+#define TIME_OUT 55 // second
 
 
 t_cgiInfo Cgi::INTERNAL_ERROR = {500, -1, "", ""};
@@ -113,17 +117,21 @@ bool Cgi::makeStaticVariable(char **env, Request &req, string &path)
 		string REQUEST_METHOD = "REQUEST_METHOD=";
 		string QUERY_STRING = "QUERY_STRING=";
 		string CONTENT_TYPE = "CONTENT_TYPE=";
+		string SCRIPT_FILENAME = "SCRIPT_FILENAME=";
 		PATH_INFO += path;
 		REQUEST_METHOD += req.getMethod();
 		QUERY_STRING += req.getQuery();
 		QUERY_STRING += req.getHeader("Content-Type");
 		CONTENT_TYPE += req.getHeader("Content-Length");
+		SCRIPT_FILENAME += path;
 		env[0] = strdup(PATH_INFO.c_str());
 		env[1] = strdup(CONTENT_LENGTH.c_str());
 		env[2] = strdup(CONTENT_TYPE.c_str());
 		env[3] = strdup(QUERY_STRING.c_str());
 		env[4] = strdup(REQUEST_METHOD.c_str());
-		for(int i = 0; i < 5;i++)
+		env[5] = strdup("REDIRECT_STATUS=200");
+		env[6] = strdup(SCRIPT_FILENAME.c_str());
+		for(int i = 0; i < STATIC_VAR_NUM;i++)
 			if(env[i] == NULL)
 				return true;
 		}
@@ -164,7 +172,7 @@ char **Cgi::makeEnv(Request &req,std::string &path)
 {
 	char **env  = NULL;
 	size_t pos = 0;
-	size_t size = req.getHeaders().size() + 5 + 1;
+	size_t size = req.getHeaders().size() + STATIC_VAR_NUM + 1;
 
 	try
 	{
@@ -177,7 +185,7 @@ char **Cgi::makeEnv(Request &req,std::string &path)
 		if (makeStaticVariable(env, req, path) == false)
 			return deleteDP(env, pos);
 
-		pos = 5;
+		pos = STATIC_VAR_NUM;
 		for(; it != header.end(); it++, pos++)
 		{
 			toEnvVariable(it->first, it->second, tmp);
@@ -206,7 +214,7 @@ char **Cgi::MakeArgs(string &bin, string &path)
 		if (args[0] == NULL) return NULL;
 		args[1] = strdup(path.c_str());
 		if(args[1] == NULL) return deleteDP(args, 1);
-		args[0] = NULL;
+		args[2] = NULL;
 		return args;
 	}
 	catch(std::exception &ex)
@@ -218,3 +226,34 @@ char **Cgi::MakeArgs(string &bin, string &path)
 }
 
 
+bool Cgi::isFinished(t_cgiInfo &info, int &status)
+{
+	int s = 0;
+	if (info.pid < 0) return true;
+	if (waitpid(info.pid, &s, WNOHANG) == 0)
+		return false;
+		if (WIFEXITED(s))
+            status  = WEXITSTATUS(status);
+		else
+			status = s;
+	return  true;
+}
+
+void Cgi::CgiUnlink(t_cgiInfo info)
+{
+	if (access(info.input.c_str(), F_OK))
+			unlink(info.input.c_str());
+	if (access(info.output.c_str(), F_OK))
+			unlink(info.output.c_str());
+}
+bool Cgi::isTimeOut(t_cgiInfo &info)
+{
+	time_t  tm;
+	time(&tm);
+	return info.time - tm > TIME_OUT;
+}
+
+bool Cgi::KillCgi(t_cgiInfo &info)
+{
+	return kill(info.pid, SIGKILL) == 0;
+}
