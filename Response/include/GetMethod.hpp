@@ -1,5 +1,3 @@
-
-
 #pragma	once
 
 #include "GenerateResponse.hpp"
@@ -41,7 +39,7 @@ class GetMethod
 		void serveFile(std::string path, size_t size);
 		void serveDirectory();
 		bool checkCGI();
-		
+
 
 
 };

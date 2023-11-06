@@ -12,11 +12,11 @@ Response *GenerateResponse::generateResponse(Server &ser, Request &req, int fd){
 	res->errorPage = ser.getErrorPages();
 	if (req.getMethod() == "GET")
 	{
-		 std::cout << "DELETE" << std::endl;
 	 	GetMethod GetHandler(ser, req, *res);
 	}
 	else if (req.getMethod() == "POST")
 	{
+	 	// GetMethod GetHandler(ser, req, *res);
 		PostMethod PostHandler(ser, req, *res);
 	}
 	else if (req.getMethod() == "DELETE") std::cout << "DELETE" << std::endl;

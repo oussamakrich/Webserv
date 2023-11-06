@@ -94,7 +94,7 @@ void GetMethod::serveFile(std::string path, size_t size){
 		if (file.is_open()){
 			char *buffer = new char[R_READ];
 			file.read(buffer, R_READ);
-			res.setBuffer(buffer, file.gcount());	
+			res.setBuffer(buffer, file.gcount());
 			res.pos = file.gcount();
 			res.stillSend = true;
 			if (file.eof())
@@ -129,20 +129,20 @@ void GetMethod::simpleGet(){
 		serveDirectory();
 	else if (type == NOT_FOUND) //TODO : Generate 404
 		res.setCode(404);
-	
+
 }
 
 bool GetMethod::checkRedirection(){
 	char *buffer;
 	if (location->isRedirection()){
-		res.setCode(location->getRedirectionCode());	
+		res.setCode(location->getRedirectionCode());
 		if (res.getCode() >= 300 && res.getCode() < 400){
-			res.setHeadr("Location: " + location->getRedirectionText());	
+			res.setHeadr("Location: " + location->getRedirectionText());
 		}
 		else {
 			res.setHeadr("Content-Length: " + convertCode(location->getRedirectionText().size()));
 			res.setHeadr("Content-Type: text/html");
-			buffer = new char[location->getRedirectionText().size()];	
+			buffer = new char[location->getRedirectionText().size()];
 			copy(buffer, location->getRedirectionText());
 			res.setBuffer(buffer, location->getRedirectionText().size());
 		}

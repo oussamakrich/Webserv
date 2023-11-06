@@ -28,7 +28,6 @@ void RequestBuffer::clear()
 	_chunkSize = -1;
 	_boundary = "";
 	_body_level = -1;
-	_status = 0;
 }
 
 RequestBuffer::RequestBuffer(int MaxBodySize)
@@ -190,7 +189,7 @@ std::string RequestBuffer::_generate_tmp_file_path()
 	int i = 0;
 	while (true)
 	{
-			_path = "/tmp/file_";
+		_path = "/tmp/file_";
 		std::stringstream ss;
 		ss << i++;
 		_path += ss.str();
