@@ -22,6 +22,8 @@ void										RequestBuffer::setBody(char *body, int size) {_body_path = std::st
 void RequestBuffer::clear()
 {
 	_buffer.clear();
+	_headers.clear();
+	_headers = "";
 	_level = 0;
 	_contentLength = -1;
 	_status = 0;
