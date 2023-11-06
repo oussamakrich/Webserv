@@ -9,7 +9,6 @@ Request *ParsRequest::Pars(RequestBuffer &reqBuff)
 	Request *req = new(std::nothrow) Request(type);
 	if (req == NULL) return NULL;
 	req->setErrorCode(reqBuff.getLevel());
-	// std::cout  << "request: " << reqBuff.getLevel()  << "type: " << req->getType() << "version: " << reqBuff.getProtocol() << std::endl; // DEBUG:
 	if (req->getType() == Request::INVALID_REQUEST) return req;
 	std::string headers = reqBuff.getHeaders();
 	std::vector<std::string> header_vect = split(headers, '\n');
@@ -23,8 +22,7 @@ Request *ParsRequest::Pars(RequestBuffer &reqBuff)
 			break;
 		}
 	}
-	// req->setBodyBuff(reqBuff.getBody());
-	// req->setBodySize(reqBuff.getBodySize());
+	req->setBody(reqBuff.getBody());
 
 	return req;
 }
