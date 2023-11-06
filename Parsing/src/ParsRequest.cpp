@@ -23,8 +23,8 @@ Request *ParsRequest::Pars(RequestBuffer &reqBuff)
 			break;
 		}
 	}
-	req->setBodyBuff(reqBuff.getBody());
-	req->setBodySize(reqBuff.getBodySize());
+	// req->setBodyBuff(reqBuff.getBody());
+	// req->setBodySize(reqBuff.getBodySize());
 
 	return req;
 }

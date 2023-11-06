@@ -1,498 +1,317 @@
 #include "RequestBuffer.hpp"
-#include <csetjmp>
-#include <cstdlib>
-#include <ctime>
-#include <malloc/_malloc.h>
 #include <sstream>
-#include <string>
+#include <fstream>
 
-RequestBuffer::~RequestBuffer()
+std::string const&							RequestBuffer::getBody() const {return _body_path;};
+int											RequestBuffer::getBodySize() {return (_buffer.size());};
+int											RequestBuffer::getLevel() const {return _status;};
+std::string	const &							RequestBuffer::getMethod() const {return _method;};
+std::string	const &							RequestBuffer::getURI() const {return _uri;};
+std::string	const &							RequestBuffer::getProtocol() const {return _protocol;};
+std::string	const &							RequestBuffer::getHeaders() const {return _headers;};
+
+
+void										RequestBuffer::setProtocol(std::string const &Protocol) {_protocol = Protocol;};
+void										RequestBuffer::setHeaders(std::string const &Headers) {_headers = Headers;};
+void										RequestBuffer::setMethod(std::string const &Method) {_method = Method;};
+void										RequestBuffer::setMaxBodySize(int MaxBodySize) {_maxBodySize = MaxBodySize;};
+void										RequestBuffer::setURI(std::string const &URI) {_uri = URI;};
+void										RequestBuffer::setBody(char *body, int size) {_body_path = std::string(body, size);};
+
+
+void RequestBuffer::clear()
 {
-	if (this->t_buffer.buffer != NULL)
-		delete[] this->t_buffer.buffer;
-	this->t_buffer.size = 0;
-
+	_buffer.clear();
+	_level = 0;
+	_contentLength = -1;
+	_status = 0;
+	_chunkSize = -1;
+	_boundary = "";
+	_body_level = -1;
+	_status = 0;
 }
 
 RequestBuffer::RequestBuffer(int MaxBodySize)
 {
-	this->tmpString = NULL;
-	this->MaxBodySize = MaxBodySize;
-	this->t_buffer.buffer = NULL;
-	this->t_buffer.size = 0;
-	this->Level = 0;
-	this->Success = 0;
-	this->bodyType = -1;
-	found = false;
-	this->contentLength = 0;
-	this->t_tmp.size = 0;
-	this->t_tmp.tmp = NULL;
-	freeHelper = NULL;
-};
+	_maxBodySize = MaxBodySize;
+	_level = 0;
+	_contentLength = -1;
+	_status = 0;
+	_chunkSize = -1;
+	_boundary = "";
+	_body_level = -1;
+}
 
-/************************************ Tools: ***********************************/
-
-char *RequestBuffer::strjoin(char *s1, char *s2, int size1, int size2)
+int RequestBuffer::_first_line_handler()
 {
-	char	*tmp;
-	int		i;
-	int		j;
-
-	i = 0;
-	j = 0;
-	tmp = new char[size1 + size2 + 1];
-	while (i < size1)
-	{
-		tmp[i] = s1[i];
-		i++;
-	}
-	while (j < size2)
-	{
-		tmp[i + j] = s2[j];
-		j++;
-	}
-	return (tmp);
+	int _pos = _buffer.find("\r\n", 2);
+	if (_pos == -1)						return 0;
+	char *_tmp = nullTerminate(_buffer.substr(0, _pos), _pos);
+	std::string first_line = _tmp;
+	if (_tmp != NULL) delete [] _tmp;
+	_buffer.resize(_pos + 2);
+	_pos = 0;
+	// calculate the number of space in the first line.
+	for (std::string::iterator it = first_line.begin(); it != first_line.end(); it++)
+		if (*it == ' ')
+			_pos++;
+	// if the number of space is not 2, return 400: bad request.
+	if (_pos != 2)						return 400;
+	std::stringstream ss(first_line);
+	ss >> _method >> _uri >> _protocol; // insert first line.
+	if (!IS_METHOD_SUPORTED(_method))	return 501; // not implemented.
+	// if the protocol is not HTTP/1.1, return 505: HTTP version not supported.
+	if (_protocol != "HTTP/1.1")		return 505;
+	// URI too long.
+	if (_uri.size() > 2048)				return 414;
+	// if the URI contains not allowed characters, return 400: bad request.
+	if (_uri.find_first_not_of(ALLOWED_CHARS) != std::string::npos) return 400;
+	if ((_pos = _buffer.find("\r\n", 2)) == 0)	return 1; // This mean that the request does not have headers.
+	_level++;
+	_headers_handler();
+	_found = true;
+	return 0;
 }
 
 
-char *RequestBuffer::strDuplicate(char *str, int size)
-{
-	char	*tmp;
-	int		i;
-
-	if (size == 0)
-		return (NULL);
-	i = 0;
-	tmp = new char[size + 1];
-	while (i < size)
-	{
-		tmp[i] = str[i];
-		i++;
-	}
-	return (tmp);
-}
-
-char *RequestBuffer::substr(char *str, int start, int end)
-{
-	char	*tmp;
-	int		i;
-
-	if (end < start)
-		return (NULL);
-	i = 0;
-
-	tmp = new char[end - start];
-	while (start < end)
-	{
-		tmp[i] = str[start];
-		i++;
-		start++;
-	}
-	return (tmp);
-}
-
-int RequestBuffer::find(char *str, const char *to_find, int strSize, int to_findSize)
-{
-	int		i;
-	int		j;
-
-	i = 0;
-	j = 0;
-	while (i < strSize)
-	{
-		if (str[i] == to_find[j])
+int RequestBuffer::_headers_handler()
 		{
-			while (i + j < strSize && str[i + j] == to_find[j] && j < to_findSize)
-				j++;
-			if (j == to_findSize)
-				return (i);
-			j = 0;
+			if (_buffer.size() == 0)				return 0; // This mean that the buffer is empty.
+			int _pos  = _buffer.find("\r\n", 2);
+			if (_pos == -1)							return 0; // This mean that the buffer does not contain a full line. so we return.
+			if (_pos == 0) // This mean that we have reached the end of the headers.
+			{
+				_buffer.resize(2);
+				_level++;
+				if (_method == "POST")
+					_status = _body_handler();
+				else // TEST: remove this else if you want to allow GET requests with body.
+					_status = 1;
+				return (_status);
+			}
+			while (_buffer.size() > 0 && (_pos = _buffer.find("\r\n", 2)) > 0) // this loop will run until the buffer is empty or we reach the end of the headers.
+			{
+				char *_tmp = nullTerminate(_buffer.substr(0, _pos), _pos);
+				if (_tmp)
+				{
+					_headers += _tmp;
+					_headers += "\n";
+					delete [] _tmp;
+				}
+				_buffer.resize(_pos + 2);
+			}
+			return 0;
 		}
-		i++;
+
+
+int	RequestBuffer::_get_body_level()
+{
+	int _pos = _headers.find("Transfer-Encoding: ");
+	if (_pos != std::string::npos)
+	{
+		_pos += 19;
+		std::string _tmp = _headers.substr(_pos, _headers.find("\n", _pos) - _pos);
+		if (_tmp == "chunked") return 2;
+		return 501;
+	}
+	_pos = _headers.find("Content-Length: ");
+	if (_pos != std::string::npos)
+	{
+		_pos += 16;
+		std::string _tmp = _headers.substr(_pos, _headers.find("\n", _pos) - _pos);
+		std::stringstream ss(_tmp);
+		ss >> _contentLength;
+		if (_contentLength > _maxBodySize) return 413;
+		return 1;
+	}
+	_pos = _headers.find("Content-Type: ");
+	if (_pos != std::string::npos)
+	{
+		_pos += 14;
+		std::string _tmp = _headers.substr(_pos, _headers.find("\n", _pos) - _pos);
+		if (_tmp.find("multipart/form-data") != std::string::npos)
+		{
+			_pos = _tmp.find("boundary=");
+			if (_pos != std::string::npos)
+			{
+				_pos += 9;
+				_boundary = _tmp.substr(_pos, _tmp.size() - _pos);
+				_boundary = "--" + _boundary;
+				return 3;
+			}
+		}
+		return 501;
 	}
 	return (-1);
 }
 
-bool	RequestBuffer::strLenCmp(char *str1, const char *str2, int len)
-{
-	int i = 0;
 
-	while (i < len)
+int RequestBuffer::_content_length_handler()
+{
+	if (_body_path.size() == 0)	{_body_path = _generate_tmp_file_path();}
+	std::ofstream _file(_body_path, std::ios::out | std::ios::binary | std::ios::app);
+	if (_file.is_open() == false)
 	{
-		if (str1[i] != str2[i])
-			return false;
-		i++;
+		std::cout << RED"Inernal server error: " << "failed to create a tmp file." << _body_path << std::endl;
+		return (_status = 500, _status);
 	}
-	return true;
-}
-
-void RequestBuffer::clear()
-{
-	if (this->t_buffer.buffer != NULL)
-		delete[] this->t_buffer.buffer;
-	this->t_buffer.buffer = NULL;
-	this->t_buffer.size = 0;
-	this->Level = 0;
-	this->Success = 0;
-	this->bodyType = -1;
-	this->firstLine.clear();
-	this->Headers.clear();
-	this->Method.clear();
-	this->URI.clear();
-	this->Protocol.clear();
-	this->contentLength = 0;
-	this->boundary.clear();
-}
-
-/*******************************************************************************/
-
-/*********************************** Methods: **********************************/
-
-int	RequestBuffer::insertBuffer(char *buffer, int size)
-{
-	switch (Level) {
-		case 0:
-			RequestBuffer::InsertFirstLine(buffer, size);
-			break;
-		case 1:
-			RequestBuffer::InsertHeaders(buffer, size);
-			break;
-		case 2:
-			RequestBuffer::InsertBody(buffer, size);
-			break;
-		default:
-			break;
-	}
-	return (RequestBuffer::Success);
-}
-
-
-/*
-	1 -> join the buffer with the firstLine string.
-	2 -> find the end of the firstLine string.
-	3 -> if the end of the firstLine string is found, then we start pars the firstLine.
-*/
-int RequestBuffer::InsertFirstLine(char *buffer, int size)
-{
-	int		pos;
-	int		count = 0;
-	std::string tmp;
-	RequestBuffer::firstLine += std::string(buffer, size);
-
-	if ((pos = RequestBuffer::firstLine.find("\r\n")) != std::string::npos)
+	if (_buffer.size() >= _contentLength)
 	{
-		firstLine = firstLine.substr(0, pos);
-		for (int i = 0; i < pos; i++)
-			if (RequestBuffer::firstLine[i] == ' ')		count++;
-		if (count != 2) RequestBuffer::Success = 405;
-		std::stringstream ss(firstLine);
-		while (ss>>tmp)
-		{
-			if (Method.empty())			Method = tmp;
-			else if (URI.empty())		URI = tmp;
-			else if (Protocol.empty())	Protocol = tmp;
-		}
-		if (Method.empty() || URI.empty() || Protocol.empty()) RequestBuffer::Success = 406;
-		if (Protocol.find_first_not_of(ALLOWED_CHARS) != std::string::npos) RequestBuffer::Success = 400;
-		if (IS_METHOD_SUPORTED(Method) == false) RequestBuffer::Success = 407;
-		if (Protocol != "HTTP/1.1") {
-			std::cout << Protocol << std::endl;
-			RequestBuffer::Success = 408;
-		}
-
-		size -= pos + 2;
-		if (size <= 0)
-		{
-			return (Level++);
-		}
-		if (size >= 2 && RequestBuffer::strLenCmp((buffer + pos + 2), "\r\n", 2) == true)
-			return (RequestBuffer::Success = 1, 1);
-		RequestBuffer::Level++;
-		RequestBuffer::InsertHeaders((buffer + pos + 2), size);
-	}
-	return (RequestBuffer::Level);
-}
-
-
-int	RequestBuffer::InsertHeaders(char *buffer, int size)
-{
-	int	LineBreak;
-
-	if (buffer[0] == '\r' || buffer[0] == '\n')
-	{
-		int i = 0;
-		while (i < size && (buffer[i] == '\r' || buffer[i] == '\n'))	i++;
-		std::string test = Headers.substr(Headers.length() - 3, 3);
-
-		test += std::string(buffer, i);
-		if ((LineBreak = test.find("\r\n\r\n")) != std::string::npos)
-		{
-			if (LineBreak > 2) {}
-			else
-			{
-				char *tmp = NULL;
-				switch (LineBreak)
-				{
-					case 0:	tmp = RequestBuffer::strDuplicate(buffer, 1);	break;
-					case 1:	tmp = RequestBuffer::strDuplicate(buffer, 2);	break;
-					case 2:	tmp = RequestBuffer::strDuplicate(buffer, 3);	break;
-					default:	break;
-				}
-				if (tmp != NULL)
-				{
-					RequestBuffer::Headers += std::string(tmp, LineBreak+1);
-					delete [] tmp;
-				}
-				Headers.erase(std::remove(Headers.begin(), Headers.end(), '\r'), Headers.end());
-				RequestBuffer::Level++;
-				if (this->Method != "POST")
-					return (this->Success = 1, 1);
-				else
-				{
-					size -= LineBreak+1;
-					if (size <= 0)
-						return (1);
-					buffer += LineBreak+1;
-					RequestBuffer::InsertBody(buffer, size);
-					return (1);
-				}
-			}
-		}
-	}
-	LineBreak = RequestBuffer::find(buffer, "\r\n\r\n", size, 4);
-
-	if (LineBreak != -1)
-	{
-		RequestBuffer::Headers += std::string(buffer, LineBreak);
-		size -= LineBreak + 4;
-		if (size <= 0)
-		{
-			Headers.erase(std::remove(Headers.begin(), Headers.end(), '\r'), Headers.end());
-			RequestBuffer::Level++;
-			if (this->Method != "POST")
-			{
-				return (RequestBuffer::Success = 1, 1);
-			}
-
-			return (1);
-		}
-		Headers.erase(std::remove(Headers.begin(), Headers.end(), '\r'), Headers.end());
-		RequestBuffer::Level++;
-		RequestBuffer::InsertBody((buffer + LineBreak + 4), size);
+		_file.write(_buffer.getData(), _contentLength);
+		_file.close();
+		_buffer.resize(_contentLength);
+		_contentLength = 0;
+		return (_status = 1, _status);
 	}
 	else
 	{
-		RequestBuffer::Headers += std::string(buffer, size);
+		_file.write(_buffer.getData(), _buffer.size());
+		_contentLength -= _buffer.size();
+		_buffer.resize(_buffer.size());
+		_file.close();
 	}
-
-	return (1);
-}
-
-int	RequestBuffer::GenerateBodyType()
-{
-	int pos;
-
-	if ((pos = this->Headers.find("Content-Length: ")) != std::string::npos)
-	{
-		this->contentLength = std::atoi(
-			Headers.substr((pos + 16), Headers.find('\r', pos + 16) - (pos + 16)).c_str()
-		);
-		return (1);
-	}
-	else if ((pos = this->Headers.find("Transfer-Encoding: chunked")) != std::string::npos)
-	{
-		std::cout << "chunked" << std::endl;
-		return (2);
-	}
-	else if ((pos = this->Headers.find("Transfer-Encoding: ")))
-		return (Success = 505, -1);
-	return (Success = 400, -1);
-}
-
-int	RequestBuffer::InsertContentLengthBody(char *buffer, int size)
-{
-	char *tmp = NULL;
-	if (RequestBuffer::t_buffer.buffer == NULL)
-	{
-		RequestBuffer::t_buffer.buffer = RequestBuffer::strDuplicate(buffer, size);
-		RequestBuffer::t_buffer.size = size;
-		if (this->contentLength - size <= 0)
-		{
-			RequestBuffer::t_buffer.size = this->contentLength;
-			RequestBuffer::Success = 1;
-			return (1);
-		}
-		this->contentLength -= size;
-	}
-	else
-	{
-		if (this->contentLength - size <= 0)
-			size = this->contentLength;
-
-		tmp = t_buffer.buffer;
-		RequestBuffer::t_buffer.buffer = RequestBuffer::strjoin(RequestBuffer::t_buffer.buffer, buffer, RequestBuffer::t_buffer.size, size);
-		if (tmp != NULL)
-			delete [] tmp;
-
-		RequestBuffer::t_buffer.size += size;
-		this->contentLength -= size;
-	}
-	if (this->contentLength <= 0)
-	{
-		RequestBuffer::Success = 1;
-	}
-	return (1);
-}
-
-int	RequestBuffer::InsertBody(char *buffer, int size)
-{
-	if (RequestBuffer::bodyType == -1) bodyType = RequestBuffer::GenerateBodyType();
-
-	switch (RequestBuffer::bodyType)
-	{
-		case 1:
-			if (contentLength > MaxBodySize)
-			{
-				std::cout << MaxBodySize << std::endl;
-				std::cout << size << std::endl;
-				RequestBuffer::Success = 413; // Request Entity Too Large
-			}
-			else
-				RequestBuffer::InsertContentLengthBody(buffer, size);
-			break;
-		case 2:
-
-			RequestBuffer::InsertTransferEncodingBody(buffer, size);
-			break;
-		default:
-			break;
-	}
-	return 1;
-}
-
-char *RequestBuffer::nullTerminate(char *str, int size)
-{
-	char *tmp = new char[size + 1];
-	int i = 0;
-	while (i < size)
-	{
-		tmp[i] = str[i];
-		i++;
-	}
-	tmp[i] = '\0';
-	if (size > 0)
-		delete [] str;
-	return (tmp);
-
-}
-
-
-int RequestBuffer::GetChunkSize()
-{
-	tmpString = NULL;
-	int pos = find(t_tmp.tmp, "\r\n", t_tmp.size, 2);
-	if (pos == -1 || pos == 0)	return (-1);
-	tmpString = nullTerminate(substr(t_tmp.tmp, 0, pos), pos);
-
-	int chunkSize = std::strtol(tmpString, NULL, 16);
-	if (tmpString != NULL)
-		delete [] tmpString;
-	t_tmp.tmp += pos + 2;
-	t_tmp.size -= pos + 2;
-	return (chunkSize);
-}
-
-int	RequestBuffer::ParseChunkedBodyAndFillBuffer()
-{
-	freeHelper = t_tmp.tmp;
-	char *tmp = NULL;
-
-	int maxBodySize = RequestBuffer::MaxBodySize;
-	while (t_tmp.size > 0)
-	{
-		contentLength = RequestBuffer::GetChunkSize();
-		if (contentLength == 0)	return (delete [] freeHelper, Success = 1, Success);
-		if (contentLength < 0)
-			return (Success = 400, Success);
-		maxBodySize -= contentLength;
-		if (maxBodySize < 0)
-			return (Success = 413, Success);
-		tmp = t_buffer.buffer;
-		t_buffer.buffer = RequestBuffer::strjoin(t_buffer.buffer, t_tmp.tmp, t_buffer.size, contentLength);
-		if (tmp != NULL)
-			delete [] tmp;
-
-		t_buffer.size += contentLength;
-		t_tmp.size -= contentLength + 2;
-		if (t_tmp.size <= 0)
-		{
-			RequestBuffer::Success = 400;
-			return (Success);
-		}
-		t_tmp.tmp += contentLength + 2;
-	}
-	return Success;
-}
-
-int RequestBuffer::InsertTransferEncodingBody(char *buffer,int size)
-{
-	char *tmp = NULL;
-
-	tmp = t_tmp.tmp;
-	t_tmp.tmp = RequestBuffer::strjoin(t_tmp.tmp, buffer, t_tmp.size, size);
-	if (tmp != NULL)
-		delete [] tmp;
-	t_tmp.size += size;
-	int pos = 0;
-	if ((pos = find(t_tmp.tmp, "\r\n0\r\n\r\n", t_tmp.size, 7)) != -1)
-	{
-		if (pos != 0)
-		{
-			return (Success = ParseChunkedBodyAndFillBuffer(), Success);
-		}
-		return (Success = 1, Success);
-	}
-
 	return 0;
 }
 
-/*********************************** Getters: ***********************************/
 
-char *RequestBuffer::getBody() const {return (this->t_buffer.buffer);}
-
-int RequestBuffer::getBodySize() const {return (this->t_buffer.size);}
-
-int RequestBuffer::getMaxBodySize() const {return (this->MaxBodySize);}
-
-std::string const &RequestBuffer::getMethod() const {return (this->Method);}
-
-std::string const &RequestBuffer::getURI() const {return (this->URI);}
-
-std::string const &RequestBuffer::getProtocol() const {return (this->Protocol);}
-
-std::string const &RequestBuffer::getHeaders() const {return (this->Headers);}
-int	RequestBuffer::getLevel() const{return Success;};
-
-/*******************************************************************************/
-
-/*********************************** Setters: ***********************************/
-
-void RequestBuffer::setBody(char *body, int size)
+std::string RequestBuffer::_generate_tmp_file_path()
 {
-	if (this->t_buffer.buffer != NULL)
-		delete[] this->t_buffer.buffer;
-	this->t_buffer.buffer = body;
-	this->t_buffer.size = size;
+		std::string _path;
+	int i = 0;
+	while (true)
+	{
+			_path = "/tmp/file_";
+		std::stringstream ss;
+		ss << i++;
+		_path += ss.str();
+		if (access(_path.c_str(), F_OK) != 0)
+		{
+				break;
+		}
+	}
+	return _path;
 }
 
-void RequestBuffer::setMaxBodySize(int MaxBodySize) {this->MaxBodySize = MaxBodySize;}
 
-void RequestBuffer::setMethod(std::string const &Method) {this->Method = Method;}
+int	RequestBuffer::_chunked_handler()
+{
+	if (_chunkSize == -1)
+	{
+		int _pos = _buffer.find("\r\n", 2);
+		if (_pos == -1)						return 0; // This mean that the buffer does not contain a full line. so we return.
+		char *_tmp = nullTerminate(_buffer.substr(0, _pos), _pos);
+		std::stringstream ss(_tmp);
+		ss >> std::hex >> _chunkSize;
+		if (_tmp != NULL) delete [] _tmp;
+		_buffer.resize(_pos + 2);
+	}
+	if (_chunkSize == 0)	return (_status = 1, _status);
+	else
+	{
+		if (_body_path.size() == 0)	{_body_path = _generate_tmp_file_path();}
+		std::ofstream _file(_body_path, std::ios::out | std::ios::binary | std::ios::app);
+		if (_file.is_open() == false)
+		{
+			std::cout << RED"Inernal server error: " << "failed to create a tmp file." << _body_path << std::endl;
+			return (_status = 500, _status);
+		}
+		if (_buffer.size() >= _chunkSize)
+		{
+			_file.write(_buffer.getData(), _chunkSize);
+			_file.close();
+			_buffer.resize(_chunkSize + 2);
+			_chunkSize = -1;
+		}
+		else
+		{
+			_file.write(_buffer.getData(), _buffer.size());
+			_chunkSize -= _buffer.size();
+			_buffer.resize(_buffer.size());
+			_file.close();
+		}
+	}
+	return (0);
+}
 
-void RequestBuffer::setURI(std::string const &URI) {this->URI = URI;}
 
-void RequestBuffer::setProtocol(std::string const &Protocol) {this->Protocol = Protocol;}
+int RequestBuffer::_multipart_handler()
+{
+	int _pos;
+	if (_multiform_data_tmp_path.size() == 0)
+	{
+		_multiform_data_tmp_path = _generate_tmp_file_path();
+	}
+	std::ofstream _file(_multiform_data_tmp_path, std::ios::out | std::ios::binary | std::ios::app);
+	if (_file.is_open() == false)
+	{
+		std::cout << RED"Inernal server error: " << "failed to create a tmp file." << _multiform_data_tmp_path << std::endl;
+		return (_status = 500, _status);
+	}
+	std::string _line;
+	std::ifstream _file2(_multiform_data_tmp_path, std::ios::in | std::ios::binary);
+	while (std::getline(_file2, _line))
+	{
+		if (_line == (_boundary + "--"))
+		{
+			_file.close();
+			_file2.close();
+			_buffer.resize(_buffer.size());
+			return (_status = 1, _status);
+		}
+	}
+	if ((_pos = _buffer.find((_boundary + "--").c_str(), (_boundary.size() + 2))) == -1)
+	{
+		_file.write(_buffer.getData(), _buffer.size());
+		_buffer.resize(_buffer.size());
+		_file.close();
+		return (0);
+	}
+	else {
+		_file.write(_buffer.getData(), _pos + (_boundary.size() + 2));
+		_file.close();
+		_buffer.resize(_pos + (_boundary.size() + 2));
+		return (_status = 1, _status);
+	}
+	return (0);
+}
 
-void RequestBuffer::setHeaders(std::string const &Headers) {this->Headers = Headers;}
+int RequestBuffer::_body_handler()
+{
+	if (_body_level == -1)
+		_body_level = _get_body_level(); // This mean that we have not yet determined the type of the body.-> 1: Content-Length, 2: chunked, 3: multipart/form-data. -1: undetermined.
+	if (_body_level == -1)
+		return 1; // This mean that the request does not have a body. so we return.
+	else if (_body_level > 3)
+		return _body_level; // This mean that the body type is not supported.
+	if (_buffer.size() == 0)				return 0; // This mean that the buffer is empty.
+	switch (_body_level)
+	{
+		case 1:
+			_status = _content_length_handler();
+			break;
+		case 2:
+			_status = _chunked_handler();
+			break;
+		case 3:
+			_status = _multipart_handler();
+			break;
+		default:
+			break;
+	}
+	return _status;
+}
 
-/*******************************************************************************/
+int	RequestBuffer::insertBuffer(const char *buffer, int size)
+{
+	// std::cout << buffer << " " << size<< std::endl;
+	_buffer = _buffer + Byte(buffer, size);
+
+	switch (_level)
+	{
+		case 0: _status = _first_line_handler(); break;
+		case 1: _status = _headers_handler(); break;
+		case 2: _status = _body_handler(); break;
+		default: break;
+	}
+	return _status;
+}
