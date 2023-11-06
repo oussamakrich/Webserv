@@ -15,7 +15,6 @@ int main (int argc, char **argv)
 
 		Request req(Request::GET);
 		// req.setBodyBuff("hi");
-		req.setBodySize(2);
 		req.insertHeader("host", "test");
 		req.insertHeader("Port", "test");
 		req.insertHeader("Content-type", "");

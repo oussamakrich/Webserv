@@ -27,7 +27,7 @@ t_cgiInfo  Cgi::Run(Request &req, std::string  &bin, std::string &path)
 	}
 
 	info.output = getRandomName("/tmp/", "-cgi-output"); //TODO: select root , default rot is /tmp
-	info.input  = getRandomName("/tmp/", "-cgi-input"); //TODO: select root , default rot is /tmp
+	info.input  = req.getBody(); //TODO: select root , default rot is /tmp
 	info.code  	= 0;
 	info.pid =  fork();
 	if (info.pid == -1)
@@ -82,13 +82,10 @@ void Cgi::cgiProcess(t_cgiInfo &info, Request &req, char **env,  char **args)
 	{
 		int ifd = 0;
 		int ofd = 0;
-		if (req.getBodySize() > 0)
+		if (req.getType()  == Request::POST)
 		{
 			int ifd = open(info.input.c_str(),O_CREAT | O_TRUNC | O_RDWR, 0777);
 			if (ifd == -1)	throw std::runtime_error("cgi  process can't creat input file");
-			int wr = write(ifd, req.getBodyBuff(), req.getBodySize());
-			if (wr != req.getBodySize())	throw std::runtime_error("cgi can't write input file");
-				lseek(ifd, SEEK_SET, 0);
 			if (dup2(ifd, 0) == -1)			throw std::runtime_error("cgi poress cant dup stdinput wth input file");
 			close(ifd);
 		}

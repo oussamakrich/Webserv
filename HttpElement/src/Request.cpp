@@ -11,8 +11,6 @@ Request::Request(int type)
 	this->query 			= "";
 	this->transfer_encoding = "";
 	this->connection        = false;
-	this->bodyBuff          = NULL;
-	this->bodySize 			= -1;
 }
 
 Request::~Request(){}
@@ -26,8 +24,8 @@ void    Request::setContentLength(const int content_length) { this->content_leng
 void    Request::setTransferEncoding(const std::string& transfer_encoding) { this->transfer_encoding = transfer_encoding; }
 void    Request::setErrorCode(int code) { this->error_code = code; }
 void 	Request::setConnection(bool conn) {this->connection = conn;}
-void 	Request::setBodySize(int size) {this->bodySize = size;}
-void 	Request::setBodyBuff(char *buff) {this->bodyBuff = buff;}
+void 	Request::setBody(const std::string &path) {this->body = path;}
+
 
 //*****************  GETTERS ********************//
 
@@ -39,8 +37,8 @@ int             Request::getType() 				const { return this->type; }
 std::string     Request::getMethod()            const { return method; }
 int   			Request::getErrorCode() 		const { return this->error_code; }
 bool 			Request::getConnection()		const {	return this->connection;}
-int 			Request::getBodySize() 			const { return this->bodySize; }
-char 			*Request::getBodyBuff() 		const { return this->bodyBuff;}
+const std::string 	&Request::getBody() 		const { return this->body; }
+
 const std::map<std::string, std::string> &Request::getHeaders() const { return this->headers;}
 
 //std::map<std::string, std::string> Request::getHeaders() const { return headers; }
