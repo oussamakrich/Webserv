@@ -6,7 +6,7 @@
 #include <sys/time.h>
 #include <signal.h>
 
-#define SERVER_NAME  "Hustler SERVER"
+
 #define TIME_OUT 55 // second
 
 
@@ -230,12 +230,12 @@ bool Cgi::isFinished(t_cgiInfo &info, int &status)
 {
 	int s = 0;
 	if (info.pid < 0) return true;
-	if (waitpid(info.pid, &s, WNOHANG) == 0)
+	if (waitpid(info.pid, &s, WNOHANG ) == 0)
 		return false;
 		if (WIFEXITED(s))
-            status  = WEXITSTATUS(status);
+            status  = WEXITSTATUS(s);
 		else
-			status = s;
+			status  = s + 128;
 	return  true;
 }
 

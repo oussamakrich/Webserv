@@ -23,9 +23,17 @@ int main (int argc, char **argv)
 		req.setContentLength(0);
 		req.setTransferEncoding("shunked");
 		req.insertHeader("Protoco", "test");
-		string bin = "./cgi-bin/php-cgi";
-		string path = "/Users/ebennamr/Desktop/WebServer/index.php";
-		Cgi::Run(req, bin , path);
+		string bin = "/bin/bash";
+		string path = "hi.sh";
+	t_cgiInfo info  = Cgi::Run(req, bin , path);
+
+		int status;
+		while (Cgi::isFinished(info, status) == false )
+		{
+			std::cout << "wait child for finish...\n";
+			sleep(1);
+		}
+		std::cout << "status " << status;
 		// Request req(0);
 		// req.setBodyBuff(0);
 		// req.setBodySize(0);
@@ -38,27 +46,27 @@ int main (int argc, char **argv)
 		// Cgi::Run(req, bin , path);
 
 	// out << "HIE";
-atexit(ff);
-	if (argc != 2){
-		std::cerr << "Error: required a config file" << std::endl;
-		return 1;
-	}
-	try
-	{
-		std::ifstream file(argv[1]);
+// atexit(ff);
+	// if (argc != 2){
+	// 	std::cerr << "Error: required a config file" << std::endl;
+	// 	return 1;
+	// }
+	// try
+	// {
+	// 	std::ifstream file(argv[1]);
 
-		std::vector<TOKEN> tokens = Tokenizer::tokenGenerator(file);//
+	// 	std::vector<TOKEN> tokens = Tokenizer::tokenGenerator(file);//
 
-	// 	// printTokens(tokens);
+	// // 	// printTokens(tokens);
 
-		Global *WebServer = GenerateGlobalClass::generateGlobalClass(tokens);
-		// WebServer->print();
+	// 	Global *WebServer = GenerateGlobalClass::generateGlobalClass(tokens);
+	// 	// WebServer->print();
 
-		 WebServer->run();
+	// 	 WebServer->run();
 
-	}catch (std::exception &e) {
-		std::cout << e.what() << std::endl;
-	}
+	// }catch (std::exception &e) {
+	// 	std::cout << e.what() << std::endl;
+	// }
 
 	// // int x;cin >> x;
 
