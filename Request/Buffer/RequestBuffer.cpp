@@ -68,9 +68,9 @@ int RequestBuffer::_first_line_handler()
 	if (_uri.find_first_not_of(ALLOWED_CHARS) != std::string::npos) return 400;
 	if ((_pos = _buffer.find("\r\n", 2)) == 0)	return 1; // This mean that the request does not have headers.
 	_level++;
-	_headers_handler();
+	_status = _headers_handler();
 	_found = true;
-	return 0;
+	return _status;
 }
 
 
@@ -99,6 +99,16 @@ int RequestBuffer::_headers_handler()
 					delete [] _tmp;
 				}
 				_buffer.resize(_pos + 2);
+			}
+			if (_pos == 0) // This mean that we have reached the end of the headers.
+			{
+				_buffer.resize(2);
+				_level++;
+				if (_method == "POST")
+					_status = _body_handler();
+				else // TEST: remove this else if you want to allow GET requests with body.
+					_status = 1;
+				return (_status);
 			}
 			return 0;
 		}

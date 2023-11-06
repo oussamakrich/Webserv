@@ -33,6 +33,9 @@ bool Client::ReadRequest(){
 		return false;
 	}
 	int level = reqBuff.insertBuffer(buffer, status);
+	// std::cout << buffer << std::endl;
+	// exit(9);
+
 	delete buffer;
 	return true;
 }

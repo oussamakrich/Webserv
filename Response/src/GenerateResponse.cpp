@@ -10,7 +10,11 @@ Response *GenerateResponse::generateResponse(Server &ser, Request &req, int fd){
 	Response *res = new Response(fd);
 
 	res->errorPage = ser.getErrorPages();
-	if (req.getMethod() == "GET") GetMethod GetHandler(ser, req, *res);
+	if (req.getMethod() == "GET")
+	{
+		 std::cout << "DELETE" << std::endl;
+	 	GetMethod GetHandler(ser, req, *res);
+	}
 	else if (req.getMethod() == "POST")
 	{
 		PostMethod PostHandler(ser, req, *res);
