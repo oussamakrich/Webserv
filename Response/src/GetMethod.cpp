@@ -83,10 +83,39 @@ void GetMethod::serveDirectory(){
 	}
 }
 
+
+bool GetMethod::checkCGI(){
+	if (isLoacation){
+		return location->isCgiExtention(res.path);
+	}
+	else
+		return false;
+}
+
+void GetMethod::handelCGI(){
+	//TODO : handel cgi
+
+	res.isCGI = true;
+	std::string bin = location->getCgiBinFor(res.path);
+	res.cgiInfo =  Cgi::Run(req, bin, res.path);
+	if (res.cgiInfo.code == 500){
+		res.setCode(500);
+		return;
+	}
+	int status;
+	if (Cgi::isFinished(res.cgiInfo, status)){
+		if (status == 0){
+
+		}	
+	}
+	else
+		res.setCode(500);
+}
+
 void GetMethod::serveFile(std::string path, size_t size){
 
 		if (checkCGI()){
-			// handelCgi();
+			handelCGI();
 			return;
 		}
 		std::ifstream file(path.c_str());
@@ -109,17 +138,10 @@ void GetMethod::serveFile(std::string path, size_t size){
 		}
 }
 
-bool GetMethod::checkCGI(){
-	if (isLoacation)
-		// return location->isCGI();
-		return false;
-	else
-		return false;
-}
 
 void GetMethod::simpleGet(){
 	res.path = this->root + '/' + req.getPath();
-	std::cout << RED"path: "<<RESET << res.path << std::endl;
+	// std::cout << RED"path: "<<RESET << res.path << std::endl;
 	size_t size;
 	int type = isFile(res.path, size);
 

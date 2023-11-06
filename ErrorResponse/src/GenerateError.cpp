@@ -53,6 +53,10 @@ std::string simpleBody(int code){
 	ss << code;
 	page = "<html><head><title>" + ss.str() + " " + GenerateError::generateMsg(code) + "</title></head>";
 	page += "<body><center><h1>" + ss.str() + " " + GenerateError::generateMsg(code) + "</h1></center><hr><center>webserv</center></body></html>";
+
+
+
+
 	return page;
 }
 

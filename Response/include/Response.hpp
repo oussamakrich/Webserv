@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../include/includes.hpp"
+#include "../../HttpElement/include/Cgi.hpp"
 
 #define R_READ 5024
 #define VECT_STR std::vector<std::string>
@@ -25,6 +26,8 @@ class Response{
 		int pos; // pos in the file to sek it when we send the reminder
 		int lastSend; // Not now
 		VECT_ERRORPIR errorPage;
+		bool isCGI;
+		t_cgiInfo cgiInfo;
 		
 
 	public:

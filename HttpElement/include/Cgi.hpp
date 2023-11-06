@@ -2,9 +2,10 @@
 #include "../../include/includes.hpp"
 #include "Request.hpp"
 
-#include <string>
 using namespace std;
+
 #define STATIC_VAR_NUM 7
+
 struct s_cgiInfo
 {
 	int code;

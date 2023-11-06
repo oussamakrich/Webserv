@@ -229,10 +229,10 @@ bool Cgi::isFinished(t_cgiInfo &info, int &status)
 	if (info.pid < 0) return true;
 	if (waitpid(info.pid, &s, WNOHANG ) == 0)
 		return false;
-		if (WIFEXITED(s))
-            status  = WEXITSTATUS(s);
-		else
-			status  = s + 128;
+	if (WIFEXITED(s))
+    status  = WEXITSTATUS(s);
+	else
+		status  = s + 128;
 	return  true;
 }
 
