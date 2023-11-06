@@ -41,7 +41,9 @@ int   			Request::getErrorCode() 		const { return this->error_code; }
 bool 			Request::getConnection()		const {	return this->connection;}
 int 			Request::getBodySize() 			const { return this->bodySize; }
 char 			*Request::getBodyBuff() 		const { return this->bodyBuff;}
-std::map<std::string, std::string> Request::getHeaders() const { return headers; }
+const std::map<std::string, std::string> &Request::getHeaders() const { return this->headers;}
+
+//std::map<std::string, std::string> Request::getHeaders() const { return headers; }
 bool	        Request::insertHeader(std::string key, std::string value)
 {
     if (headers.find(key) != headers.end())  return false;

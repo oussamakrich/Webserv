@@ -113,14 +113,14 @@ std::vector<ERRPAGE_PAIR> Server::getErrorPages() const{return errorPages;}
 
 Location	&Server::getLocation(std::string url){ return *locations[url]; }
 
-std::map<std::string, Location*> Server::getAllLocation() const { return locations; }
+LOCATION_MAP &Server::getAllLocation() { return locations; }
 
 std::map<std::string, std::string>	Server::getMimeType() const{return mimeType;}
 
 
 //INFO : ++++++++++++++++++++++++++for Print++++++++++++++++++++++++++++++++++++
 
-std::ostream &operator<<(std::ostream &out, const Server &server){
+std::ostream &operator<<(std::ostream &out, Server &server){
 	out << BLUE "serverName: " << U_YELLOW << server.getServerName() << std::endl;
 	out << RED "\tport: " << GREEN << server.getPort() << std::endl;
 	out << RED "\tclientMaxBodySize: " <<GREEN <<  server.getClientMaxBodySize() << std::endl;
@@ -145,7 +145,7 @@ std::ostream &operator<<(std::ostream &out, const Server &server){
 		out << GREEN"\t\t"<< it -> first << " " << it -> second << std::endl;
 	out << RED"\tlocations: " << std::endl;
 	std::cout << RESET;
-	std::map<std::string, Location*> loc = server.getAllLocation();
+	LOCATION_MAP loc = server.getAllLocation();
 	for (std::map<std::string, Location*>::const_iterator it = loc.begin(); it != loc.end(); it++)
 	{
 		out <<it -> first << " " ;

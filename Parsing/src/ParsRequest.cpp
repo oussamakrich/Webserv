@@ -56,11 +56,14 @@ bool  ParsRequest::isValidKey(std::string key)
  bool  ParsRequest::ParsHeaders(Request& req, std::string& line)
 {
 	size_t pos = line.find(':');
+	if (line.empty()) return true;
 	if (pos == std::string::npos) return false;
 	std::string key = line.substr(0, pos);
 	std::string value = line.substr(pos + 1);
 	value = trim(value);
+	if (key.empty() || value.empty()) return true;
 	if (isValidKey(key) == false) return false;
+
 
 	if(key == "Content-Length")
 	{

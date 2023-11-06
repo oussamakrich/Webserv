@@ -1,12 +1,12 @@
 #include "../include/GenerateError.hpp"
 #include <string>
 
-ErrorResponse	GenerateError::generateError(int code, Server &ser){
+ErrorResponse	GenerateError::generateError(int code, VECT_ERRORPIR errorPage){
 	ErrorResponse error;
 
 	error.setErrorCode(code);
 	error.setErrorMsg(generateMsg(code));
-	error.setErrorBody(generateBody(code, ser.getErrorPages()));
+	error.setErrorBody(generateBody(code, errorPage));
 	return error;
 }
 

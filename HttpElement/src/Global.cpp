@@ -1,5 +1,6 @@
 
 #include "../include/Global.hpp"
+#include <sys/poll.h>
 
 std::vector<struct pollfd> Global::gPollFds =  std::vector<struct pollfd>();
 
@@ -76,9 +77,6 @@ void  Global::run()
 				this->callHandelFds(gPollFds[i]);
 				pollStatus--;
 			}
-			// else if ((gPollFds[i].revents & POLLOUT)){
-			// 	std::cout << "out" << std::endl;
-			// }
 		}
 	}
 }

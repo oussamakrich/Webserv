@@ -1,11 +1,6 @@
 #include "../include/DirListing.hpp"
-#include  <time.h>
-#include <sys/stat.h>
+#include "../../include/includes.hpp"
 #include <dirent.h>
-#include <cstdlib>
-#include <string>
-#include <iostream>
-#include <sstream>
 
 std::string DirListing::GenerateFileRow(const std::string &parent, const std::string &name)
 {
@@ -13,7 +8,7 @@ std::string DirListing::GenerateFileRow(const std::string &parent, const std::st
 	std::string path = parent + "/" + name;
 	output << "<tr><td>\n<a href=\"";
 	output << name;
-	output << "\">";
+	output <<  "/\">";
 	output << name;
 	output << "</a> </td>";
 

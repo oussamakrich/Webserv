@@ -14,9 +14,7 @@ Response::Response(int fd){
 	this->bufferSize = 0;
 }
 
-Response::~Response(){
-
-}
+Response::~Response(){}
 
 int Response::getCode(){ return this->code;}
 
@@ -48,7 +46,7 @@ void Response::setHeaderAndStart(std::string header){this->HeaderAndStart = head
 
 void Response::sendErrorResponse(Server &ser ,int fd){
 		stillSend = false;
-		ErrorResponse err = GenerateError::generateError(this->code, ser);
+		ErrorResponse err = GenerateError::generateError(this->code, this->errorPage);
 		std::string error =  err.getErrorPage(ser);
 		send(fd, error.c_str(), error.size(), 0);
 }
@@ -58,6 +56,7 @@ bool Response::sendResponse(){
 	if (this->code >= 400)
 		return false;
 	const char *resp = this->strjoin(HeaderAndStart.c_str(), buffer, HeaderAndStart.size(), bufferSize);
+	buffer = NULL;
 	int ret = send(fd, resp, HeaderAndStart.size() + bufferSize, 0);
 	if (ret == -1) std::cout << "Error send" << std::endl;
 	delete  resp;

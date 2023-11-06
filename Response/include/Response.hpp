@@ -3,6 +3,8 @@
 #include "../../include/includes.hpp"
 
 #define R_READ 5024
+#define VECT_STR std::vector<std::string>
+#define VECT_ERRORPIR std::vector<ERRPAGE_PAIR>
 
 class Server;
 
@@ -22,6 +24,7 @@ class Response{
 		std::string path; // path of file to serv it when we send the reminder
 		int pos; // pos in the file to sek it when we send the reminder
 		int lastSend; // Not now
+		VECT_ERRORPIR errorPage;
 		
 
 	public:
