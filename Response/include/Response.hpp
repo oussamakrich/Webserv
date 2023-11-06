@@ -54,6 +54,8 @@ class Response{
 
 		bool sendResponse();
 		bool ReminderResponse();
+		bool CgiResponse(Request &req);
+		bool CgiHeaders(Request &req);
 
 		void sendErrorResponse(Server &ser, int fd);
 		

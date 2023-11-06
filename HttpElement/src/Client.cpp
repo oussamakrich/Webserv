@@ -9,6 +9,7 @@
 Client::Client(int bodySize, int fd) : reqBuff(bodySize){
 	lastTime = std::time(NULL);
 	IhaveResponse = false;
+	IhaveCGI = false;
 	this->response = NULL;
 	pfd.fd = fd;
 	pfd.events = POLLIN | POLLOUT;
@@ -77,12 +78,33 @@ bool Client::OldRequest(ITT_CLIENT it, Server &ser){
 	}
 	IhaveResponse = response->stillSend;
 	if (!IhaveResponse){
+		if (response->isCGI)
+			Cgi::CgiUnlink(response->cgiInfo);
 		delete  response;
 		response = NULL;
 		switchEvent(getFd(), POLLIN);
 	}
 	return true;
 }
+
+bool Client::CgiRequest(){
+	switchEvent(this->pfd.fd, POLLOUT);
+	if (response->CgiResponse(*req)){
+		CGIFinish = true;
+		delete req;
+		IhaveResponse = response->stillSend;		
+		if (!IhaveResponse){
+			switchEvent(this->pfd.fd, POLLIN);
+			response->isCGI = false;
+			Cgi::CgiUnlink(response->cgiInfo);
+			delete response;
+			response = NULL;
+		}
+		return true;
+	}
+	return false;	
+} 
+
 
 
 bool Client::NewRequest(ITT_CLIENT it, Server &ser){
@@ -107,8 +129,12 @@ bool Client::NewRequest(ITT_CLIENT it, Server &ser){
 		delete req;
 		return false;
 	}
-
 	response = GenerateResponse::generateResponse(ser, *req, this->pfd.fd);
+	IhaveCGI = response->isCGI;
+	if (response->isCGI){
+		this->req = req;
+		return true;
+	}
 	if (!response->sendResponse()){
 		delete req;
 		return false;

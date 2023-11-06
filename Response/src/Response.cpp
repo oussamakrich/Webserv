@@ -2,6 +2,9 @@
 #include "../../ErrorResponse/include/ErrorResponse.hpp"
 #include "../../ErrorResponse/include/GenerateError.hpp"
 #include "../../HttpElement/include/Server.hpp"
+#include "../include/GenerateResponse.hpp"
+#include "../../include/includes.hpp"
+#include <sys/_types/_size_t.h>
 
 
 Response::Response(int fd){
@@ -51,6 +54,56 @@ void Response::sendErrorResponse(Server &ser ,int fd){
 		send(fd, error.c_str(), error.size(), 0);
 }
 
+bool Response::CgiHeaders(Request &req){
+	path = cgiInfo.output;
+	size_t sizeOfFile;
+	isFile(path, sizeOfFile);
+
+	std::ifstream file(path);	
+	if (!file.is_open()){
+		setCode(500);	
+		return false;
+	}
+	std::string header;
+	size_t pos;
+	size_t headerPos = 0;
+	while (!file.eof()){
+		std::getline(file, header);	
+		if (header.empty()) 
+			break;
+		pos = header.find('\r');
+		if (pos != header.npos)
+			header.erase(pos);
+		if (!header.empty())
+			headers.push_back(header);		
+	}
+	headerPos = file.tellg();
+	this->msg = "OK";
+	this->code = 200;
+	setHeadr("Content-Length: " + convertCode(sizeOfFile - headerPos));
+	this->HeaderAndStart = GenerateResponse::generateHeaderAndSt(*this, req);	
+	buffer = new char[R_READ];
+	file.read(buffer, R_READ);
+	bufferSize = file.gcount();
+	this->pos = bufferSize + headerPos;
+	stillSend = true;
+	if (file.eof())
+		stillSend = false;
+	file.close();
+	return true;
+}
+
+bool Response::CgiResponse(Request &req){
+
+	int status;
+	if (Cgi::isFinished(cgiInfo, status)){
+		CgiHeaders(req);
+		sendResponse();
+		return true;
+	}
+	return false;
+}
+
 bool Response::sendResponse(){
 
 	if (this->code >= 400)
@@ -66,24 +119,21 @@ bool Response::sendResponse(){
 bool Response::ReminderResponse(){
 
 	std::ifstream file(path.c_str());
-	if (file.is_open()){
-		char *buffer = new char[R_READ];
-		file.seekg(pos);
-		file.read(buffer, R_READ);
-		setBuffer(buffer, file.gcount());
-		pos += file.gcount();
-		stillSend = true;
-		if (file.eof())
-			stillSend = false;
-		file.close();
-	}
-	else{
-		setCode(404);
+	if (!file.is_open()){
+		setCode(500);
 		return false;
 	}
-
+	char *buffer = new char[R_READ];
+	file.seekg(pos);
+	file.read(buffer, R_READ);
+	setBuffer(buffer, file.gcount());
+	pos += file.gcount();
+	stillSend = true;
+	if (file.eof())
+		stillSend = false;
+	file.close();
 	int ret = send(fd, buffer, bufferSize, 0);
 	if (ret == -1) std::cout << "Error send" << std::endl; //FIX : error Response
-	delete  buffer;
+	delete [] buffer;
 	return true;
 }

@@ -22,7 +22,7 @@ bool GetMethod::isLocation(LOCATION_ITT &it)
 	return false;
 }
 
-int GetMethod::isFile(std::string path, size_t &size)
+int isFile(std::string path, size_t &size)
 {
 	struct stat buffer;
 
@@ -95,47 +95,39 @@ bool GetMethod::checkCGI(){
 void GetMethod::handelCGI(){
 	//TODO : handel cgi
 
-	res.isCGI = true;
 	std::string bin = location->getCgiBinFor(res.path);
 	res.cgiInfo =  Cgi::Run(req, bin, res.path);
 	if (res.cgiInfo.code == 500){
 		res.setCode(500);
 		return;
 	}
-	int status;
-	if (Cgi::isFinished(res.cgiInfo, status)){
-		if (status == 0){
-
-		}	
-	}
-	else
-		res.setCode(500);
+	res.isCGI = true;
 }
 
 void GetMethod::serveFile(std::string path, size_t size){
 
-		if (checkCGI()){
-			handelCGI();
-			return;
-		}
-		std::ifstream file(path.c_str());
+	res.isCGI = false;
+	if (checkCGI()){
+		handelCGI();
+		return;
+	}
+	std::ifstream file(path.c_str());
 
-		if (file.is_open()){
-			char *buffer = new char[R_READ];
-			file.read(buffer, R_READ);
-			res.setBuffer(buffer, file.gcount());	
-			res.pos = file.gcount();
-			res.stillSend = true;
-			if (file.eof())
-				res.stillSend = false;
-			file.close();
-		res.setHeadr("Content-Length: " + convertCode(size));
-		res.setHeadr("Content-Type: " + findMimeType(path, ser));
-		res.setCode(200);
-		}
-		else{
-			res.setCode(404);
-		}
+	if (!file.is_open()){
+		res.setCode(500);
+		return;
+	}
+	char *buffer = new char[R_READ];
+	file.read(buffer, R_READ);
+	res.setBuffer(buffer, file.gcount());	
+	res.pos = file.gcount();
+	res.stillSend = true;
+	if (file.eof())
+		res.stillSend = false;
+	file.close();
+	res.setHeadr("Content-Length: " + convertCode(size));
+	res.setHeadr("Content-Type: " + findMimeType(path, ser));
+	res.setCode(200);
 }
 
 

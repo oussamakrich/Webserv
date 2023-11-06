@@ -37,7 +37,7 @@ class GetMethod
 		std::string findMimeType(std::string path, Server &ser);
 		bool checkRedirection();
 
-		int	isFile(std::string path, size_t &size);
+		// int	isFile(std::string path, size_t &size);
 		void serveFile(std::string path, size_t size);
 		void serveDirectory();
 		bool checkCGI();

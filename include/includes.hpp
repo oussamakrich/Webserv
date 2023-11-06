@@ -108,8 +108,9 @@ void printEnam(Token t);
 
 
 std::string convertCode(int code);
-int isClientValid(int fd);
+// int isClientValid(int fd);
 
+int isFile(std::string path, size_t &size);
 
 
 

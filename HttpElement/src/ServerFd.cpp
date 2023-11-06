@@ -87,11 +87,9 @@ bool Server::handelClient(ITT_CLIENT it){
 
 	Client *client = *it;
 	client->setLastTime(time(NULL));
-	// if (client->cgi == true){
-		// isReady;
-		// send reminder();
-	// }
-	if (client->IhaveResponse)
+	if (client->IhaveCGI && !client->CGIFinish)
+		client->CgiRequest();
+	else if (client->IhaveResponse)
 		client->OldRequest(it, *this);
 	else if (!client->NewRequest(it, *this)){
 		client->response->sendErrorResponse(*this, client->getFd());

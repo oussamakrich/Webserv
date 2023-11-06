@@ -26,8 +26,11 @@ class Client{
 	public:
 		RequestBuffer reqBuff;
 		Response *response;
+		Request		*req;
 		bool			IhaveResponse;
+		bool			IhaveCGI;
 		bool			keepAlive;
+		bool			CGIFinish;
 
 	public: //Utils
 		bool		ReadRequest();
@@ -37,6 +40,7 @@ class Client{
 
 		bool NewRequest(ITT_CLIENT	it, Server &ser);
 		bool OldRequest(ITT_CLIENT it, Server &ser);
+		bool CgiRequest(); 
 		void Error();
 
 	public: //Geters
