@@ -9,3 +9,6 @@ test.cpp
 *.conf
 MyLab
 .gitignore
+todo 
+*.sh
+.gitignore

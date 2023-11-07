@@ -110,6 +110,10 @@ void printEnam(Token t);
 std::string convertCode(int code);
 int isClientValid(int fd);
 
+void sigChange();
+void sigRestDefault();
+void sigHandler(int sig);
+
 
 
 

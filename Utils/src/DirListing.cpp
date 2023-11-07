@@ -6,20 +6,23 @@ std::string DirListing::GenerateFileRow(const std::string &parent, const std::st
 {
 	std::stringstream output;
 	std::string path = parent + "/" + name;
+	struct stat info;
+	int res_stat = stat(path.c_str(), &info);
 	output << "<tr><td>\n<a href=\"";
 	output << name;
-	output <<  "/\">";
+	output <<  (S_ISDIR(info.st_mode) ?  "/" : "");
+	output <<  "\">";
 	output << name;
 	output << "</a> </td>";
 
 	char buff[100] = "";
-	struct stat info;
-	if (stat(path.c_str(), &info) == 0)
+
+	if (res_stat == 0)
 	{
 		strftime(buff, 100, "%d/%m/%Y %H:%M:%S", localtime(&info.st_mtime));
 		output << " <td>" <<  info.st_size << " byte</td>\n<td>" << buff << "</td>\n</tr>";
 	}
-	else 
+	else
 	    output << " <td> -- </td>\n<td> --:--:-- --:-- </td>\n</tr>";
 	return output.str();
 }
@@ -46,7 +49,7 @@ bool DirListing::getDirlistigHtml(const std::string path, std::string &output)
 	std::string htmlContent;
     if (dir == NULL) return false;
     while ( (ent =  readdir(dir)) != NULL)
-    {	
+    {
 		if(ent->d_name[0] != '.')
 		htmlContent += GenerateFileRow(path , ent->d_name);
     }
