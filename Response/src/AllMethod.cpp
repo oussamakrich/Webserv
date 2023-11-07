@@ -1,5 +1,5 @@
 
-#include "../include/GetMethod.hpp"
+#include "../include/AllMethod.hpp"
 #include "../../Utils/include/DirListing.hpp"
 #include "../../Uploader/include/Upload.hpp"
 
@@ -55,8 +55,6 @@ void copy(char *buffer, std::string out){
 void ResponseHandler::serveDirectory(){
 	size_t size;
 	int type;
-
-
 
 	std::vector<std::string>::iterator it = indexes.begin();
 	for (; it != indexes.end(); it++){
@@ -172,24 +170,17 @@ void ResponseHandler::simpleGet(){
 	size_t size;
 	int type = isFile(res.path, size);
 
-	if (req.getMethod() == "POST" && isLoacation)
+	if (req.getMethod() == "POST" && isLoacation && location->isUploadOn())
 	{
 		Upload up(ser, req, res, *location);
 		return;
 	}
 	if (type == FILE)
-	{
 		serveFile(res.path, size);
-	}
 	else if (type == DIRECTORY) //TODO :  try index.html || check auto index
-	{
-
 		serveDirectory();
-	}
 	else if (type == NOT_FOUND) //TODO : Generate 404
-	{
 		res.setCode(404);
-	}
 
 }
 

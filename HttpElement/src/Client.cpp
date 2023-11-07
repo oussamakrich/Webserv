@@ -33,7 +33,6 @@ bool Client::ReadRequest(){
 	status = recv(pfd.fd, buffer, N_READ, 0);
 	if (status == -1 || status == 0)
 	{
-		std::cout << "error in recv" << std::endl;
 		delete  buffer;
 		return false;
 	}

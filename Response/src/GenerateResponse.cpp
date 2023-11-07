@@ -1,6 +1,6 @@
 
 #include "../include/GenerateResponse.hpp"
-#include "../include/GetMethod.hpp"
+#include "../include/AllMethod.hpp"
 #include "../include/Response.hpp"
 
 
@@ -44,7 +44,7 @@ std::string GenerateResponse::generateHeaderAndSt(Response &res, Request &req){
 			str = res.getVersion() + " " + convertCode(res.getCode()) + " " + res.getMsg() + "\r\n";
 		}
 	}
-	headersTmp += "\r\n";
+	str += headersTmp + "\r\n";
 	return str;
 }
 

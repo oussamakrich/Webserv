@@ -57,6 +57,7 @@ void Upload::Uploader(Server &ser, Request &req, Response &res, Location &loc)
 	// }
 	// else
 	// {
+	std::cout << destinationFile << std::endl;
 		if (rename(sourceFile.c_str(), destinationFile.c_str()) == 0)
 		{
 			std::cout<< GREEN"File Uploaded successfully: " <<U_WHITE<< destinationFile << "\n";
