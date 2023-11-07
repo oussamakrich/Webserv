@@ -3,7 +3,7 @@
 #include "../../include/includes.hpp"
 #include "../../HttpElement/include/Cgi.hpp"
 
-#define R_READ 5024
+#define R_READ 50000
 #define VECT_STR std::vector<std::string>
 #define VECT_ERRORPIR std::vector<ERRPAGE_PAIR>
 

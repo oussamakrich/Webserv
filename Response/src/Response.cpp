@@ -134,6 +134,7 @@ bool Response::ReminderResponse(){
 		stillSend = false;
 	file.close();
 	int ret = send(fd, buffer, bufferSize, 0);
+	std::cout << "reminder ret : " << ret << " : " << time(NULL) << std::endl;
 	if (ret == -1) std::cout << "Error send" << std::endl; //FIX : error Response
 	delete [] buffer;
 	return true;

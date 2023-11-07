@@ -4,7 +4,7 @@
 #include "../include/Server.hpp"
 #include "../../Response/include/GenerateResponse.hpp"
 
-#define N_READ 5024
+#define N_READ 50000
 
 Client::Client(int bodySize, int fd) : reqBuff(bodySize){
 	lastTime = std::time(NULL);
