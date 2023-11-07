@@ -43,7 +43,7 @@ void Upload::multipart(Server &ser, Request &req, Response &res, Location &loc)
 
 	std::getline(file, boundary);
 	std::cout << "boundary: " << boundary << std::endl;
-	
+
 }
 
 void Upload::Uploader(Server &ser, Request &req, Response &res, Location &loc)
@@ -59,13 +59,13 @@ void Upload::Uploader(Server &ser, Request &req, Response &res, Location &loc)
 	// {
 		if (rename(sourceFile.c_str(), destinationFile.c_str()) == 0)
 		{
-			std::cout<< "File moved successfully\n";
+			std::cout<< GREEN"File Uploaded successfully: " <<U_WHITE<< destinationFile << "\n";
 			res.setCode(201);
 			res.stillSend = false;
 		}
 		else
 		{
-			std::cout << "Error: unable to move the file\n";
+			std::cout << YELLOW"Warning:"<<  RESET" unable to upload the file\n";
 			res.setCode(500);
 			res.stillSend = false;
 		}

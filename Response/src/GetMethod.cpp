@@ -132,7 +132,6 @@ void GetMethod::simpleGet(){
 
 	if (req.getMethod() == "POST" && isLoacation)
 	{
-		std::cout << "upload" << std::endl;
 		Upload up(ser, req, res, *location);
 		return;
 	}
