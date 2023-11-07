@@ -1,7 +1,6 @@
 
 #include "../include/GenerateResponse.hpp"
 #include "../include/GetMethod.hpp"
-#include "../include/PostMethod.hpp"
 #include "../include/Response.hpp"
 
 
@@ -10,18 +9,20 @@ Response *GenerateResponse::generateResponse(Server &ser, Request &req, int fd){
 	Response *res = new Response(fd);
 
 	res->errorPage = ser.getErrorPages();
-	if (req.getMethod() == "GET")
+	if (req.getMethod() == "GET" || req.getMethod() == "POST")
 	{
 	 	GetMethod GetHandler(ser, req, *res);
 	}
-	else if (req.getMethod() == "POST")
-	{
-	 	// GetMethod GetHandler(ser, req, *res);
-		PostMethod PostHandler(ser, req, *res);
-	}
+	// else if (req.getMethod() == "POST")
+	// {
+	//  	// GetMethod GetHandler(ser, req, *res);
+	// 	PostMethod PostHandler(ser, req, *res);
+	// }
 	else if (req.getMethod() == "DELETE") std::cout << "DELETE" << std::endl;
 
+
 	res->setMsg(generateMsg(res->getCode()));
+
 	res->setHeaderAndStart(generateHeaderAndSt(*res, req));
 
 	return res;

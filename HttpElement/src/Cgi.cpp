@@ -7,7 +7,7 @@
 #include <signal.h>
 
 
-#define TIME_OUT 55 // second
+#define TIME_OUT 5500000000000 // second
 
 
 t_cgiInfo Cgi::INTERNAL_ERROR = {500, -1, "", ""};

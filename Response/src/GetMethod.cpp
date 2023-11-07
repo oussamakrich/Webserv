@@ -2,6 +2,7 @@
 #include "../include/GetMethod.hpp"
 #include "../../Utils/include/DirListing.hpp"
 #include <string>
+#include "../../Uploader/include/Upload.hpp"
 
 GetMethod::GetMethod(Server &ser, Request &req, Response &res) : ser(ser), req(req), res(res)
 {
@@ -55,6 +56,9 @@ void copy(char *buffer, std::string out){
 void GetMethod::serveDirectory(){
 	size_t size;
 	int type;
+
+
+
 	std::vector<std::string>::iterator it = indexes.begin();
 	for (; it != indexes.end(); it++){
 		std::string path = res.path + '/' + *it;
@@ -89,6 +93,9 @@ void GetMethod::serveFile(std::string path, size_t size){
 			// handelCgi();
 			return;
 		}
+
+
+
 		std::ifstream file(path.c_str());
 
 		if (file.is_open()){
@@ -118,17 +125,30 @@ bool GetMethod::checkCGI(){
 }
 
 void GetMethod::simpleGet(){
-	res.path = this->root + '/' + req.getPath();
+	res.path = this->root + req.getPath();
 	std::cout << RED"path: "<<RESET << res.path << std::endl;
 	size_t size;
 	int type = isFile(res.path, size);
 
+	if (req.getMethod() == "POST" && isLoacation)
+	{
+		std::cout << "upload" << std::endl;
+		Upload up(ser, req, res, *location);
+		return;
+	}
 	if (type == FILE)
+	{
 		serveFile(res.path, size);
+	}
 	else if (type == DIRECTORY) //TODO :  try index.html || check auto index
+	{
+
 		serveDirectory();
+	}
 	else if (type == NOT_FOUND) //TODO : Generate 404
+	{
 		res.setCode(404);
+	}
 
 }
 
@@ -155,7 +175,8 @@ void GetMethod::GetMethode(Server &ser, Request &req, Response &res)
 {
 	LOCATION_ITT it;
 
-	if (isLocation(it)){
+	if (isLocation(it))
+	{
 		isLoacation = true;
 		location = it->second;
 		if (checkRedirection())
@@ -170,7 +191,8 @@ void GetMethod::GetMethode(Server &ser, Request &req, Response &res)
 		indexes = location->getIndexesList();
 		res.errorPage = location->getErrorPageList();
 	}
-	else{
+	else
+	{
 		isLoacation = false;
 		autoindex = ser.getAutoIndex();
 		root = ser.getRoot();

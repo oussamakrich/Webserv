@@ -29,7 +29,7 @@ void Tokenizer::generateTokenMap(void){
 	SpecialWords["autoindex"] = AUTO_INDEX;
 	SpecialWords["allowed_methods"] = ALLOWED_METHOD;
 	SpecialWords["upload"] = UPLOAD;
-
+	
 	SpecialWords["upload_path"] = UPLOAD_PATH;
 	SpecialWords["cgi"] = CGI;
 	SpecialSymbols["["] = OPEN_S_BRACKET;

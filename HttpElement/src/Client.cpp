@@ -3,10 +3,12 @@
 #include "../include/Global.hpp"
 #include "../include/Server.hpp"
 #include "../../Response/include/GenerateResponse.hpp"
+#include <fstream>
 
-#define N_READ 5024
+#define N_READ 5000
 
-Client::Client(int bodySize, int fd) : reqBuff(bodySize){
+Client::Client(int bodySize, int fd) : reqBuff(bodySize * 100){
+
 	lastTime = std::time(NULL);
 	IhaveResponse = false;
 	this->response = NULL;
@@ -24,16 +26,17 @@ int Client::getFd(){return pfd.fd; }
 bool Client::ReadRequest(){
 
 	char *buffer;
+	
 	buffer = new char[N_READ];
 	memset(buffer, 0, N_READ);
 	status = recv(pfd.fd, buffer, N_READ, 0);
 	if (status == -1 || status == 0)
 	{
+		std::cout << "error in recv" << std::endl;
 		delete  buffer;
 		return false;
 	}
 	int level = reqBuff.insertBuffer(buffer, status);
-
 	delete buffer;
 	return true;
 }

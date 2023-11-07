@@ -1,0 +1,22 @@
+POST /upload HTTP/1.1
+Host: 10.13.3.5:9090
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/116.0
+Accept: */*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Content-Disposition: attachment; filename=pexels-james-wheeler-417074.jpg
+Content-Type: image/jpeg
+Content-Length: 1253384
+Origin: http://10.13.3.5:9090
+Connection: keep-alive
+Referer: http://10.13.3.5:9090/
+
+ÿØÿàGET / HTTP/1.1
+Host: 10.13.3.5:9090
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/116.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Connection: keep-alive
+Upgrade-Insecure-Requests: 1
+

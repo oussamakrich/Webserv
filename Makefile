@@ -25,7 +25,7 @@ SRC =	./HttpElement/src/Client.cpp\
 		./Response/src/GenerateResponse.cpp\
 		./Response/src/GetMethod.cpp\
 		./HttpElement/src/Cgi.cpp\
-		./Response/src/PostMethod.cpp
+		./Uploader/src/Upload.cpp \
 
 
 
@@ -50,22 +50,22 @@ HEADER =	./HttpElement/include/Client.hpp \
 			./Response/include/GenerateResponse.hpp\
 			./Response/include/GetMethod.hpp\
 			./HttpElement/include/Cgi.hpp\
-			./Response/include/PostMethod.hpp\
 			./Request/Buffer/Byte.hpp\
+			./Uploader/include/Upload.hpp \
 
 
 
 OBJ = $(SRC:.cpp=.o)
 
-FLAGS = -g #-fsanitize=address -g-Wall -Wextra -Werror -std=c++98
+FLAGS = -g -fsanitize=address #-g-Wall -Wextra -Werror -std=c++98
 
 all:  $(NAME)
 
 $(NAME): $(OBJ) $(HEADER)
-			c++ $(FLAGS) $(OBJ) -o $(NAME)
-
+			@c++ $(FLAGS) $(OBJ) -o $(NAME)
+			@mkdir -p tmp
 %.o: %.cpp $(HEADER)
-			c++ $(FLAGS) -c $< -o $@
+			@c++ $(FLAGS) -c $< -o $@
 
 clean c:
 			rm -rf $(OBJ)
