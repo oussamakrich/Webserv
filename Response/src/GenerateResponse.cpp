@@ -3,6 +3,7 @@
 #include "../include/GetMethod.hpp"
 #include "../include/PostMethod.hpp"
 #include "../include/Response.hpp"
+#include <string>
 
 
 
@@ -21,6 +22,12 @@ Response *GenerateResponse::generateResponse(Server &ser, Request &req, int fd){
 	return res;
 }
 
+void extractStatus(Response &res, std::string header){
+	std::vector<std::string> cc = split(header, ' ');
+	std::cout << cc.size() << std::endl;
+	res.setCode(std::atoi(cc[1].c_str())); 
+	res.setMsg(cc[2]);
+}
 
 std::string GenerateResponse::generateHeaderAndSt(Response &res, Request &req){
 	std::string str;
@@ -31,8 +38,11 @@ std::string GenerateResponse::generateHeaderAndSt(Response &res, Request &req){
 	if (req.getConnection() == 1)
 		connection = "Connection: keep-alive";
 	headers.push_back(connection);
-	for (unsigned int i = 0;i < headers.size();i++)
+	for (unsigned int i = 0;i < headers.size();i++){
 		str += headers[i] + "\r\n";
+		if (headers[i].find("Status: ") != headers[i].npos)
+			extractStatus(res, headers[i]);
+	}
 	str += "\r\n";
 	return str;
 }
