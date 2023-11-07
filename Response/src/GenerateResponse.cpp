@@ -1,7 +1,6 @@
 
 #include "../include/GenerateResponse.hpp"
 #include "../include/GetMethod.hpp"
-#include "../include/PostMethod.hpp"
 #include "../include/Response.hpp"
 
 
@@ -13,7 +12,7 @@ Response *GenerateResponse::generateResponse(Server &ser, Request &req, int fd){
 	if (req.getMethod() == "GET" || req.getMethod() == "POST")
 		ResponseHandler Handler(ser, req, *res);
 	else if (req.getMethod() == "DELETE") std::cout << "DELETE" << std::endl;
-	// else if (req.getMethod() == "POST") 	PostMethod PostHandler(ser, req, *res);
+
 
 	res->setMsg(generateMsg(res->getCode()));
 	res->setHeaderAndStart(generateHeaderAndSt(*res, req));
@@ -40,10 +39,10 @@ std::string GenerateResponse::generateHeaderAndSt(Response &res, Request &req){
 	headers.push_back(connection);
 	for (unsigned int i = 0;i < headers.size();i++){
 		headersTmp += headers[i] + "\r\n";
-		if (headers[i].find("Status: ") != headers[i].npos)
+		if (headers[i].find("Status: ") != headers[i].npos){
 			extractStatus(res, headers[i]);
 			str = res.getVersion() + " " + convertCode(res.getCode()) + " " + res.getMsg() + "\r\n";
-
+		}
 	}
 	headersTmp += "\r\n";
 	return str;

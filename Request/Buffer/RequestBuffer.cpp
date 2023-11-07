@@ -30,7 +30,6 @@ void RequestBuffer::clear()
 	_chunkSize = -1;
 	_boundary = "";
 	_body_level = -1;
-	_status = 0;
 }
 
 RequestBuffer::RequestBuffer(int MaxBodySize)
@@ -46,12 +45,20 @@ RequestBuffer::RequestBuffer(int MaxBodySize)
 
 int RequestBuffer::_first_line_handler()
 {
+	int increment = 0;
 	int _pos = _buffer.find("\r\n", 2);
+	increment = 2;
+	if (_pos == -1)
+	{
+		_pos = _buffer.find("\n", 1);
+		increment = 1;
+	}
 	if (_pos == -1)						return 0;
+
 	char *_tmp = nullTerminate(_buffer.substr(0, _pos), _pos);
 	std::string first_line = _tmp;
 	if (_tmp != NULL) delete [] _tmp;
-	_buffer.resize(_pos + 2);
+	_buffer.resize(_pos + increment);
 	_pos = 0;
 	// calculate the number of space in the first line.
 	for (std::string::iterator it = first_line.begin(); it != first_line.end(); it++)
@@ -68,7 +75,7 @@ int RequestBuffer::_first_line_handler()
 	if (_uri.size() > 2048)				return 414;
 	// if the URI contains not allowed characters, return 400: bad request.
 	if (_uri.find_first_not_of(ALLOWED_CHARS) != std::string::npos) return 400;
-	if ((_pos = _buffer.find("\r\n", 2)) == 0)	return 1; // This mean that the request does not have headers.
+	if ((_pos = _buffer.find("\r\n", 2)) == 0 || (_pos = _buffer.find("\n", 1)) == 0)	return 1; // This mean that the request does not have headers.
 	_level++;
 	_status = _headers_handler();
 	_found = true;
@@ -77,43 +84,65 @@ int RequestBuffer::_first_line_handler()
 
 
 int RequestBuffer::_headers_handler()
+{
+	int increment = 0;
+	if (_buffer.size() == 0)				return 0; // This mean that the buffer is empty.
+	int _pos  = _buffer.find("\r\n", 2);
+	increment = 2;
+	if (_pos == -1)
+	{
+		_pos = _buffer.find("\n", 1);
+		increment = 1;
+		if (_pos == -1)						return 0; // This mean that the buffer does not contain a full line. so we return.
+	}
+	if (_pos == 0) // This mean that we have reached the end of the headers.
+	{
+		_buffer.resize(increment);
+		_level++;
+		if (_method == "POST")
+			_status = _body_handler();
+		else // TEST: remove this else if you want to allow GET requests with body.
+			_status = 1;
+		return (_status);
+	}
+	int _pos2;
+	while (_buffer.size() > 0)
+	{
+		_pos = _buffer.find("\r\n", 2);
+		_pos2 = _buffer.find("\n", 1);
+		if ((_pos2 == -1 && _pos == -1) || (_pos == 0 || _pos2 == 0)) break;;
+		if ((_pos2 != -1 && _pos != -1 && _pos2 < _pos) || (_pos == -1))
 		{
-			if (_buffer.size() == 0)				return 0; // This mean that the buffer is empty.
-			int _pos  = _buffer.find("\r\n", 2);
-			if (_pos == -1)							return 0; // This mean that the buffer does not contain a full line. so we return.
-			if (_pos == 0) // This mean that we have reached the end of the headers.
-			{
-				_buffer.resize(2);
-				_level++;
-				if (_method == "POST")
-					_status = _body_handler();
-				else // TEST: remove this else if you want to allow GET requests with body.
-					_status = 1;
-				return (_status);
-			}
-			while (_buffer.size() > 0 && (_pos = _buffer.find("\r\n", 2)) > 0) // this loop will run until the buffer is empty or we reach the end of the headers.
-			{
-				char *_tmp = nullTerminate(_buffer.substr(0, _pos), _pos);
-				if (_tmp)
-				{
-					_headers += _tmp;
-					_headers += "\n";
-					delete [] _tmp;
-				}
-				_buffer.resize(_pos + 2);
-			}
-			if (_pos == 0) // This mean that we have reached the end of the headers.
-			{
-				_buffer.resize(2);
-				_level++;
-				if (_method == "POST")
-					_status = _body_handler();
-				else // TEST: remove this else if you want to allow GET requests with body.
-					_status = 1;
-				return (_status);
-			}
-			return 0;
+			_pos = _pos2;
+			increment = 1;
 		}
+		else
+			increment = 2;
+		char *_tmp = nullTerminate(_buffer.substr(0, _pos), _pos);
+		if (_tmp)
+		{
+			_headers += _tmp;
+			_headers += "\n";
+			delete [] _tmp;
+		}
+		_buffer.resize(_pos + increment);
+	}
+	if (_pos == 0 || _pos2 == 0) // This mean that we have reached the end of the headers.
+	{
+		if (_pos == 0)
+			increment = 2;
+		else
+			increment = 1;
+		_buffer.resize(increment);
+		_level++;
+		if (_method == "POST")
+			_status = _body_handler();
+		else // TEST: remove this else if you want to allow GET requests with body.
+			_status = 1;
+		return (_status);
+	}
+	return 0;
+}
 
 
 int	RequestBuffer::_get_body_level()
@@ -124,17 +153,7 @@ int	RequestBuffer::_get_body_level()
 		_pos += 19;
 		std::string _tmp = _headers.substr(_pos, _headers.find("\n", _pos) - _pos);
 		if (_tmp == "chunked") return 2;
-		return 501;
-	}
-	_pos = _headers.find("Content-Length: ");
-	if (_pos != std::string::npos)
-	{
-		_pos += 16;
-		std::string _tmp = _headers.substr(_pos, _headers.find("\n", _pos) - _pos);
-		std::stringstream ss(_tmp);
-		ss >> _contentLength;
-		if (_contentLength > _maxBodySize) return 413;
-		return 1;
+			return 501;
 	}
 	_pos = _headers.find("Content-Type: ");
 	if (_pos != std::string::npos)
@@ -152,7 +171,16 @@ int	RequestBuffer::_get_body_level()
 				return 3;
 			}
 		}
-		return 501;
+	}
+	_pos = _headers.find("Content-Length: ");
+	if (_pos != std::string::npos)
+	{
+		_pos += 16;
+		std::string _tmp = _headers.substr(_pos, _headers.find("\n", _pos) - _pos);
+		std::stringstream ss(_tmp);
+		ss >> _contentLength;
+		if (_contentLength > _maxBodySize) return 413;
+		return 1;
 	}
 	return (-1);
 }
@@ -188,11 +216,21 @@ int RequestBuffer::_content_length_handler()
 
 std::string RequestBuffer::_generate_tmp_file_path()
 {
-		std::string _path;
+	std::string _path;
+	struct stat info;
 	int i = 0;
+
+	if (!(stat("tmp", &info) == 0 && S_ISDIR(info.st_mode)))
+	{
+		if (mkdir("tmp", 0777) == -1)
+		{
+			std::cout << RED"Inernal server error: " << "failed to create a tmp directory." << std::endl;
+			return "";
+		}
+	}
 	while (true)
 	{
-			_path = "/tmp/file_";
+		_path = "./tmp/file_";
 		std::stringstream ss;
 		ss << i++;
 		_path += ss.str();
@@ -207,15 +245,23 @@ std::string RequestBuffer::_generate_tmp_file_path()
 
 int	RequestBuffer::_chunked_handler()
 {
+	int increment;
+	if (_buffer.size() == 0)				return 0; // This mean that the buffer is empty.
 	if (_chunkSize == -1)
 	{
 		int _pos = _buffer.find("\r\n", 2);
-		if (_pos == -1)						return 0; // This mean that the buffer does not contain a full line. so we return.
+		increment = 2;
+		if (_pos == -1)
+		{
+			_pos = _buffer.find("\n", 1);
+			increment = 1;
+			if (_pos == -1)						return 0; // This mean that the buffer does not contain a full line. so we return.
+		}
 		char *_tmp = nullTerminate(_buffer.substr(0, _pos), _pos);
 		std::stringstream ss(_tmp);
 		ss >> std::hex >> _chunkSize;
 		if (_tmp != NULL) delete [] _tmp;
-		_buffer.resize(_pos + 2);
+		_buffer.resize(_pos + increment);
 	}
 	if (_chunkSize == 0)	return (_status = 1, _status);
 	else
@@ -231,7 +277,7 @@ int	RequestBuffer::_chunked_handler()
 		{
 			_file.write(_buffer.getData(), _chunkSize);
 			_file.close();
-			_buffer.resize(_chunkSize + 2);
+			_buffer.resize(_chunkSize + increment);
 			_chunkSize = -1;
 		}
 		else
@@ -241,6 +287,7 @@ int	RequestBuffer::_chunked_handler()
 			_buffer.resize(_buffer.size());
 			_file.close();
 		}
+		return (_chunked_handler());
 	}
 	return (0);
 }
@@ -253,10 +300,12 @@ int RequestBuffer::_multipart_handler()
 	{
 		_multiform_data_tmp_path = _generate_tmp_file_path();
 	}
-	std::ofstream _file(_multiform_data_tmp_path, std::ios::out | std::ios::binary | std::ios::app);
+	std::ofstream _file(_multiform_data_tmp_path, std::ios::out | std::ios::binary |
+	std::ios::app);
 	if (_file.is_open() == false)
 	{
-		std::cout << RED"Inernal server error: " << "failed to create a tmp file." << _multiform_data_tmp_path << std::endl;
+		std::cout << RED"Inernal server error: " << "failed to create a tmp file." <<
+	_multiform_data_tmp_path << std::endl;
 		return (_status = 500, _status);
 	}
 	std::string _line;
@@ -271,14 +320,16 @@ int RequestBuffer::_multipart_handler()
 			return (_status = 1, _status);
 		}
 	}
-	if ((_pos = _buffer.find((_boundary + "--").c_str(), (_boundary.size() + 2))) == -1)
+	if ((_pos = _buffer.find((_boundary + "--").c_str(), (_boundary.size() + 2)))
+	== -1)
 	{
 		_file.write(_buffer.getData(), _buffer.size());
 		_buffer.resize(_buffer.size());
 		_file.close();
 		return (0);
 	}
-	else {
+	else
+	{
 		_file.write(_buffer.getData(), _pos + (_boundary.size() + 2));
 		_file.close();
 		_buffer.resize(_pos + (_boundary.size() + 2));
@@ -296,6 +347,7 @@ int RequestBuffer::_body_handler()
 	else if (_body_level > 3)
 		return _body_level; // This mean that the body type is not supported.
 	if (_buffer.size() == 0)				return 0; // This mean that the buffer is empty.
+
 	switch (_body_level)
 	{
 		case 1:
