@@ -23,13 +23,13 @@ Response *GenerateResponse::generateResponse(Server &ser, Request &req, int fd){
 
 void extractStatus(Response &res, std::string header){
 	std::vector<std::string> cc = splitStream(header, ' ');
-	std::cout << cc.size() << std::endl;
 	res.setCode(std::atoi(cc[1].c_str())); 
 	res.setMsg(cc[2]);
 }
 
 std::string GenerateResponse::generateHeaderAndSt(Response &res, Request &req){
 	std::string str;
+	std::string headersTmp = "";
 	std::string connection = "Connection: close";
 
 	str = res.getVersion() + " " + convertCode(res.getCode()) + " " + res.getMsg() + "\r\n";
@@ -38,11 +38,14 @@ std::string GenerateResponse::generateHeaderAndSt(Response &res, Request &req){
 		connection = "Connection: keep-alive";
 	headers.push_back(connection);
 	for (unsigned int i = 0;i < headers.size();i++){
-		str += headers[i] + "\r\n";
-		if (headers[i].find("Status: ") != headers[i].npos)
+		headersTmp += headers[i] + "\r\n";
+		if (headers[i].find("Status: ") != headers[i].npos){
 			extractStatus(res, headers[i]);
+			str = res.getVersion() + " " + convertCode(res.getCode()) + " " + res.getMsg() + "\r\n";
+		}
 	}
-	str += "\r\n";
+	headersTmp += "\r\n";
+	str += headersTmp;
 	return str;
 }
 
