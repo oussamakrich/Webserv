@@ -2,7 +2,6 @@
 #include "../include/AllMethod.hpp"
 #include "../../Utils/include/DirListing.hpp"
 #include "../../Uploader/include/Upload.hpp"
-#include <unistd.h>
 
 ResponseHandler::ResponseHandler(Server &ser, Request &req, Response &res) : ser(ser), req(req), res(res)
 {

@@ -93,7 +93,6 @@ bool Client::CgiRequest(){
 		CGIFinish = true;
 		delete req;
 		IhaveResponse = response->stillSend;		
-		std::cout << "IhaveResponse : " << IhaveResponse << std::endl;
 		if (!IhaveResponse){
 			switchEvent(this->pfd.fd, POLLIN);
 			response->isCGI = false;
