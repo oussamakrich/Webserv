@@ -112,6 +112,7 @@ std::string convertCode(int code);
 
 int isFile(std::string path, size_t &size);
 
+std::vector<std::string> splitStream(const std::string& str, char delimiter);
 
 
 

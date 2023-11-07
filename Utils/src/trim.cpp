@@ -22,3 +22,13 @@ std::string trim(const std::string &s) {
     return rtrim(ltrim(s));
 }
 
+
+std::vector<std::string> splitStream(const std::string& str, char delimiter) {
+    std::vector<std::string> tokens;
+    std::stringstream ss(str);
+    std::string token;
+    while (ss >> token) {
+        tokens.push_back(token);
+    }
+    return tokens;
+}

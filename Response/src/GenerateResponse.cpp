@@ -3,7 +3,6 @@
 #include "../include/GetMethod.hpp"
 #include "../include/PostMethod.hpp"
 #include "../include/Response.hpp"
-#include <string>
 
 
 
@@ -23,7 +22,7 @@ Response *GenerateResponse::generateResponse(Server &ser, Request &req, int fd){
 }
 
 void extractStatus(Response &res, std::string header){
-	std::vector<std::string> cc = split(header, ' ');
+	std::vector<std::string> cc = splitStream(header, ' ');
 	std::cout << cc.size() << std::endl;
 	res.setCode(std::atoi(cc[1].c_str())); 
 	res.setMsg(cc[2]);

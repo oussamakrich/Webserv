@@ -110,10 +110,6 @@ void ResponseHandler::serveFile(std::string path, size_t size){
 		handelCGI();
 		return;
 	}
-	if (req.getMethod() == "POST" && isLoacation && location->isUploadOn()){
-		// UPloaderup (req, res, path);)	
-		// return;
-	}
 	std::ifstream file(path.c_str());
 
 	if (!file.is_open()){
