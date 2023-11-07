@@ -1,16 +1,15 @@
 
 #include "../include/GetMethod.hpp"
 #include "../../Utils/include/DirListing.hpp"
-#include <string>
 
-GetMethod::GetMethod(Server &ser, Request &req, Response &res) : ser(ser), req(req), res(res)
+ResponseHandler::ResponseHandler(Server &ser, Request &req, Response &res) : ser(ser), req(req), res(res)
 {
-	GetMethode(ser, req, res);
+	ResponseHandlere(ser, req, res);
 }
 
-GetMethod::~GetMethod(){}
+ResponseHandler::~ResponseHandler(){}
 
-bool GetMethod::isLocation(LOCATION_ITT &it)
+bool ResponseHandler::isLocation(LOCATION_ITT &it)
 {
 	std::string path = req.getPath();
 	LOCATION_MAP &locations = ser.getAllLocation();
@@ -36,7 +35,7 @@ int isFile(std::string path, size_t &size)
 	return NOT_FOUND;
 }
 
-std::string GetMethod::findMimeType(std::string path, Server &ser){
+std::string ResponseHandler::findMimeType(std::string path, Server &ser){
 	std::string extention = path.substr(path.find_last_of('.') + 1);
 	if (extention.empty())
 		return defaultType;
@@ -52,7 +51,7 @@ void copy(char *buffer, std::string out){
 		buffer[i] = out[i];
 }
 
-void GetMethod::serveDirectory(){
+void ResponseHandler::serveDirectory(){
 	size_t size;
 	int type;
 	std::vector<std::string>::iterator it = indexes.begin();
@@ -84,7 +83,7 @@ void GetMethod::serveDirectory(){
 }
 
 
-bool GetMethod::checkCGI(){
+bool ResponseHandler::checkCGI(){
 	if (isLoacation){
 		return location->isCgiExtention(res.path);
 	}
@@ -92,7 +91,7 @@ bool GetMethod::checkCGI(){
 		return false;
 }
 
-void GetMethod::handelCGI(){
+void ResponseHandler::handelCGI(){
 	//TODO : handel cgi
 
 	std::string bin = location->getCgiBinFor(res.path);
@@ -104,12 +103,16 @@ void GetMethod::handelCGI(){
 	res.isCGI = true;
 }
 
-void GetMethod::serveFile(std::string path, size_t size){
+void ResponseHandler::serveFile(std::string path, size_t size){
 
 	res.isCGI = false;
 	if (checkCGI()){
 		handelCGI();
 		return;
+	}
+	if (req.getMethod() == "POST" && isLoacation && location->isUploadOn()){
+		// UPloaderup (req, res, path);)	
+		// return;
 	}
 	std::ifstream file(path.c_str());
 
@@ -131,9 +134,8 @@ void GetMethod::serveFile(std::string path, size_t size){
 }
 
 
-void GetMethod::simpleGet(){
+void ResponseHandler::simpleGet(){
 	res.path = this->root + '/' + req.getPath();
-	// std::cout << RED"path: "<<RESET << res.path << std::endl;
 	size_t size;
 	int type = isFile(res.path, size);
 
@@ -146,7 +148,7 @@ void GetMethod::simpleGet(){
 	
 }
 
-bool GetMethod::checkRedirection(){
+bool ResponseHandler::checkRedirection(){
 	char *buffer;
 	if (location->isRedirection()){
 		res.setCode(location->getRedirectionCode());	
@@ -165,11 +167,11 @@ bool GetMethod::checkRedirection(){
 	return false;
 }
 
-void GetMethod::GetMethode(Server &ser, Request &req, Response &res)
+void ResponseHandler::ResponseHandlere(Server &ser, Request &req, Response &res)
 {
 	LOCATION_ITT it;
 
-	if (isLocation(it)){
+	if (isLocation(it)) {
 		isLoacation = true;
 		location = it->second;
 		if (checkRedirection())

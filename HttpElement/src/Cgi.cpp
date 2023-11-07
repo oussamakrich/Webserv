@@ -238,10 +238,10 @@ bool Cgi::isFinished(t_cgiInfo &info, int &status)
 
 void Cgi::CgiUnlink(t_cgiInfo info)
 {
-	if (!access(info.input.c_str(), F_OK))
-			unlink(info.input.c_str());
-	if (!access(info.output.c_str(), F_OK))
-			unlink(info.output.c_str());
+	// if (!access(info.input.c_str(), F_OK))
+	// 		unlink(info.input.c_str());
+	// if (!access(info.output.c_str(), F_OK))
+	// 		unlink(info.output.c_str());
 }
 bool Cgi::isTimeOut(t_cgiInfo &info)
 {

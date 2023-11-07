@@ -9,12 +9,12 @@
 #define DIRECTORY 1
 #define NOT_FOUND 2
 
-class GetMethod
+class ResponseHandler
 {
 
 		public:
-			GetMethod(Server &ser, Request &req, Response &res);
-			~GetMethod();
+			ResponseHandler(Server &ser, Request &req, Response &res);
+			~ResponseHandler();
 
 		  std::vector<std::string> indexes;
 	  	bool autoindex;
@@ -31,7 +31,7 @@ class GetMethod
 
 
 	private:
-		void GetMethode(Server &ser, Request &req, Response &res);
+		void ResponseHandlere(Server &ser, Request &req, Response &res);
 		bool isLocation(LOCATION_ITT &it);
 		void simpleGet();
 		std::string findMimeType(std::string path, Server &ser);

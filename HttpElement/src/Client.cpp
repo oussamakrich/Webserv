@@ -62,7 +62,9 @@ void Client::setAddr(struct sockaddr &addr){ sockaddr = addr;}
 
 std::time_t Client::getLastTime(){ return lastTime;}
 
-void Client::setLastTime(std::time_t tm){ this->lastTime = tm;}
+void Client::setLastTime(std::time_t tm){ this->lastTime = tm;
+	// std::cout << "fd : " << pfd.fd << " set last Time " << tm << std::endl;
+}
 
 void Client::switchEvent(int fd, int Flag){
 	pfd.events = Flag;
@@ -93,6 +95,7 @@ bool Client::CgiRequest(){
 		CGIFinish = true;
 		delete req;
 		IhaveResponse = response->stillSend;		
+		std::cout << "IhaveResponse : " << IhaveResponse << std::endl;
 		if (!IhaveResponse){
 			switchEvent(this->pfd.fd, POLLIN);
 			response->isCGI = false;

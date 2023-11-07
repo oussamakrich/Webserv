@@ -10,9 +10,10 @@ Response *GenerateResponse::generateResponse(Server &ser, Request &req, int fd){
 	Response *res = new Response(fd);
 
 	res->errorPage = ser.getErrorPages();
-	if (req.getMethod() == "GET") GetMethod GetHandler(ser, req, *res);
-	else if (req.getMethod() == "POST") 	PostMethod PostHandler(ser, req, *res);
+	if (req.getMethod() == "GET" || req.getMethod() == "POST")
+		ResponseHandler Handler(ser, req, *res);
 	else if (req.getMethod() == "DELETE") std::cout << "DELETE" << std::endl;
+	// else if (req.getMethod() == "POST") 	PostMethod PostHandler(ser, req, *res);
 
 	res->setMsg(generateMsg(res->getCode()));
 	res->setHeaderAndStart(generateHeaderAndSt(*res, req));
@@ -32,7 +33,7 @@ std::string GenerateResponse::generateHeaderAndSt(Response &res, Request &req){
 	headers.push_back(connection);
 	for (unsigned int i = 0;i < headers.size();i++)
 		str += headers[i] + "\r\n";
-	str += "\n";
+	str += "\r\n";
 	return str;
 }
 

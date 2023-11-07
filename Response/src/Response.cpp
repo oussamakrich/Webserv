@@ -74,8 +74,9 @@ bool Response::CgiHeaders(Request &req){
 		pos = header.find('\r');
 		if (pos != header.npos)
 			header.erase(pos);
-		if (!header.empty())
-			headers.push_back(header);		
+		if (header.empty())
+			break;
+		headers.push_back(header);		
 	}
 	headerPos = file.tellg();
 	this->msg = "OK";

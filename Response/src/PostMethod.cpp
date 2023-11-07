@@ -1,6 +1,5 @@
 #include "../include/PostMethod.hpp"
 #include "../../Utils/include/DirListing.hpp"
-#include <string>
 
 PostMethod::PostMethod(Server &ser, Request &req, Response &res) : ser(ser), req(req), res(res)
 {
