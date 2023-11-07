@@ -107,18 +107,23 @@ bool Response::CgiResponse(Request &req){
 
 bool Response::sendResponse(){
 
+	errorInSend = false;
 	if (this->code >= 400)
 		return false;
 	const char *resp = this->strjoin(HeaderAndStart.c_str(), buffer, HeaderAndStart.size(), bufferSize);
 	buffer = NULL;
 	int ret = send(fd, resp, HeaderAndStart.size() + bufferSize, 0);
-	if (ret == -1) std::cout << "Error send" << std::endl;
 	delete  resp;
+	if (ret == -1 || ret == 0){
+	 std::cout << "Error send" << std::endl;
+		errorInSend = true;
+		return false;
+	}
 	return true;
 }
 
 bool Response::ReminderResponse(){
-
+	errorInSend = false;
 	std::ifstream file(path.c_str());
 	if (!file.is_open()){
 		setCode(500);
@@ -134,8 +139,11 @@ bool Response::ReminderResponse(){
 		stillSend = false;
 	file.close();
 	int ret = send(fd, buffer, bufferSize, 0);
-	std::cout << "reminder ret : " << ret << " : " << time(NULL) << std::endl;
-	if (ret == -1) std::cout << "Error send" << std::endl; //FIX : error Response
 	delete [] buffer;
+	if (ret == -1 || ret == 0) {
+		std::cout << "Error send : "<< std::endl;
+		errorInSend = true;
+		return false;
+	}
 	return true;
 }

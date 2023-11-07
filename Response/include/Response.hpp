@@ -28,6 +28,7 @@ class Response{
 		VECT_ERRORPIR errorPage;
 		bool isCGI;
 		t_cgiInfo cgiInfo;
+		bool		errorInSend;
 		
 
 	public:

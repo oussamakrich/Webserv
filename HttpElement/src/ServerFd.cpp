@@ -3,6 +3,42 @@
 #include "../../Utils/include/DirListing.hpp"
 #include "../include/Global.hpp"
 #include "../../Response/include/GenerateResponse.hpp"
+#include <netdb.h>
+#include <string>
+#include <sys/socket.h>
+
+// bool getAddr(int port, std::string host, struct addrinfo **MyAddr){
+// 	stringstream PortString;
+// 	PortString << port;
+// 	struct addrinfo hints;
+// 	bzero(&hints, sizeof(hints));
+// 	hints.ai_flags = AI_PASSIVE;
+// 	hints.ai_family = AF_UNSPEC;
+// 	hints.ai_socktype = SOCK_STREAM;
+//
+// 	int	ret = getaddrinfo(host.c_str(), PortString.str().c_str(), &hints, MyAddr);
+// 	if(ret){
+// 		gai_strerror(ret);
+// 		freeaddrinfo(*MyAddr);
+// 		return false;
+// 	}
+// 	return true;
+// }
+
+bool creatSocket(int *listen, addrinfo *MyAddr){
+	*listen = socket(MyAddr->ai_family , MyAddr->ai_socktype , 0);
+	if (*listen == -1){
+		std::cerr << "Socket : failed " << std::endl;
+		freeaddrinfo(MyAddr);
+		return false;
+	}
+	int opt = 1;
+	if (setsockopt(*listen, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
+		perror("setsockopt");
+		return false;
+	}
+	return true;
+}
 
 bool Server::start(){
 	stringstream PortString;
@@ -14,25 +50,15 @@ bool Server::start(){
 	hints.ai_socktype = SOCK_STREAM;
 
 	struct addrinfo *MyAddr;
-	// atexit(fn);
 	int	ret = getaddrinfo(this->getHost().c_str(), PortString.str().c_str(), &hints, &MyAddr);
 	if(ret){
 		gai_strerror(ret);
 		freeaddrinfo(MyAddr);
 		return false;
 	}
-
-	_listen = socket(MyAddr->ai_family , MyAddr->ai_socktype , 0);
-	if (_listen == -1){
-		std::cerr << "Socket : failed " << std::endl;
-		freeaddrinfo(MyAddr);
+	if (!creatSocket(&_listen, MyAddr))
 		return false;
-	}
-	int opt = 1;
-  if (setsockopt(_listen, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
-      perror("setsockopt");
-			return false;
-  }
+
 	if (bind(_listen, MyAddr->ai_addr,MyAddr->ai_addrlen) != 0){
 		std::cerr << "bind : failed " << std::endl;
 		freeaddrinfo(MyAddr);
@@ -91,7 +117,7 @@ bool Server::handelClient(ITT_CLIENT it){
 		client->CgiRequest();
 	else if (client->IhaveResponse)
 		client->OldRequest(it, *this);
-	else if (!client->NewRequest(it, *this)){
+	else if (!client->NewRequest(it, *this) && !client->response->errorInSend){
 		client->response->sendErrorResponse(*this, client->getFd());
 		closeConnection(it);
 		return true;

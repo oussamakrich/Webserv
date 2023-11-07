@@ -62,9 +62,7 @@ void Client::setAddr(struct sockaddr &addr){ sockaddr = addr;}
 
 std::time_t Client::getLastTime(){ return lastTime;}
 
-void Client::setLastTime(std::time_t tm){ this->lastTime = tm;
-	// std::cout << "fd : " << pfd.fd << " set last Time " << tm << std::endl;
-}
+void Client::setLastTime(std::time_t tm){ this->lastTime = tm;}
 
 void Client::switchEvent(int fd, int Flag){
 	pfd.events = Flag;
@@ -73,7 +71,7 @@ void Client::switchEvent(int fd, int Flag){
 
 bool Client::OldRequest(ITT_CLIENT it, Server &ser){
 
-	if (!response->ReminderResponse()){
+	if (!response->ReminderResponse() && !response->errorInSend){
 		response->sendErrorResponse(ser, getFd());
 		ser.closeConnection(it);
 		return true;
