@@ -25,7 +25,8 @@ SRC =	./HttpElement/src/Client.cpp\
 		./Response/src/GenerateResponse.cpp\
 		./Response/src/GetMethod.cpp\
 		./HttpElement/src/Cgi.cpp\
-		./Response/src/PostMethod.cpp
+		./Response/src/PostMethod.cpp\
+		./Utils/src/signal.cpp
 
 
 

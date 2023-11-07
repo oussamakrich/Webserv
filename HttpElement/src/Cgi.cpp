@@ -38,7 +38,7 @@ t_cgiInfo  Cgi::Run(Request &req, std::string  &bin, std::string &path)
 		return Cgi::INTERNAL_ERROR;
 	}
 	else if (info.pid == 0)
-		cgiProcess(info, req, env, args);
+		cgiProcess(info, req,env,args);
 	deleteDP(env  , INT_MAX);
 	deleteDP(args , INT_MAX);
 	return info;
@@ -84,7 +84,7 @@ void Cgi::cgiProcess(t_cgiInfo &info, Request &req, char **env,  char **args)
 		int ofd = 0;
 		if (req.getType()  == Request::POST)
 		{
-			int ifd = open(info.input.c_str(),O_CREAT | O_TRUNC | O_RDWR, 0777);
+			int ifd = open(info.input.c_str(), O_RDONLY, 0777);
 			if (ifd == -1)	throw std::runtime_error("cgi  process can't creat input file");
 			if (dup2(ifd, 0) == -1)			throw std::runtime_error("cgi poress cant dup stdinput wth input file");
 			close(ifd);
@@ -97,8 +97,6 @@ void Cgi::cgiProcess(t_cgiInfo &info, Request &req, char **env,  char **args)
 	catch(const std::exception& e)
 	{
 		std::cerr << e.what() << '\n';
-		std::cerr << info.input <<std::endl;
-		std::cerr << info.output << std::endl;
 			perror("erro : ");
 		exit(-1);
 	}
@@ -179,10 +177,11 @@ char **Cgi::makeEnv(Request &req,std::string &path)
 		if (env == NULL) return NULL;
 		map<string, string> header = req.getHeaders(); // TODO: use refernce ??
 		map<string, string>::iterator it = header.begin();
+		pos = STATIC_VAR_NUM;
 		if (makeStaticVariable(env, req, path) == false)
 			return deleteDP(env, pos);
 
-		pos = STATIC_VAR_NUM;
+
 		for(; it != header.end(); it++, pos++)
 		{
 			toEnvVariable(it->first, it->second, tmp);

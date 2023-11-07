@@ -112,6 +112,10 @@ std::string convertCode(int code);
 
 int isFile(std::string path, size_t &size);
 
+void sigChange();
+void sigRestDefault();
+void sigHandler(int sig);
+
 std::vector<std::string> splitStream(const std::string& str, char delimiter);
 
 

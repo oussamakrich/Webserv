@@ -22,8 +22,8 @@ class Cgi
 private:
 
 public:
-	static	t_cgiInfo INTERNAL_ERROR;
-	static	t_cgiInfo  Run(Request &req, std::string  &bin, std::string &path);
+	static	t_cgiInfo	INTERNAL_ERROR;
+	static	t_cgiInfo	Run(Request &req, std::string  &bin, std::string &path);
 	static	char **makeEnv(Request &req, std::string &path);
 	static	char **MakeArgs(string &bin, string &path);
 	static	bool toEnvVariable(const string &name, const string &value, string &tmp);
@@ -31,10 +31,10 @@ public:
 	static	void cgiProcess(t_cgiInfo &info, Request &req, char **env,  char **args);
 	static	string getRandomName(string root="/tmp/", string postfix="-file");
 	static	char **deleteDP(char **pt, size_t pos);
-	static bool isFinished(t_cgiInfo &info, int &status);
-	static void CgiUnlink(t_cgiInfo info);
-	static bool  isTimeOut(t_cgiInfo &info);
-	static bool KillCgi(t_cgiInfo &info);
+	static	bool isFinished(t_cgiInfo &info, int &status);
+	static	void CgiUnlink(t_cgiInfo info);
+	static	bool  isTimeOut(t_cgiInfo &info);
+	static	bool KillCgi(t_cgiInfo &info);
 
 };
 
