@@ -9,9 +9,7 @@ Response *GenerateResponse::generateResponse(Server &ser, Request &req, int fd){
 	Response *res = new Response(fd);
 
 	res->errorPage = ser.getErrorPages();
-	if (req.getMethod() == "GET" || req.getMethod() == "POST")
-		ResponseHandler Handler(ser, req, *res);
-	else if (req.getMethod() == "DELETE") std::cout << "DELETE" << std::endl;
+	ResponseHandler Handler(ser, req, *res);
 
 
 	res->setMsg(generateMsg(res->getCode()));
