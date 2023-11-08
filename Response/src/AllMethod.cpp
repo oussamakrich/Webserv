@@ -123,7 +123,7 @@ void ResponseHandler::serveFile(std::string path, size_t size){
 		if (unlink(path.c_str()) == 0)
 			res.setCode(200);//NOTE : No Content???
 		else
-			res.setCode(500);
+			res.setCode(500); //NOTE : check permission
 		return;
 	}
 	std::ifstream file(path.c_str());
@@ -151,7 +151,7 @@ void ResponseHandler::simpleGet(){
 	size_t size;
 	int type = isFile(res.path, size);
 
-	if (req.getMethod() == "POST" && isLoacation && location->isUploadOn()) {
+	if (req.getMethod() == "POST" && isLoacation && location->isUploadOn()) { //TODO : check Cgi
 		Upload up(ser, req, res, *location);
 		return;
 	}

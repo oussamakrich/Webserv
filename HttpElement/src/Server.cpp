@@ -4,7 +4,7 @@
 #include "../include/Global.hpp"
 
 Server::Server(){
-	this->host = "localhost";
+	this->host = "0.0.0.0";
 	this->port = 80;
 	this->clientMaxBodySize = 1000000;
 	this->autoIndex = false;
