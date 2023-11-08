@@ -157,7 +157,6 @@ bool Client::NewRequest(ITT_CLIENT it, Server &ser){
 		delete req;
 		return false;
 	}
-	//TODO : check host && return server 	
 	Server &server = Global::FindServer(req->getHeaders(),  ser); 
 	response = GenerateResponse::generateResponse(server, *req, this->pfd.fd);
 	IhaveCGI = response->isCGI;

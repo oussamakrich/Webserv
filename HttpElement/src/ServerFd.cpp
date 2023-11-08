@@ -115,6 +115,7 @@ bool Server::handelClient(ITT_CLIENT it){
 	if (it == clients.end())	return false;
 
 	Client *client = *it;
+	Server server;
 	client->setLastTime(time(NULL));
 	if (client->IhaveCGI && !client->CGIFinish)
 		client->CgiRequest();

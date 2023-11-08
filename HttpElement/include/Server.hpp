@@ -71,6 +71,7 @@ class Server {
 	public:
 		std::vector<int>		CheckRepeatErrorPages;
 		bool	listenRepeat;
+		bool	ServerOff;
 		
 
 

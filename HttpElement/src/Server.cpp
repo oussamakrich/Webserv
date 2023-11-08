@@ -9,6 +9,7 @@ Server::Server(){
 	this->clientMaxBodySize = 1000000;
 	this->autoIndex = false;
 	this->listenRepeat = false;
+	this->ServerOff = false;
 }
 
 Server::~Server()
