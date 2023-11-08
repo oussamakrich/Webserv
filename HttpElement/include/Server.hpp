@@ -69,7 +69,9 @@ class Server {
 		  void setItIndex(str_it begin, str_it end);
 
 	public:
-		std::vector<int>		CheckRepeat;
+		std::vector<int>		CheckRepeatErrorPages;
+		bool	listenRepeat;
+		
 
 
 		void final();

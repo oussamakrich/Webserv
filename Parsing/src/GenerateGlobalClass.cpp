@@ -23,6 +23,8 @@ bool	GenerateGlobalClass::checkHostAndPort(Server *server, std::vector<HOST_PORT
 	return true;
 }
 
+//TODO : store listen && server_name for check repetition
+// add flag if listen repeated for not start the server 
 
 Global *GenerateGlobalClass::generateGlobalClass(std::vector<TOKEN> tokens){
 	Global *global = new Global();
@@ -34,8 +36,9 @@ Global *GenerateGlobalClass::generateGlobalClass(std::vector<TOKEN> tokens){
 	for(it = tokens.begin(); it != tokens.end(); it++){
 		if (it->first == SERVER){
 			server = GenerateServer::NewServer(++it);
-			if (checkHostAndPort(server, portAndHost)) global->addServer(server);
-			else delete server;
+			if (!checkHostAndPort(server, portAndHost))
+				server->listenRepeat = true;		
+			global->addServer(server);
 		}
 	}
 	return global;

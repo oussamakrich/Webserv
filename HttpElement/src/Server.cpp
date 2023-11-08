@@ -8,6 +8,7 @@ Server::Server(){
 	this->port = 80;
 	this->clientMaxBodySize = 1000000;
 	this->autoIndex = false;
+	this->listenRepeat = false;
 }
 
 Server::~Server()
@@ -48,7 +49,7 @@ void Server::final()
 		this->defaultType = "application/octet-stream";
 	index.shrink_to_fit();
 	errorPages.shrink_to_fit();
-	CheckRepeat.shrink_to_fit();
+	CheckRepeatErrorPages.shrink_to_fit();
 }
 
 void Server::setPort(int port) { this->port = port; }
