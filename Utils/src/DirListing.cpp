@@ -31,8 +31,12 @@ std::string DirListing::MakeHtml(std::string DirName, std::string HtmlContent)
 {
 	std::stringstream html;
 	html << "<html>\n<head>";
-	html <<  "<style>\nbody{ \n ;text-indent: 10%; \n color : rgb(200, 200, 255); \n background-color :black;}";
-	html <<  "th, td{\npadding-left: 50px;\npadding-bottom: 10px;\ncolor : rgb(200, 200, 200);\n}\n</style>";
+	html <<  "<style>\nbody{ \n ;text-indent: 10%; \n color : #F5F5F5; \n background-color :#363062;}";
+	html <<  "th, td{\npadding-left: 50px;\npadding-bottom: 10px;\ncolor : #F99417;\n}";
+	html <<  "\na {color:#F99417;text-decoration: none;border-bottom: 2px dashed black:}\n";
+	html <<  "\n a:hover {border-bottom: 2px solid white; color : white;}\n";
+	html <<  "\n hr { color :#F99417;}\n";
+	html << "\n</style>";
 	html <<  "<title> Index of " << DirName << "</title>\n</head>\n<body><center>\n";
 	html << "<h1> Index of " << DirName <<"</h1>";
 	html <<   "<hr>\n<table>\n<tr>\n<th> Name </th>\n<th> Size  </th>\n<th>Last Modified </th>\n</tr>";

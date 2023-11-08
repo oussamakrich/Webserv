@@ -12,3 +12,5 @@ MyLab
 todo 
 *.sh
 .gitignore
+/tmp/file*
+*.conf
