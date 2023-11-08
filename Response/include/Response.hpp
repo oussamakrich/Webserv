@@ -56,7 +56,8 @@ class Response{
 		bool sendResponse();
 		bool ReminderResponse();
 		bool CgiResponse(Request &req);
-		bool CgiHeaders(Request &req);
+		bool CgiRead(Request &req);
+		void CgiHeaders(Request &req, std::ifstream &file, size_t sizeOfFile);
 
 		void sendErrorResponse(Server &ser, int fd);
 		

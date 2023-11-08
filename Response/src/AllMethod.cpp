@@ -1,6 +1,7 @@
 
-#include "../include/GetMethod.hpp"
+#include "../include/AllMethod.hpp"
 #include "../../Utils/include/DirListing.hpp"
+#include "../../Uploader/include/Upload.hpp"
 
 ResponseHandler::ResponseHandler(Server &ser, Request &req, Response &res) : ser(ser), req(req), res(res)
 {
@@ -54,6 +55,11 @@ void copy(char *buffer, std::string out){
 void ResponseHandler::serveDirectory(){
 	size_t size;
 	int type;
+
+	if (req.getMethod() == "DELETE") {//NOTE : req is DELETE
+		res.setCode(403);
+		return;
+	}
 	std::vector<std::string>::iterator it = indexes.begin();
 	for (; it != indexes.end(); it++){
 		std::string path = res.path + '/' + *it;
@@ -92,8 +98,11 @@ bool ResponseHandler::checkCGI(){
 }
 
 void ResponseHandler::handelCGI(){
-	//TODO : handel cgi
 
+	if (req.getMethod() == "DELETE") {//NOTE : req is DELETE  && iscgi == Not Implemented
+		res.setCode(501);
+		return;
+	}
 	std::string bin = location->getCgiBinFor(res.path);
 	res.cgiInfo =  Cgi::Run(req, bin, res.path);
 	if (res.cgiInfo.code == 500){
@@ -108,6 +117,13 @@ void ResponseHandler::serveFile(std::string path, size_t size){
 	res.isCGI = false;
 	if (checkCGI()){
 		handelCGI();
+		return;
+	}
+	if (req.getMethod() == "DELETE") {//NOTE : req is DELETE
+		if (unlink(path.c_str()) == 0)
+			res.setCode(200);//NOTE : No Content???
+		else
+			res.setCode(500);
 		return;
 	}
 	std::ifstream file(path.c_str());
@@ -135,26 +151,30 @@ void ResponseHandler::simpleGet(){
 	size_t size;
 	int type = isFile(res.path, size);
 
+	if (req.getMethod() == "POST" && isLoacation && location->isUploadOn()) {
+		Upload up(ser, req, res, *location);
+		return;
+	}
 	if (type == FILE)
 		serveFile(res.path, size);
 	else if (type == DIRECTORY) //TODO :  try index.html || check auto index
 		serveDirectory();
 	else if (type == NOT_FOUND) //TODO : Generate 404
 		res.setCode(404);
-	
+
 }
 
 bool ResponseHandler::checkRedirection(){
 	char *buffer;
 	if (location->isRedirection()){
-		res.setCode(location->getRedirectionCode());	
+		res.setCode(location->getRedirectionCode());
 		if (res.getCode() >= 300 && res.getCode() < 400){
-			res.setHeadr("Location: " + location->getRedirectionText());	
+			res.setHeadr("Location: " + location->getRedirectionText());
 		}
 		else {
 			res.setHeadr("Content-Length: " + convertCode(location->getRedirectionText().size()));
 			res.setHeadr("Content-Type: text/html");
-			buffer = new char[location->getRedirectionText().size()];	
+			buffer = new char[location->getRedirectionText().size()];
 			copy(buffer, location->getRedirectionText());
 			res.setBuffer(buffer, location->getRedirectionText().size());
 		}
@@ -182,7 +202,8 @@ void ResponseHandler::ResponseHandlere(Server &ser, Request &req, Response &res)
 		indexes = location->getIndexesList();
 		res.errorPage = location->getErrorPageList();
 	}
-	else{
+	else
+	{
 		isLoacation = false;
 		autoindex = ser.getAutoIndex();
 		root = ser.getRoot();

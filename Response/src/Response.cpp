@@ -4,6 +4,7 @@
 #include "../../HttpElement/include/Server.hpp"
 #include "../include/GenerateResponse.hpp"
 #include "../../include/includes.hpp"
+#include <fstream>
 #include <sys/_types/_size_t.h>
 
 
@@ -53,17 +54,7 @@ void Response::sendErrorResponse(Server &ser ,int fd){
 		std::string error =  err.getErrorPage(ser);
 		send(fd, error.c_str(), error.size(), 0);
 }
-
-bool Response::CgiHeaders(Request &req){
-	path = cgiInfo.output;
-	size_t sizeOfFile;
-	isFile(path, sizeOfFile);
-
-	std::ifstream file(path);	
-	if (!file.is_open()){
-		setCode(500);	
-		return false;
-	}
+void Response::CgiHeaders(Request &req, std::ifstream &file, size_t sizeOfFile){
 	std::string header;
 	size_t pos;
 	size_t headerPos = 0;
@@ -83,10 +74,43 @@ bool Response::CgiHeaders(Request &req){
 	this->code = 200;
 	setHeadr("Content-Length: " + convertCode(sizeOfFile - headerPos));
 	this->HeaderAndStart = GenerateResponse::generateHeaderAndSt(*this, req);	
+	this->pos = headerPos;
+}
+
+bool Response::CgiRead(Request &req){
+	path = cgiInfo.output;
+	size_t sizeOfFile;
+	isFile(path, sizeOfFile);
+
+	std::ifstream file(path);	
+	if (!file.is_open()){
+		setCode(500);	
+		return false;
+	}
+	// std::string header;
+	// size_t pos;
+	// size_t headerPos = 0;
+	// while (!file.eof()){
+	// 	std::getline(file, header);	
+	// 	if (header.empty()) 
+	// 		break;
+	// 	pos = header.find('\r');
+	// 	if (pos != header.npos)
+	// 		header.erase(pos);
+	// 	if (header.empty())
+	// 		break;
+	// 	headers.push_back(header);		
+	// }
+	// headerPos = file.tellg();
+	// this->msg = "OK";
+	// this->code = 200;
+	// setHeadr("Content-Length: " + convertCode(sizeOfFile - headerPos));
+	// this->HeaderAndStart = GenerateResponse::generateHeaderAndSt(*this, req);	
+	CgiHeaders(req, file, sizeOfFile);
 	buffer = new char[R_READ];
 	file.read(buffer, R_READ);
 	bufferSize = file.gcount();
-	this->pos = bufferSize + headerPos;
+	this->pos += bufferSize;
 	stillSend = true;
 	if (file.eof())
 		stillSend = false;
@@ -98,7 +122,7 @@ bool Response::CgiResponse(Request &req){
 
 	int status;
 	if (Cgi::isFinished(cgiInfo, status)){
-		CgiHeaders(req);
+		CgiRead(req);
 		sendResponse();
 		return true;
 	}

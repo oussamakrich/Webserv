@@ -3,10 +3,12 @@
 #include "../include/Global.hpp"
 #include "../include/Server.hpp"
 #include "../../Response/include/GenerateResponse.hpp"
+#include <fstream>
 
 #define N_READ 50000
 
 Client::Client(int bodySize, int fd) : reqBuff(bodySize){
+
 	lastTime = std::time(NULL);
 	IhaveResponse = false;
 	IhaveCGI = false;
@@ -25,6 +27,7 @@ int Client::getFd(){return pfd.fd; }
 bool Client::ReadRequest(){
 
 	char *buffer;
+	
 	buffer = new char[N_READ];
 	memset(buffer, 0, N_READ);
 	status = recv(pfd.fd, buffer, N_READ, 0);
@@ -34,9 +37,6 @@ bool Client::ReadRequest(){
 		return false;
 	}
 	int level = reqBuff.insertBuffer(buffer, status);
-	// std::cout << buffer << std::endl;
-	// exit(9);
-
 	delete buffer;
 	return true;
 }
@@ -93,7 +93,6 @@ bool Client::CgiRequest(){
 		CGIFinish = true;
 		delete req;
 		IhaveResponse = response->stillSend;		
-		std::cout << "IhaveResponse : " << IhaveResponse << std::endl;
 		if (!IhaveResponse){
 			switchEvent(this->pfd.fd, POLLIN);
 			response->isCGI = false;

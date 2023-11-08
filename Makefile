@@ -23,10 +23,10 @@ SRC =	./HttpElement/src/Client.cpp\
 		./HttpElement/src/Request.cpp\
 		./Response/src/Response.cpp\
 		./Response/src/GenerateResponse.cpp\
-		./Response/src/GetMethod.cpp\
+		./Response/src/AllMethod.cpp\
 		./HttpElement/src/Cgi.cpp\
-		./Response/src/PostMethod.cpp\
-		./Utils/src/signal.cpp
+		./Utils/src/signal.cpp\
+		./Uploader/src/Upload.cpp \
 
 
 
@@ -49,10 +49,10 @@ HEADER =	./HttpElement/include/Client.hpp \
 			./HttpElement/include/Request.hpp\
 			./Response/include/Response.hpp\
 			./Response/include/GenerateResponse.hpp\
-			./Response/include/GetMethod.hpp\
+			./Response/include/AllMethod.hpp\
 			./HttpElement/include/Cgi.hpp\
-			./Response/include/PostMethod.hpp\
 			./Request/Buffer/Byte.hpp\
+			./Uploader/include/Upload.hpp \
 
 
 
@@ -64,7 +64,7 @@ all:  $(NAME)
 
 $(NAME): $(OBJ) $(HEADER)
 			c++ $(FLAGS) $(OBJ) -o $(NAME)
-
+			@mkdir -p tmp
 %.o: %.cpp $(HEADER)
 			c++ $(FLAGS) -c $< -o $@
 
