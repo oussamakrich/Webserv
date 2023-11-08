@@ -69,9 +69,8 @@ void  Global::run()
 		checkTimeOut(servers);
 		int pollStatus = poll(this->gPollFds.data(), this->gPollFds.size(), -1);
 		if (pollStatus == -1) {
-			perror("poll Debug"); // Debug
+			perror("poll");
 			continue;
-			// break;
 		}
 		for(unsigned int i =0; i < gPollFds.size() && pollStatus; i++){
 			if (pollStatus && ((gPollFds[i].revents & POLLIN) || (gPollFds[i].revents & POLLOUT))){
