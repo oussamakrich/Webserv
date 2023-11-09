@@ -33,8 +33,6 @@ std::vector<std::string> splitStream(const std::string& str, char delimiter) {
     }
     return tokens;
 }
-<<<<<<< HEAD
-=======
 
 void removeSlash(std::string &path) {
     for(size_t i =0 ; i < path.size(); i++)
@@ -45,4 +43,3 @@ void removeSlash(std::string &path) {
                 path.erase(i, 1);
         }
 }
->>>>>>> origin/mergeGetPost

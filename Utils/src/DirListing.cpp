@@ -2,16 +2,6 @@
 #include "../../include/includes.hpp"
 #include <dirent.h>
 
-<<<<<<< HEAD
-std::string DirListing::GenerateFileRow(const std::string &parent, const std::string &name)
-{
-	std::stringstream output;
-	std::string path = parent + "/" + name;
-	struct stat info;
-	int res_stat = stat(path.c_str(), &info);
-	output << "<tr><td>\n<a href=\"";
-	output << name;
-=======
 std::string DirListing::GenerateFileRow(const std::string &parent, const std::string &name, std::string vt_path)
 {
 	std::stringstream output;
@@ -22,8 +12,7 @@ std::string DirListing::GenerateFileRow(const std::string &parent, const std::st
 	struct stat info;
 	int res_stat = stat(path.c_str(), &info);
 	output << "<tr><td>\n<a href=\"";
-	output << path2; 
->>>>>>> origin/mergeGetPost
+	output << path2;
 	output <<  (S_ISDIR(info.st_mode) ?  "/" : "");
 	output <<  "\">";
 	output << name;
@@ -45,31 +34,16 @@ std::string DirListing::MakeHtml(std::string DirName, std::string HtmlContent)
 {
 	std::stringstream html;
 	html << "<html>\n<head>";
-<<<<<<< HEAD
-	html <<  "<style>\nbody{ \n ;text-indent: 10%; \n color : rgb(200, 200, 255); \n background-color :black;}";
-	html <<  "th, td{\npadding-left: 50px;\npadding-bottom: 10px;\ncolor : rgb(200, 200, 200);\n}\n</style>";
-=======
 	html <<  "<style>\nbody{ \n ;text-indent: 10%; \n color : #F5F5F5; \n background-color :#363062;}";
 	html <<  "th, td{\npadding-left: 50px;\npadding-bottom: 10px;\ncolor : #F99417;\n}";
 	html <<  "\na {color:#F99417;text-decoration: none;border-bottom: 2px dashed black:}\n";
 	html <<  "\n a:hover {border-bottom: 2px solid white; color : white;}\n";
 	html <<  "\n hr { color :#F99417;}\n";
 	html << "\n</style>";
->>>>>>> origin/mergeGetPost
 	html <<  "<title> Index of " << DirName << "</title>\n</head>\n<body><center>\n";
 	html << "<h1> Index of " << DirName <<"</h1>";
 	html <<   "<hr>\n<table>\n<tr>\n<th> Name </th>\n<th> Size  </th>\n<th>Last Modified </th>\n</tr>";
 	html << HtmlContent;
-<<<<<<< HEAD
-	html << "   </table>\n<h2>Hustlers Server 1.0 [beta] </h2>\n</center>\n</body></html>";
-	return html.str();
-}
-
-bool DirListing::getDirlistigHtml(const std::string path, std::string &output)
-{
-    DIR *dir = NULL;
-    dirent *ent = NULL;
-=======
 	html << "</table>\n<h2>Hustlers Server 1.0 [beta] </h2>\n</center>\n</body></html>";
 	return html.str();
 }
@@ -79,22 +53,15 @@ bool DirListing::getDirlistigHtml(const std::string path, std::string &output, s
     DIR *dir = NULL;
     dirent *ent = NULL;
     removeSlash(vt_path);
->>>>>>> origin/mergeGetPost
     dir  = opendir(path.c_str());
 	std::string htmlContent;
     if (dir == NULL) return false;
     while ( (ent =  readdir(dir)) != NULL)
     {
 		if(ent->d_name[0] != '.')
-<<<<<<< HEAD
-		htmlContent += GenerateFileRow(path , ent->d_name);
-    }
-	output = MakeHtml(path, htmlContent);
-=======
 		htmlContent += GenerateFileRow(path , ent->d_name, vt_path);
     }
 	output = MakeHtml(vt_path, htmlContent);
->>>>>>> origin/mergeGetPost
      closedir(dir);
 	 return true;
 }

@@ -123,7 +123,6 @@ void Upload::multipart()
 			break;
 		default :
 			{
-				std::cout <<RED<< _pos_of_boundary <<RESET<< std::endl;
 				std::ofstream _out_file(res.location->getUploadPath() + "/" + res._file_uploading, std::ios::binary | std::ios::app);
 				if (!Upload::_check_file_open_out(_out_file))			return(res.byte.clear());
 				_out_file.write(res.byte.getData(), _pos_of_boundary);

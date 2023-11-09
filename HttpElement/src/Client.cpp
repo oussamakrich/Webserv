@@ -108,6 +108,30 @@ bool Client::CgiRequest(){
 	return false;
 }
 
+Server &Global::FindServer(const MAP_STRING &headers, Server &ser){
+
+	std::string value;
+	//TODO : first check if host is only alpha
+
+	value = headers.at("Host");
+	if (value.empty())
+		return ser;
+	stringstream ss(value);
+	std::getline(ss, value, ':');
+
+	std::vector<std::string>::iterator it;
+
+	it = std::find(serverNames.begin(), serverNames.end(), value);
+	if (it == serverNames.end() || value == ser.getServerName())
+		return ser;
+
+	size_t size = servers.size();
+	for (size_t i = 0;i < size; i++){
+		if (servers[i]->getServerName() == value && servers[i]->getPort() == ser.getPort() && servers[i]->getHost() == ser.getHost())
+			return *servers[i];
+	}
+	return ser;
+}
 
 
 bool Client::NewRequest(ITT_CLIENT it, Server &ser){
