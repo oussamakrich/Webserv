@@ -22,6 +22,7 @@ Server *GenerateServer::NewServer(TOKEN_IT &it){
 			case DEFAULT_TYPE		: SetSingleValue(*server, it);		break;
 			case ERROR_LOG			: SetSingleValue(*server, it);		break;
 			case ACCESS_LOG			: SetSingleValue(*server, it);		break;
+			case AUTO_INDEX			: SetSingleValue(*server, it);		break;
 			case OPEN_C_BRACKET :	break;
 			case COLON					:	break;
 			case SEMICOLON			:	error("Unexpected SEMICOLONE");
@@ -31,7 +32,7 @@ Server *GenerateServer::NewServer(TOKEN_IT &it){
 	}
 	if (server->getRoot().empty())
 		error("root is required");
-	server->Shrink();
+	server->final();
 	return server;
 }
 
@@ -84,20 +85,36 @@ void GenerateServer::SetTypes(Server &ser, TOKEN_IT &it){
 	if (it->first == OPEN_C_BRACKET)
 		it++;
 	if (it->first != WORD)	error("Types should be followd by WORD");
-	value = it->second;
-	if ((++it)->first != WORD)	error("Types Expect Key and Value");
 
 	while (it->first != CLOSE_C_BRACKET){
+		value = it->second;
+		it++;
+		if (it->first != WORD)	error("Types Expect Key and Value");
 		while (it->first != SEMICOLON && it->first != CLOSE_C_BRACKET){
 			key = it->second;
 			if (!ser.setMimeType(std::make_pair(key, value)))
 				error("duplicate Type");
 			it++;
 		}
-		if (it->first == CLOSE_C_BRACKET)
+		if (it->first == CLOSE_C_BRACKET){
+			it++;
 			break;
+		}
 		it++;
 	}
+}
+void checkReapeat(Server &ser, Token Key){
+	if (Key == ROOT && !ser.getRoot().empty())
+		error("\"root\" directive is duplicate");
+	if (Key == DEFAULT_TYPE && !ser.getDefaultType().empty())
+		error("\"default_type\" directive is duplicate");
+}
+
+bool parseIndex(std::string value){
+	if (value == "on")		return true;
+	if (value == "off")		return false;
+	error("autoindex should be on or off");
+	return false;
 }
 
 void GenerateServer::SetSingleValue(Server &ser,TOKEN_IT &it){
@@ -113,7 +130,9 @@ void GenerateServer::SetSingleValue(Server &ser,TOKEN_IT &it){
 	it++;
 	if (it->first != SEMICOLON)
 		error("Error: " + keyWord +" Accept only one Value");
+	checkReapeat(ser, key);
 	if (key == SERVER_NAME)				ser.setServerName(value);
+	else if (key == AUTO_INDEX)		ser.setAutoIndex(parseIndex(value));
 	else if (key == DEFAULT_TYPE)	ser.setDefaultType(value);
 	else if (key == ACCESS_LOG)		ser.setAccessLog(value);
 	else if (key == ERROR_LOG)		ser.setErrorLog(value);

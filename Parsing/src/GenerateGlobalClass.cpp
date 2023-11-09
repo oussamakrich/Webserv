@@ -2,50 +2,6 @@
 #include "../include/GenerateServer.hpp"
 
 
-
-// Server *GenerateGlobalClass::fillServer(TOKEN_IT &it){
-//
-// 	Server *server = new Server();
-// 	while(it->first != CLOSE_C_BRACKET){
-// 		switch (it->first) {
-// 			case LOCATION				: server->fillLocation(++it);	break;
-// 			case TYPES					:	server->SetTypes(++it);			break;
-// 			case MAX_BODY_SIZE	: server->SetInt(it);					break;
-// 			case ERROR_PAGES		: server->SetErrorPages(++it);	break;
-// 			case INDEX					: server->SetMultiValue(it);	break;
-// 			case ROOT						: server->SetSingleValue(it); break;
-// 			case LISTEN					: server->SetHostAndPort(++it); break;
-// 			case SERVER_NAME		: server->SetSingleValue(it); break;
-// 			case DEFAULT_TYPE		: server->SetSingleValue(it); break;
-// 			case ERROR_LOG			: server->SetSingleValue(it); break;
-// 			case ACCESS_LOG			: server->SetSingleValue(it); break;
-// 			case OPEN_C_BRACKET :	break;
-// 			case COLON					:	break;
-// 			case SEMICOLON			:	error("Unexpected SEMICOLONE");
-// 			default							: error("Unexpected key : " + it->second);
-// 		}
-// 		it++;
-// 	}
-// 	if (server->getRoot().empty())
-// 		error("root is required");
-// 	server->Shrink();
-// 	return server;
-// }
-
-
-Server *GenerateGlobalClass::fillServer(TOKEN_IT &it){
-
-	Server *server = new Server();
-	while(it->first != CLOSE_C_BRACKET){
-
-		it++;
-	}
-	if (server->getRoot().empty())
-		error("root is required");
-	server->Shrink();
-	return server;
-}
-
 void warning(std::string warn){
 	std::cout << YELLOW"WARNING : " << RESET << warn << std::endl;
 }
@@ -79,6 +35,7 @@ Global *GenerateGlobalClass::generateGlobalClass(std::vector<TOKEN> tokens){
 		if (it->first == SERVER){
 			server = GenerateServer::NewServer(++it);
 			if (checkHostAndPort(server, portAndHost)) global->addServer(server);
+			else delete server;
 		}
 	}
 	return global;

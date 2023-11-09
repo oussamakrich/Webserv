@@ -1,7 +1,6 @@
 
 #include "../include/Global.hpp"
 #include <sys/poll.h>
-#include <vector>
 
 std::vector<struct pollfd> Global::gPollFds =  std::vector<struct pollfd>();
 
@@ -29,12 +28,28 @@ void  Global::print(){
 };
 
 void Global::callHandelFds(struct pollfd pfd){
-	Server *server;
 
-	for (unsigned int i =0; i < servers.size(); i++){
-		server = servers[i];
-		if (server->handelFd(pfd))
+	for (unsigned int i =0; i < servers.size(); i++)
+	{
+		if (servers[i]->handelFd(pfd))
 			break;
+	}
+}
+
+void Global::removeFd(int fd){
+	for(unsigned int i=0; i < gPollFds.size(); i++){
+			if (gPollFds[i].fd == fd){
+				close(gPollFds[i].fd);
+				gPollFds.erase(gPollFds.begin() + i);
+				break ;
+		}
+	}
+}
+
+void checkTimeOut(vector<Server*> &servers){
+	vector<Server*>::iterator it  = servers.begin();
+	for(;it != servers.end(); it++){
+		(*it)->checkTimeOut();
 	}
 }
 
@@ -42,24 +57,37 @@ void  Global::run()
 {
 	std::vector<Server *>::iterator it = servers.begin();
 
-		for(;it != servers.end(); it++){
-			std::cout << (*it)->start() << std::endl;
-		std::cout << "my listen : " << (*it)->getListen() << std::endl;
+	for(;it != servers.end(); it++) {
+		if (!(*it)->start()){
+			delete *it;
+			servers.erase(it);
 		}
+		if (servers.size() == 0)
+			exit(1);
+	}
+	while(true){
+		checkTimeOut(servers);
+		int pollStatus = poll(this->gPollFds.data(), this->gPollFds.size(), -1);
+		if (pollStatus == -1) {
+			perror("poll");
+			break;
+		}
+		for(unsigned int i =0; i < gPollFds.size() && pollStatus; i++){
+			if (pollStatus && ((gPollFds[i].revents & POLLIN) || (gPollFds[i].revents & POLLOUT))){
+				this->callHandelFds(gPollFds[i]);
+				pollStatus--;
+			}
+		}
+	}
+}
 
-		while(true){
-			std::cout << "Polling" << std::endl;
-			int pollStatus = poll(this->gPollFds.data(), this->gPollFds.size(), -1);
-			if (pollStatus == -1) {
-				perror("poll");
-				break;
-			}
-			for(unsigned int i =0; i < gPollFds.size(); i++){
-				if ((gPollFds[i].revents & POLLIN)){
-					this->callHandelFds(gPollFds[i]);
-				}
-			}
+void Global::switchEvent(int fd, int Flag){
+	for (unsigned int i = 0; i < gPollFds.size(); i++){
+		if (gPollFds[i].fd == fd){
+			gPollFds[i].events = Flag;
+			break ;
 		}
+	}
 }
 
 void Global::insertFd(int fd){
@@ -67,7 +95,7 @@ void Global::insertFd(int fd){
 	struct pollfd pfd;
 
 	pfd.fd = fd;
-	pfd.events = POLLIN | POLLOUT;
+	pfd.events = POLLIN;
+	pfd.revents = 0;
 	Global::gPollFds.push_back(pfd);
 }
-

@@ -6,11 +6,17 @@
 Server::Server(){
 	this->host = "localhost";
 	this->port = 80;
-	this->defaultType = "application/octet-stream";
-	this->clientMaxBodySize = 1;
+	this->clientMaxBodySize = 1000000;
+	this->autoIndex = false;
 }
 
-Server::~Server(){}
+Server::~Server()
+{
+
+	for (std::map<std::string, Location*>::iterator it = locations.begin(); it != locations.end(); it++)
+		delete it->second;
+	locations.clear();
+}
 
 Server::Server(const Server &copy){*this = copy;}
 
@@ -27,19 +33,29 @@ Server &Server::operator=(const Server &copy)
 		accessLog = copy.accessLog;
 		errorLog = copy.errorLog;
 		mimeType = copy.mimeType;
+		autoIndex = copy.autoIndex;
+		locations = copy.locations;
+		_listen = copy._listen;
+		clients	= copy.clients;
+
+
 	return *this;
 }
 
-void Server::Shrink()
+void Server::final()
 {
-		index.shrink_to_fit();
-		errorPages.shrink_to_fit();
-		CheckRepeat.shrink_to_fit();
+	if (this->defaultType.empty())
+		this->defaultType = "application/octet-stream";
+	index.shrink_to_fit();
+	errorPages.shrink_to_fit();
+	CheckRepeat.shrink_to_fit();
 }
 
 void Server::setPort(int port) { this->port = port; }
 
 void Server::setClientMaxBodySize(int size) { this->clientMaxBodySize = size; }
+
+void Server::setAutoIndex(bool autoIndex) { this->autoIndex = autoIndex; }
 
 void Server::setHost(const std::string& host) { this->host = host; }
 
@@ -75,6 +91,8 @@ int		Server::getPort() const{return port;}
 
 int		Server::getListen() const	{return _listen;}
 
+bool Server::getAutoIndex() const{return autoIndex;}
+
 int		Server::getClientMaxBodySize() const{return clientMaxBodySize;}
 
 std::string Server::getErrorLog() const{return errorLog;}
@@ -95,14 +113,14 @@ std::vector<ERRPAGE_PAIR> Server::getErrorPages() const{return errorPages;}
 
 Location	&Server::getLocation(std::string url){ return *locations[url]; }
 
-std::map<std::string, Location*> Server::getAllLocation() const { return locations; }
+LOCATION_MAP &Server::getAllLocation() { return locations; }
 
 std::map<std::string, std::string>	Server::getMimeType() const{return mimeType;}
 
 
 //INFO : ++++++++++++++++++++++++++for Print++++++++++++++++++++++++++++++++++++
 
-std::ostream &operator<<(std::ostream &out, const Server &server){
+std::ostream &operator<<(std::ostream &out, Server &server){
 	out << BLUE "serverName: " << U_YELLOW << server.getServerName() << std::endl;
 	out << RED "\tport: " << GREEN << server.getPort() << std::endl;
 	out << RED "\tclientMaxBodySize: " <<GREEN <<  server.getClientMaxBodySize() << std::endl;
@@ -127,7 +145,7 @@ std::ostream &operator<<(std::ostream &out, const Server &server){
 		out << GREEN"\t\t"<< it -> first << " " << it -> second << std::endl;
 	out << RED"\tlocations: " << std::endl;
 	std::cout << RESET;
-	std::map<std::string, Location*> loc = server.getAllLocation();
+	LOCATION_MAP loc = server.getAllLocation();
 	for (std::map<std::string, Location*>::const_iterator it = loc.begin(); it != loc.end(); it++)
 	{
 		out <<it -> first << " " ;
