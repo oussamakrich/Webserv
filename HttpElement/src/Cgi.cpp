@@ -7,7 +7,7 @@
 #include <signal.h>
 
 
-#define TIME_OUT 2 // second
+#define TIME_OUT 90 // second
 
 
 t_cgiInfo Cgi::INTERNAL_ERROR = {500, -1, "", ""};
@@ -29,6 +29,7 @@ t_cgiInfo  Cgi::Run(Request &req, std::string  &bin, std::string &path)
 	info.output = getRandomName("/tmp/", "-cgi-output"); //TODO: select root , default rot is /tmp
 	info.input  = req.getBody(); //TODO: select root , default rot is /tmp
 	info.code  	= 0;
+	info.time		=  time(NULL);
 	info.pid =  fork();
 	if (info.pid == -1)
 	{
@@ -237,10 +238,10 @@ bool Cgi::isFinished(t_cgiInfo &info, int &status)
 
 void Cgi::CgiUnlink(t_cgiInfo info)
 {
-	// if (!access(info.input.c_str(), F_OK))
-	// 		unlink(info.input.c_str());
-	// if (!access(info.output.c_str(), F_OK))
-	// 		unlink(info.output.c_str());
+	if (!access(info.input.c_str(), F_OK))
+			unlink(info.input.c_str());
+	if (!access(info.output.c_str(), F_OK))
+			unlink(info.output.c_str());
 }
 bool Cgi::isTimeOut(t_cgiInfo &info)
 {

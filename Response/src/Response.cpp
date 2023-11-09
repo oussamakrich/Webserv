@@ -120,6 +120,7 @@ bool Response::CgiResponse(Request &req){
 		return true;
 	}
 	if (Cgi::isTimeOut(cgiInfo)){
+		std::cout << "is Time out" << std::endl;
 		setCode(504);
 		Cgi::CgiUnlink(cgiInfo);
 		Cgi::KillCgi(cgiInfo);	

@@ -4,6 +4,7 @@
 
 void sigHandler(int sig)
 {
+	errno = 0;
 	std::cout << "server receive a Signal" << sig<<std::endl;
 	signal(sig, sigHandler);
 }
