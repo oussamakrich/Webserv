@@ -12,7 +12,7 @@ void sigChange()
 {
 	for (size_t i = 0; i <= 22; i++)
 	{
-		if (i == SIGINT )
+		if (i == SIGINT || i == SIGABRT || i == SIGSEGV) 
 			continue;
 		signal(i, sigHandler);
 	}

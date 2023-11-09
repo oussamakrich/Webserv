@@ -1,30 +1,8 @@
 
 #include "../include/Server.hpp"
-#include "../../Utils/include/DirListing.hpp"
 #include "../include/Global.hpp"
 #include "../../Response/include/GenerateResponse.hpp"
-#include <netdb.h>
-#include <string>
-#include <sys/socket.h>
 #include "../../Uploader/include/Upload.hpp"
-
-// bool getAddr(int port, std::string host, struct addrinfo **MyAddr){
-// 	stringstream PortString;
-// 	PortString << port;
-// 	struct addrinfo hints;
-// 	bzero(&hints, sizeof(hints));
-// 	hints.ai_flags = AI_PASSIVE;
-// 	hints.ai_family = AF_UNSPEC;
-// 	hints.ai_socktype = SOCK_STREAM;
-//
-// 	int	ret = getaddrinfo(host.c_str(), PortString.str().c_str(), &hints, MyAddr);
-// 	if(ret){
-// 		gai_strerror(ret);
-// 		freeaddrinfo(*MyAddr);
-// 		return false;
-// 	}
-// 	return true;
-// }
 
 bool creatSocket(int *listen, addrinfo *MyAddr){
 	*listen = socket(MyAddr->ai_family , MyAddr->ai_socktype , 0);
@@ -127,6 +105,10 @@ bool Server::handelClient(ITT_CLIENT it){
 		client->OldRequest(it, *this);
 	else if (!client->NewRequest(it, *this) && !client->response->errorInSend){
 		client->response->sendErrorResponse(*this, client->getFd());
+		closeConnection(it);
+		return true;
+	}
+	if (client->response && client->response->errorInSend){
 		closeConnection(it);
 		return true;
 	}
