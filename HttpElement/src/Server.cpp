@@ -42,10 +42,40 @@ Server &Server::operator=(const Server &copy)
 	return *this;
 }
 
+TYPES_MAP generateMimeType(){
+	TYPES_MAP mime;
+
+	mime[".html"]		= "text/html";
+  mime[".htm"]		= "text/html";
+  mime[".shtml"]	= "text/html";
+  mime[".css"]		= "text/css";
+  mime[".xml"]		= "text/xml";
+  mime[".gif"]		= "image/gif";
+  mime[".jpeg"]		= "image/jpeg";
+  mime[".jpg"]		= "image/jpeg";
+  mime[".js"]			= "application/javascript";
+  mime[".txt"]		= "text/plain";
+  mime[".avif"]		= "image/avif";
+  mime[".png"]		= "image/png";
+  mime[".svg"]		= "image/svg+xml";
+  mime[".json"]		= "application/json";
+  mime[".pdf"]		= "application/pdf";
+  mime[".rar"]		= "application/x-rar-compressed";
+  mime[".zip"]		= "application/zip";
+  mime[".bin"]		= "application/octet-stream";
+  mime[".exe"]		= "application/octet-stream";
+  mime[".iso"]		= "application/octet-stream";
+  mime[".img"]		= "application/octet-stream";
+
+	return mime;
+}
+
 void Server::final()
 {
 	if (this->defaultType.empty())
 		this->defaultType = "application/octet-stream";
+	if (this->mimeType.empty())
+		this->mimeType = generateMimeType();
 	index.shrink_to_fit();
 	errorPages.shrink_to_fit();
 	CheckRepeatErrorPages.shrink_to_fit();
