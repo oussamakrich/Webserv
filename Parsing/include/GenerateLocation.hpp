@@ -20,6 +20,7 @@ private:
 		static void		ParsSingleValue(Location &lc, tk_iterator &tokens, void (Location::*set)(const string &), const string& (Location::*get)(void) const);
 		static void		ParsAutoIndex(Location &lc, tk_iterator &tokens);
 		static void		ParsUpload(Location &lc, tk_iterator &tokens);
+		static void		ParsDownload(Location &lc, tk_iterator &tokens);
 		static void 	ParsCGI(Location &lc, tk_iterator &tokens);
 
 };
