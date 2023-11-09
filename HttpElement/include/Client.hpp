@@ -41,7 +41,7 @@ class Client{
 
 		bool NewRequest(ITT_CLIENT	it, Server &ser);
 		bool OldRequest(ITT_CLIENT it, Server &ser);
-		bool CgiRequest();
+		bool CgiRequest(ITT_CLIENT it, Server &ser);
 		void Error();
 
 	public: //Geters

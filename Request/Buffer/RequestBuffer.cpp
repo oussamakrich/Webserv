@@ -195,7 +195,7 @@ int RequestBuffer::_content_length_handler()
 	if (_file.is_open() == false)
 	{
 		std::cout << RED"Inernal server error: " << "failed to create a tmp file." << _body_path << std::endl;
-		return (_status = 500, _status);
+		return (_status = 507, _status);
 	}
 	if (_buffer.size() >= _contentLength)
 	{
@@ -273,7 +273,7 @@ int	RequestBuffer::_chunked_handler()
 		if (_file.is_open() == false)
 		{
 			std::cout << RED"Inernal server error: " << "failed to create a tmp file." << _body_path << std::endl;
-			return (_status = 500, _status);
+			return (_status = 507, _status);
 		}
 		if (_buffer.size() >= _chunkSize)
 		{
@@ -308,7 +308,7 @@ int RequestBuffer::_multipart_handler()
 	{
 		std::cout << RED"Inernal server error: " << "failed to create a tmp file." <<
 	_body_path << std::endl;
-		return (_status = 500, _status);
+		return (_status = 507, _status);
 	}
 	std::string _line;
 	std::ifstream _file2(_body_path, std::ios::in | std::ios::binary);

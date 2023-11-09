@@ -19,6 +19,7 @@ Response::Response(int fd){
 	this->headers = std::vector<std::string>();
 	this->buffer = NULL;
 	this->bufferSize = 0;
+	this->errrCgi = false;
 }
 
 Response::~Response(){}
@@ -75,7 +76,10 @@ void Response::CgiHeaders(Request &req, std::ifstream &file, size_t sizeOfFile){
 	headerPos = file.tellg();
 	this->msg = "OK";
 	this->code = 200;
-	setHeadr("Content-Length: " + convertCode(sizeOfFile - headerPos));
+	if (file.eof())
+		setHeadr("Content-Length: 0");
+	else
+		setHeadr("Content-Length: " + convertCode(sizeOfFile - headerPos));
 	this->HeaderAndStart = GenerateResponse::generateHeaderAndSt(*this, req);
 	this->pos = headerPos;
 }
@@ -91,6 +95,11 @@ bool Response::CgiRead(Request &req){
 		return false;
 	}
 	CgiHeaders(req, file, sizeOfFile);
+	if (file.eof()){
+		file.close();
+		stillSend = false;
+		return true;
+	}
 	buffer = new char[R_READ];
 	file.read(buffer, R_READ);
 	bufferSize = file.gcount();
@@ -109,6 +118,14 @@ bool Response::CgiResponse(Request &req){
 		CgiRead(req);
 		sendResponse();
 		return true;
+	}
+	if (Cgi::isTimeOut(cgiInfo)){
+		setCode(504);
+		Cgi::CgiUnlink(cgiInfo);
+		Cgi::KillCgi(cgiInfo);	
+		stillSend = false;
+		errrCgi	= true;
+		return false;
 	}
 	return false;
 }

@@ -41,6 +41,7 @@ class Response{
 		VECT_ERRORPIR errorPage;
 		long long pos;
 		bool isCGI;
+		bool errrCgi;
 		t_cgiInfo cgiInfo;
 		bool		errorInSend;
 		std::string		multiDataFormPath;

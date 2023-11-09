@@ -100,7 +100,7 @@ bool Server::handelClient(ITT_CLIENT it){
 		client->IhaveUpload = client->response->iHaveUpload;
 	}
 	else if (client->IhaveCGI && !client->CGIFinish)
-		client->CgiRequest();
+		client->CgiRequest(it, *this);
 	else if (client->IhaveResponse)
 		client->OldRequest(it, *this);
 	else if (!client->NewRequest(it, *this) && !client->response->errorInSend){

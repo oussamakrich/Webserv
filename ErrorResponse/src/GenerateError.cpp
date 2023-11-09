@@ -35,6 +35,7 @@ std::string	GenerateError::generateMsg(int code){
 	if (code == 503) return "Service Unavailable";
 	if (code == 504) return "Gateway Timeout";
 	if (code == 505) return "HTTP Version Not Supported";
+	if (code == 507) return "Insufficient Storage"; 
 	else return "error";
 }
 

@@ -15,6 +15,7 @@ Client::Client(int bodySize, int fd) : reqBuff(bodySize){
 
 	lastTime = std::time(NULL);
 	IhaveResponse = false;
+	IhaveUpload = false;
 	IhaveCGI = false;
 	this->response = NULL;
 	pfd.fd = fd;
@@ -90,7 +91,7 @@ bool Client::OldRequest(ITT_CLIENT it, Server &ser){
 	return true;
 }
 
-bool Client::CgiRequest(){
+bool Client::CgiRequest(ITT_CLIENT it, Server &ser){
 	switchEvent(this->pfd.fd, POLLOUT);
 	if (response->CgiResponse(*req)){
 		CGIFinish = true;
@@ -103,6 +104,12 @@ bool Client::CgiRequest(){
 			delete response;
 			response = NULL;
 		}
+		return true;
+	}
+	if (response->errrCgi){
+		IhaveResponse = false;
+		response->sendErrorResponse(ser, getFd());
+		ser.closeConnection(it);
 		return true;
 	}
 	return false;

@@ -32,7 +32,7 @@ bool Upload::_check_file_open_out(std::ofstream &file)
 	if (!file.is_open())
 	{
 		std::cout << YELLOW"Warning:"<<  RESET" unable to upload the file (3)\n";
-		res.setCode(500);
+		res.setCode(507);
 		res.stillSend = false;
 		res.iHaveUpload = false;
 		return false;
@@ -146,7 +146,7 @@ bool Upload::_extract_headers()
 	if (pos == -1 && pos2 == -1)
 	{
 		std::cout << YELLOW"Warning:"<<  RESET" unable to upload the file (4)\n";
-		res.setCode(500);
+		res.setCode(507);
 		res.stillSend = false;
 		res.iHaveUpload = false;
 		return false;

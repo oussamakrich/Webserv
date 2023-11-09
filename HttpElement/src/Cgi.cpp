@@ -7,7 +7,7 @@
 #include <signal.h>
 
 
-#define TIME_OUT 5500000000000 // second
+#define TIME_OUT 2 // second
 
 
 t_cgiInfo Cgi::INTERNAL_ERROR = {500, -1, "", ""};
@@ -246,7 +246,7 @@ bool Cgi::isTimeOut(t_cgiInfo &info)
 {
 	time_t  tm;
 	time(&tm);
-	return info.time - tm > TIME_OUT;
+	return tm - info.time > TIME_OUT;
 }
 
 bool Cgi::KillCgi(t_cgiInfo &info)
