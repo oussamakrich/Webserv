@@ -58,7 +58,7 @@ void GenerateServer::SetErrorPages(Server &ser, TOKEN_IT &it){
 
 
 	if (it->first != WORD)	error("Expect NUMBER after ErrorPage");
-	code = parseErrorPage(ser.CheckRepeat, it->second);
+	code = parseErrorPage(ser.CheckRepeatErrorPages, it->second);
 	it++;
 	if (it->first != WORD)	error("Expect Tow value after ErrorPage");
 	value = it->second;

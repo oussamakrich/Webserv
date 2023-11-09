@@ -80,7 +80,6 @@ class Response{
 		void CgiHeaders(Request &req, std::ifstream &file, size_t sizeOfFile);
 
 		void sendErrorResponse(Server &ser, int fd);
-
 		void HandelLocation();
 
 		char *strjoin(const char *s1, char *s2, size_t size1, size_t size2)

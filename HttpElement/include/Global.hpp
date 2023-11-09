@@ -1,12 +1,16 @@
 #pragma once
 
 #include "../../include/includes.hpp"
+#include "Request.hpp"
 #include "Server.hpp"
+#include <vector>
 
+
+#define MAP_STRING std::map<std::string, std::string>
+#define MAP_STRITT std::map<std::string, std::string>::iterator
 
 class Global {
 	private:
-		std::vector<Server *> servers;
 		static	std::vector<struct pollfd> gPollFds;
 
 
@@ -17,6 +21,10 @@ class Global {
 		static void removeFd(int fd);
 		static void switchEvent(int fd, int Flag);
 		void	callHandelFds(struct pollfd pfd);
+
+		static  std::vector<std::string> serverNames;
+	 static Server &FindServer( const MAP_STRING  &headers, Server &ser);
+		static std::vector<Server *> servers;
 
 
 

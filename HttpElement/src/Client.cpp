@@ -4,6 +4,10 @@
 #include "../include/Server.hpp"
 #include "../../Response/include/GenerateResponse.hpp"
 #include <fstream>
+#include <sstream>
+#include <string>
+#include <sys/_types/_size_t.h>
+#include <vector>
 
 #define N_READ 50000
 
@@ -27,7 +31,6 @@ int Client::getFd(){return pfd.fd; }
 bool Client::ReadRequest(){
 
 	char *buffer;
-
 	buffer = new char[N_READ];
 	memset(buffer, 0, N_READ);
 	status = recv(pfd.fd, buffer, N_READ, 0);
@@ -36,7 +39,6 @@ bool Client::ReadRequest(){
 		delete  buffer;
 		return false;
 	}
-
 	int level = reqBuff.insertBuffer(buffer, status);
 	delete buffer;
 	return true;
@@ -126,11 +128,12 @@ bool Client::NewRequest(ITT_CLIENT it, Server &ser){
 	{
 		this->response = new Response(this->pfd.fd);
 		response->errorPage = ser.getErrorPages();
-		response->setCode(req->getType());
+		response->setCode(404);
 		delete req;
 		return false;
 	}
-	response = GenerateResponse::generateResponse(ser, *req, this->pfd.fd);
+	Server &server = Global::FindServer(req->getHeaders(),  ser);
+	response = GenerateResponse::generateResponse(server, *req, this->pfd.fd);
 	IhaveCGI = response->isCGI;
 	if (response->isCGI){
 		this->req = req;

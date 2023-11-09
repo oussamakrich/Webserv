@@ -116,8 +116,8 @@ bool Cgi::makeStaticVariable(char **env, Request &req, string &path)
 		PATH_INFO += path;
 		REQUEST_METHOD += req.getMethod();
 		QUERY_STRING += req.getQuery();
-		QUERY_STRING += req.getHeader("Content-Type");
-		CONTENT_TYPE += req.getHeader("Content-Length");
+		CONTENT_TYPE += req.getHeader("Content-Type");
+		CONTENT_LENGTH += req.getHeader("Content-Length");
 		SCRIPT_FILENAME += path;
 		env[0] = strdup(PATH_INFO.c_str());
 		env[1] = strdup(CONTENT_LENGTH.c_str());

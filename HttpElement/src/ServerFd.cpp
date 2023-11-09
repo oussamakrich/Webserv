@@ -42,6 +42,9 @@ bool creatSocket(int *listen, addrinfo *MyAddr){
 }
 
 bool Server::start(){
+	if (listenRepeat == true) // NOTE : if the server is repeated dont start it
+		return true;
+
 	stringstream PortString;
 	PortString << this->port;
 	struct addrinfo hints;

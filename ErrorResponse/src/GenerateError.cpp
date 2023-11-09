@@ -51,12 +51,10 @@ std::string simpleBody(int code){
 	std::string page;
 	std::stringstream ss;
 	ss << code;
-	page = "<html><head><title>" + ss.str() + " " + GenerateError::generateMsg(code) + "</title></head>";
-	page += "<body><center><h1>" + ss.str() + " " + GenerateError::generateMsg(code) + "</h1></center><hr><center>webserv</center></body></html>";
-
-
-
-
+	page = "<html><head ><title>" + ss.str() + " " + GenerateError::generateMsg(code) + "</title></head>";
+	page += "<body style='color: #F99417; background-color : #363062;'>";
+	page += "<center><h1>" + ss.str() + " " + GenerateError::generateMsg(code) + "</h1></center>";
+	page += "<hr style='color:#F99417'><center><h4>Hustler Server v0.1</h4></center></body></html>";
 	return page;
 }
 
@@ -64,7 +62,7 @@ std::string simpleBody(int code){
 std::string	GenerateError::generateBody(int code, VECT_ERRORPIR errorPage){
 	std::string body;
 	std::string page;
-	
+
 	page = findPage(errorPage, code);
 	if (page.empty())
 		return simpleBody(code);

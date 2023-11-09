@@ -3,6 +3,8 @@
 #include <sys/poll.h>
 
 std::vector<struct pollfd> Global::gPollFds =  std::vector<struct pollfd>();
+std::vector<std::string> Global::serverNames =  std::vector<std::string>();
+std::vector<Server *> Global::servers =  std::vector<Server *>();
 
 Global::Global(){}
 
@@ -64,13 +66,15 @@ void  Global::run()
 		}
 		if (servers.size() == 0)
 			exit(1);
+		if (!(*it)->getServerName().empty())
+			serverNames.push_back((*it)->getServerName());
 	}
 	while(true){
 		checkTimeOut(servers);
 		int pollStatus = poll(this->gPollFds.data(), this->gPollFds.size(), -1);
 		if (pollStatus == -1) {
 			perror("poll");
-			break;
+			continue;
 		}
 		for(unsigned int i =0; i < gPollFds.size() && pollStatus; i++){
 			if (pollStatus && ((gPollFds[i].revents & POLLIN) || (gPollFds[i].revents & POLLOUT))){

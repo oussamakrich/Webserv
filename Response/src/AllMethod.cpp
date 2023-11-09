@@ -71,7 +71,7 @@ void ResponseHandler::serveDirectory(){
 	}
 	if (autoindex){ //TODO : List Dir if auto index on
 		std::string output;
-		if (DirListing::getDirlistigHtml(res.path, output)){
+		if (DirListing::getDirlistigHtml(res.path, output, req.getPath())){
 			char *buffer = new char[output.size()];
 			copy(buffer , output);
 			res.setBuffer(buffer, output.size());
@@ -123,7 +123,7 @@ void ResponseHandler::serveFile(std::string path, size_t size){
 		if (unlink(path.c_str()) == 0)
 			res.setCode(200);//NOTE : No Content???
 		else
-			res.setCode(500);
+			res.setCode(500); //NOTE : check permission
 		return;
 	}
 	std::ifstream file(path.c_str());

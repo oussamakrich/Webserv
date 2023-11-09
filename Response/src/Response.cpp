@@ -10,7 +10,6 @@
 
 Response::Response(int fd){
 	this->_seek_pos = 0;
-
 	this->code = 0;
 	this->pos = 0;
 	this->fd = fd;
