@@ -75,8 +75,8 @@ void GenerateServer::SetErrorPages(Server &ser, TOKEN_IT &it){
 void GenerateServer::fillLocation(Server &ser, TOKEN_IT &it){
 
 	Location *location =	GenerateLocation::generateLocation(it);
-	std::string uri = location->getUri();
-	ser.setSingleLocation(std::make_pair(uri, location));
+	std::string path = location->getPath();
+	ser.setSingleLocation(std::make_pair(path, location));
 }
 
 void GenerateServer::SetTypes(Server &ser, TOKEN_IT &it){

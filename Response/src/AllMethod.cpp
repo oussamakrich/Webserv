@@ -16,6 +16,11 @@ bool ResponseHandler::isLocation(LOCATION_ITT &it)
 	LOCATION_MAP &locations = ser.getAllLocation();
 	it = locations.begin();
 
+	for (; it != locations.end(); it++)
+		cout << "yes : " << it->first  << endl;
+
+	it = locations.begin();
+
 	for (;it != locations.end(); it++)
 		if (it->second->isMatch(path))
 			return true;
@@ -250,6 +255,7 @@ void ResponseHandler::ResponseHandlere(Server &ser, Request &req, Response &res)
 	if (isLocation(it)) {
 		isLoacation = true;
 		location = it->second;
+		std::cout << "location : " << location->getRoot() << std::endl;
 		res.location = location;
 		if (checkRedirection())
 			return;

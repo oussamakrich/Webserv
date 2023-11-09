@@ -152,7 +152,7 @@ bool Client::NewRequest(ITT_CLIENT it, Server &ser){
 	{
 		this->response = new Response(this->pfd.fd);
 		response->errorPage = ser.getErrorPages();
-		response->setCode(404);
+		response->setCode(req->getErrorCode());
 		delete req;
 		return false;
 	}

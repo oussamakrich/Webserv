@@ -166,30 +166,6 @@ bool Upload::_extract_headers()
 	return true;
 }
 
-
-
-// void Upload::_get_line(std::ifstream &file)
-// {
-// 	char *line = new char[1];
-// 	while (file.read(line, 1))
-// 	{
-// 		if (*line == '\n')
-// 			break;
-// 		res.byte = res.byte + Byte(line, 1);
-
-// 	}
-// }
-
-// void Upload::multipart()
-// {
-// 	std::ifstream file(res._source_file.c_str(), std::ios::binary);
-// 	Upload::_get_line(file);
-// 	std::cout << res.byte << std::endl;
-// 	res.stillSend = true;
-// 	res.iHaveUpload = true;
-// }
-
-
 void Upload::Uploader()
 {
 	std::string sourceFile = res._source_file;
