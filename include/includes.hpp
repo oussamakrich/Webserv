@@ -118,5 +118,6 @@ void sigHandler(int sig);
 
 std::vector<std::string> splitStream(const std::string& str, char delimiter);
 
+void removeSlash(std::string &path);
 
 

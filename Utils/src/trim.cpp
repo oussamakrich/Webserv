@@ -1,4 +1,5 @@
 #include "../../include//includes.hpp"
+#include <sys/_types/_size_t.h>
 
 std::string ltrim(const std::string &s) {
     std::string result = s;
@@ -31,4 +32,14 @@ std::vector<std::string> splitStream(const std::string& str, char delimiter) {
         tokens.push_back(token);
     }
     return tokens;
+}
+
+void removeSlash(std::string &path) {
+    for(size_t i =0 ; i < path.size(); i++)
+        if (path[i] == '/')
+        {
+            i++;
+            while (path[i] && path[i] == '/')
+                path.erase(i, 1);
+        }
 }

@@ -2,14 +2,17 @@
 #include "../../include/includes.hpp"
 #include <dirent.h>
 
-std::string DirListing::GenerateFileRow(const std::string &parent, const std::string &name, const std::string &vt_path)
+std::string DirListing::GenerateFileRow(const std::string &parent, const std::string &name, std::string vt_path)
 {
 	std::stringstream output;
 	std::string path = parent + "/" + name;
+	std::string path2 = vt_path + "/" + name;
+	removeSlash(path);
+	removeSlash(path2);
 	struct stat info;
 	int res_stat = stat(path.c_str(), &info);
 	output << "<tr><td>\n<a href=\"";
-	output << vt_path+ "/"+ name;
+	output << path2; 
 	output <<  (S_ISDIR(info.st_mode) ?  "/" : "");
 	output <<  "\">";
 	output << name;
@@ -45,10 +48,11 @@ std::string DirListing::MakeHtml(std::string DirName, std::string HtmlContent)
 	return html.str();
 }
 
-bool DirListing::getDirlistigHtml(const std::string path, std::string &output, const std::string &vt_path)
+bool DirListing::getDirlistigHtml(const std::string path, std::string &output, std::string vt_path)
 {
     DIR *dir = NULL;
     dirent *ent = NULL;
+    removeSlash(vt_path);
     dir  = opendir(path.c_str());
 	std::string htmlContent;
     if (dir == NULL) return false;

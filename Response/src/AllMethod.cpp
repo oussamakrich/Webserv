@@ -71,7 +71,7 @@ void ResponseHandler::serveDirectory(){
 	}
 	if (autoindex){ //TODO : List Dir if auto index on
 		std::string output;
-		if (DirListing::getDirlistigHtml(res.path, output)){
+		if (DirListing::getDirlistigHtml(res.path, output, req.getPath())){
 			char *buffer = new char[output.size()];
 			copy(buffer , output);
 			res.setBuffer(buffer, output.size());
@@ -148,6 +148,7 @@ void ResponseHandler::serveFile(std::string path, size_t size){
 
 void ResponseHandler::simpleGet(){
 	res.path = this->root + '/' + req.getPath();
+	removeSlash(res.path);
 	size_t size;
 	int type = isFile(res.path, size);
 
