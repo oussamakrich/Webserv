@@ -8,3 +8,8 @@ test.cpp
 *.log
 *.conf
 todo
+MyLab
+.gitignore
+./tmp/*
+config.conf
+

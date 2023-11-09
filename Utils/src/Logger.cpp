@@ -1,15 +1,11 @@
-
 #include  "../include/Logger.hpp"
 
-    Logger::Logger(const std::string logfile): _log(logfile, std::ios::app){}
-    Logger::~Logger()
-   {
-        _log.close();
-   }
+Logger::Logger(const std::string logfile): _log(logfile, std::ios::app){}
+
+Logger::~Logger(){_log.close();}
 
 bool Logger::logFormat(const std::string &logtype, std::string &msg)
 {
-
     if (_log.good() == false) return false;
     _log << logtype;
 	_log << " : ";
@@ -55,7 +51,7 @@ bool Logger::fastLog(int type, std::string file, std::string msg)
 	{
 		case INFO		:	res = lg.Info(msg);			break;
 		case DEBUG		:	res = lg.Debug(msg);		break;
-		case WARNING 	:	res = lg.Warning(msg);		break;
+		case WARNING		:	res = lg.Warning(msg);		break;
 		case ERROR 		: 	res = lg.Error(msg);		break;
 	}
 	return res;

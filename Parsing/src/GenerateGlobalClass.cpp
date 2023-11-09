@@ -1,50 +1,7 @@
 #include "../include/GenerateGlobalClass.hpp"
 #include "../include/GenerateServer.hpp"
+#include <sys/_types/_size_t.h>
 
-
-
-// Server *GenerateGlobalClass::fillServer(TOKEN_IT &it){
-//
-// 	Server *server = new Server();
-// 	while(it->first != CLOSE_C_BRACKET){
-// 		switch (it->first) {
-// 			case LOCATION				: server->fillLocation(++it);	break;
-// 			case TYPES					:	server->SetTypes(++it);			break;
-// 			case MAX_BODY_SIZE	: server->SetInt(it);					break;
-// 			case ERROR_PAGES		: server->SetErrorPages(++it);	break;
-// 			case INDEX					: server->SetMultiValue(it);	break;
-// 			case ROOT						: server->SetSingleValue(it); break;
-// 			case LISTEN					: server->SetHostAndPort(++it); break;
-// 			case SERVER_NAME		: server->SetSingleValue(it); break;
-// 			case DEFAULT_TYPE		: server->SetSingleValue(it); break;
-// 			case ERROR_LOG			: server->SetSingleValue(it); break;
-// 			case ACCESS_LOG			: server->SetSingleValue(it); break;
-// 			case OPEN_C_BRACKET :	break;
-// 			case COLON					:	break;
-// 			case SEMICOLON			:	error("Unexpected SEMICOLONE");
-// 			default							: error("Unexpected key : " + it->second);
-// 		}
-// 		it++;
-// 	}
-// 	if (server->getRoot().empty())
-// 		error("root is required");
-// 	server->Shrink();
-// 	return server;
-// }
-
-
-Server *GenerateGlobalClass::fillServer(TOKEN_IT &it){
-
-	Server *server = new Server();
-	while(it->first != CLOSE_C_BRACKET){
-
-		it++;
-	}
-	if (server->getRoot().empty())
-		error("root is required");
-	server->Shrink();
-	return server;
-}
 
 void warning(std::string warn){
 	std::cout << YELLOW"WARNING : " << RESET << warn << std::endl;
@@ -60,13 +17,30 @@ bool	GenerateGlobalClass::checkHostAndPort(Server *server, std::vector<HOST_PORT
 	ss << "Server Duplicate : "  << pair.first << " and "+ pair.second;
 
 	if (std::find(vect.begin(), vect.end(), pair) != vect.end()){
-		warning(ss.str());
 		return false;
 	}
 	vect.push_back(pair);
 	return true;
 }
 
+//TODO : store listen && server_name for check repetition
+// add flag if listen repeated for not start the server
+
+
+void checkservername(std::vector<Server *> &ser, Server *server){
+		int port = server->getPort();
+		std::string host = server->getHost();
+		std::string serverName = server->getServerName();
+
+	for (size_t i =0; i < ser.size(); i++){
+		if (ser[i]->getServerName() == serverName && ser[i]->getPort() == port && ser[i]->getHost() == host){
+			if (!server->getServerName().empty())
+				warning("Server : " + server->getServerName() + " is repeated");
+			else
+				warning("Server : " + server->getHost() + ":" + convertCode(server->getPort()) + " is repeated");
+		}
+	}
+}
 
 Global *GenerateGlobalClass::generateGlobalClass(std::vector<TOKEN> tokens){
 	Global *global = new Global();
@@ -78,7 +52,14 @@ Global *GenerateGlobalClass::generateGlobalClass(std::vector<TOKEN> tokens){
 	for(it = tokens.begin(); it != tokens.end(); it++){
 		if (it->first == SERVER){
 			server = GenerateServer::NewServer(++it);
-			if (checkHostAndPort(server, portAndHost)) global->addServer(server);
+			if (!checkHostAndPort(server, portAndHost)){
+				server->listenRepeat = true;
+				checkservername(Global::servers, server);
+			}
+			if (server->ServerOff)
+				delete server;
+			else
+				global->addServer(server);
 		}
 	}
 	return global;
