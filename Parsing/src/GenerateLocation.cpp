@@ -21,7 +21,8 @@
 #define ERR_ERR_PAGE_MULT   "error_page  \"multi page of code\""
 #define ERR_REPEAT_VAL        "Repeat value"
 #define ERR_AUTOINDEX_VAL 	"AutoIndex accept on/off value"
-#define ERR_UPLOAD_ON_VAL 	"AutoIndex accept on/off value"
+#define ERR_UPLOAD_ON_VAL 	"Upload  accept on/off value"
+#define ERR_DOWNLOAD_ON_VAL "Dowload accept on/off value"
 #define ERR_DIRECTIVE    	"Directive must be followed by value(s)"
 #define ERR_CGI_DIRECTIVE "Loaction::cgi , \n hint : cgi php-cgi .php\n"
 #define ERR_CGI_EXTENSION "CGI extension must be start with '.'\n example .php .py ... "
@@ -51,7 +52,6 @@ Location *GenerateLocation::generateLocation(std::vector<TOKEN>::iterator &token
 		{
 			case ALLOWED_METHOD : ParsAllowedMethod(*lc, tokens);														break;
 			case INDEX 			: ParsMultiValue(*lc, tokens, &Location::AddIndex);										break;
-			case TRY_FILES 		: ParsMultiValue(*lc, tokens, &Location::AddTryFile); 									break;
 			case ERROR_PAGES 	: ParsErrorPage(*lc, tokens); 															break;
 			case ROOT			: ParsSingleValue( *lc, tokens, &Location::setRoot , &Location::getRoot); 				break;
 			case DEFAULT_TYPE   : ParsSingleValue(*lc, tokens, &Location::setDefaultType, &Location::getDefaultTypes); 	break;
@@ -59,6 +59,7 @@ Location *GenerateLocation::generateLocation(std::vector<TOKEN>::iterator &token
 			case CGI 			: ParsCGI(*lc, tokens);																	break;
 			case UPLOAD_PATH 	: ParsSingleValue(*lc, tokens, &Location::setUploadPath, &Location::getUploadPath);		break;
 			case UPLOAD			: ParsUpload(*lc, tokens);																break;
+			case DOWNLOAD		: ParsDownload (*lc, tokens);															break;
 			case RETURN			: SyntaxError(ERR_RETURN_POS);															break;
 			default				: SyntaxError("Syntax : Location Invalid  Directive");
 		}// end switch
@@ -200,6 +201,15 @@ void		GenerateLocation::ParsUpload(Location &lc, tk_iterator &tokens)
 	if (tokens->first == WORD && (tokens->second == "on" || tokens->second == "off"))
 		lc.setUploadOn(tokens->second == "on");
 	else SyntaxError(ERR_UPLOAD_ON_VAL);
+	tokens++;
+
+}
+
+void		GenerateLocation::ParsDownload(Location &lc, tk_iterator &tokens)
+{
+	if (tokens->first == WORD && (tokens->second == "on" || tokens->second == "off"))
+		lc.setDownload(tokens->second == "on");
+	else SyntaxError(ERR_DOWNLOAD_ON_VAL);
 	tokens++;
 
 }

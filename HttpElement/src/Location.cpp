@@ -16,6 +16,7 @@ Location::Location(string path): path(path)
 	this->redirection_text = "ok";
 	this->AutoIndex = false;
 	this->upload = false;
+	this->isDown = false;
 	this->upload_path = "";
 }
 Location::~Location(){}
@@ -25,14 +26,12 @@ void Location::final()
 		this->default_type = "application/octet-stream";
 	Allowed_Method.shrink_to_fit();
 	indexes.shrink_to_fit();
-	try_file.shrink_to_fit();
 	error_page.shrink_to_fit();
 }
 /*********************************< adder >*******************/
 
 bool	Location::AddErrorPage(const string &page, int code) 		{	return Add(error_page, std::make_pair(code, page)); }
 bool    Location::AddHttpMethod(const string &method)				{	return Add(Allowed_Method, method);   }
-bool    Location::AddTryFile(const string &file) 					{	return Add(try_file, file);    }
 bool    Location::AddIndex(const string &index)   					{	return Add(indexes, index);    }
 bool 	Location::AddCGI(string bin, string ex)
 {
@@ -44,16 +43,18 @@ bool 	Location::AddCGI(string bin, string ex)
 
 /*********************************< setter >*******************/
 
-void	Location::setRoot(const string &root)                  {   this->root = root;                                    }
-void	Location::setAutoIndex(bool val)                       {   this->AutoIndex = val;                                }
-void	Location::setRedirection(bool val)                     {   this->_isRedirection = val;                           }
-void	Location::setDefaultType(const string &type)           {   this->default_type = type;                            }
-void	Location::setRedirectionCode(int  code)                {   this->redirection_code = code;                        }
-void	Location::setRedirectionText(string &text)             {   this->redirection_text = text;                        }
-void	Location::setRedirection(int code, string &text)       {   setRedirectionCode(code) , setRedirectionText(text);  }
-void	Location::setPath(string &path)                        {   this->path = path;                                     }
-void	Location::setUploadOn(bool b)						   {   this->upload = b;                                      }
-void	Location::setUploadPath(const string	&upload_path)	{	this->upload_path = upload_path;}
+void	Location::setRoot(const string &root)                  {   this->root = root;                                   	 }
+void	Location::setAutoIndex(bool val)                       {   this->AutoIndex = val;                               	 }
+void	Location::setRedirection(bool val)                     {   this->_isRedirection = val;                          	 }
+void	Location::setDefaultType(const string &type)           {   this->default_type = type;                           	 }
+void	Location::setRedirectionCode(int  code)                {   this->redirection_code = code;                       	 }
+void	Location::setRedirectionText(string &text)             {   this->redirection_text = text;                        	}
+void	Location::setRedirection(int code, string &text)       {   setRedirectionCode(code) , setRedirectionText(text);  	}
+void	Location::setPath(string &path)                        {   this->path = path;                                     	}
+void	Location::setUploadOn(bool b)						   {   this->upload = b;                                      	}
+void	Location::setUploadPath(const string	&upload_path)	{	this->upload_path = upload_path;						}
+void 	Location::setDownload(bool b) 							{	 this->isDown = b;										}
+	
 
 /*********************************< getter >*******************/
 
@@ -70,13 +71,12 @@ void	Location::setUploadPath(const string	&upload_path)	{	this->upload_path = up
 
 const vector<std::pair<int,string> >    &Location::getErrorPageList()   const    { return    error_page;          }
 const vector<string>					&Location::getIndexesList()		const 	 { return indexes; 				  }
-const vector<string>					&Location::getTryFiles()		const	 { return try_file;				  }
 const string							&Location::getDefaultTypes()    const    { return    default_type;        }
 const string							&Location::getRoot()            const    { return    root;                }
 const string                      		&Location::getPath() 		    const    { return    path;                }
 const string                 			Location::getUri() 		        const    { return    root + path;         }
-const int 								Location::getRedirectionCode()  const {		return redirection_code; 	}
-const string 						    &Location::getRedirectionText()  const   {  return redirection_text;}
+const int 								Location::getRedirectionCode()  const    {		return redirection_code; }
+const string 						    &Location::getRedirectionText()  const   {  return redirection_text;    }
 const string							Location::getCgiBinFor(string file) const
 {
 	size_t pos = file.find(".");
@@ -105,6 +105,7 @@ bool  Location::isMatch(string uri)    const
 	return uri.at(this->path.size()) == '/' ;
 }
 bool Location::isUploadOn()					const          { return upload; }
+bool Location::isDownloadEnable()			const			{ return  isDown; }  
 bool Location::isCgiExtention(string file)	const
 {
 	size_t pos = file.find(".");
@@ -124,12 +125,6 @@ bool Location::isCgiExtention(string file)	const
 
 		std::cout << "Indexes: ";
 		for (std::vector<std::string>::const_iterator it = indexes.begin(); it != indexes.end(); ++it) {
-			std::cout << *it << " ";
-		}
-		std::cout << std::endl;
-
-		std::cout << "Try_File: ";
-		for (std::vector<std::string>::const_iterator it = try_file.begin(); it != try_file.end(); ++it) {
 			std::cout << *it << " ";
 		}
 		std::cout << std::endl;

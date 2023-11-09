@@ -11,7 +11,6 @@ private:
 	template<class container, class value>	bool Add(container &c, value v);
 	vector <string>  						Allowed_Method;
 	vector <string> 						indexes;
-	vector <string> 						try_file;
 	vector <std::pair<int , string> >  		error_page;
 	map<string, string>						cgi;
 	string		  							root;
@@ -23,18 +22,20 @@ private:
 	bool  									AutoIndex;
 	bool 									_isRedirection;
 	bool									upload;
+	bool									isDown;
 public :
 		Location(string path);
 		~Location();
 		void final(); // this method resize all container
+		
 /*********************************< adder >*******************/
+
 		bool             AddErrorPage(const string &page, int code);
 		bool             AddHttpMethod(const string &method);
-		bool             AddTryFile(const string &file);
 		bool             AddIndex(const string &index);
 		bool 			AddCGI(string bin, string ex);
 
-		/*********************************< setter >*******************/
+/*********************************< setter >*******************/
 
 		void         setRoot(const string &root);
 		void         setAutoIndex(bool val);
@@ -46,12 +47,13 @@ public :
 		void         setPath(string &path);
 		void		setUploadOn(bool b);
 		void 		setUploadPath(const string &upload_path);
+		void 		setDownload(bool b); 
+
 		/*********************************< getter >*******************/
 
 		bool                      				getErrorPage(int code, string  &page)	const;
 		const vector<std::pair<int,string> >    &getErrorPageList() 					const;
 		const vector<string>					&getIndexesList()						const;
-		const vector<string>					&getTryFiles()							const;
 		const string                         	&getDefaultTypes() 						const;
 		const string                			&getRoot() 								const;
 		const string                      		&getPath() 								const;
@@ -68,6 +70,7 @@ public :
 		bool isMatch(string uri)					const;
 		bool isUploadOn()							const;
 		bool isCgiExtention(string file) 			const;
+		bool isDownloadEnable()						const;	
 /*********************************< for Debug  >*******************/
 
 		void printLocation();

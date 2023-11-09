@@ -22,12 +22,10 @@ void Tokenizer::generateTokenMap(void){
 	SpecialWords["max_body_size"] = MAX_BODY_SIZE;
 	SpecialWords["error_page"] = ERROR_PAGES;
 	SpecialWords["default_type"] = DEFAULT_TYPE;
-	SpecialWords["try_files"] = TRY_FILES;
-	SpecialWords["rewrite"] = REWRITE;
 	SpecialWords["autoindex"] = AUTO_INDEX;
 	SpecialWords["allowed_methods"] = ALLOWED_METHOD;
 	SpecialWords["upload"] = UPLOAD;
-	
+	SpecialWords["download"] = DOWNLOAD;
 	SpecialWords["upload_path"] = UPLOAD_PATH;
 	SpecialWords["cgi"] = CGI;
 	SpecialSymbols["["] = OPEN_S_BRACKET;

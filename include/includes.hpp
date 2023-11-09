@@ -56,8 +56,6 @@ typedef enum {
 	MAX_BODY_SIZE,
 	ERROR_PAGES,
 	DEFAULT_TYPE,
-	TRY_FILES,
-	REWRITE,
 	AUTO_INDEX,
 	ALLOWED_METHOD,
 	OPEN_S_BRACKET,
@@ -71,7 +69,8 @@ typedef enum {
 	QUOTES,
 	UPLOAD,
 	CGI,
-	UPLOAD_PATH
+	UPLOAD_PATH,
+	DOWNLOAD
 }Token;
 
 typedef struct {

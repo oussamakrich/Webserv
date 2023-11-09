@@ -47,10 +47,6 @@ void printEnam(Token t)
 		std::cout << "ERROR_PAGES";
 	else if (t == DEFAULT_TYPE)
 		std::cout << "DEFAULT_TYPE";
-	else if (t == TRY_FILES)
-		std::cout << "TRY_FILES";
-	else if (t == REWRITE)
-		std::cout << "REWRITE";
 	else if (t == AUTO_INDEX)
 		std::cout << "AUTO_INDEX";
 	else if (t == UPLOAD)
