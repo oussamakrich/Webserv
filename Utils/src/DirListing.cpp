@@ -41,7 +41,7 @@ std::string DirListing::MakeHtml(std::string DirName, std::string HtmlContent)
 	html << "<h1> Index of " << DirName <<"</h1>";
 	html <<   "<hr>\n<table>\n<tr>\n<th> Name </th>\n<th> Size  </th>\n<th>Last Modified </th>\n</tr>";
 	html << HtmlContent;
-	html << "   </table>\n<h2>Hustlers Server 1.0 [beta] </h2>\n</center>\n</body></html>";
+	html << "</table>\n<h2>Hustlers Server 1.0 [beta] </h2>\n</center>\n</body></html>";
 	return html.str();
 }
 
@@ -55,7 +55,7 @@ bool DirListing::getDirlistigHtml(const std::string path, std::string &output, c
     while ( (ent =  readdir(dir)) != NULL)
     {
 		if(ent->d_name[0] != '.')
-		htmlContent += GenerateFileRow(path , ent->d_name);
+		htmlContent += GenerateFileRow(path , ent->d_name, vt_path);
     }
 	output = MakeHtml(vt_path, htmlContent);
      closedir(dir);
