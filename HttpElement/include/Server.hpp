@@ -40,8 +40,6 @@ class Server {
 		VECT_STR						index; // done.
 		VECT_ERRORPIR				errorPages; // done.
 		std::string 				defaultType; // done.
-		std::string 				accessLog; // done.
-		std::string					errorLog; // done.
 		TYPES_MAP						mimeType;
 		LOCATION_MAP				locations; // done.
 
@@ -60,8 +58,6 @@ class Server {
 		  void setErrorPages(const VECT_ERRORPIR& errorPages);
 		  void setErrorPage(const	 ERRPAGE_PAIR errorPage);
 		  void setDefaultType(const std::string& defaultType);
-		  void setAccessLog(const std::string& accessLog);
-		  void setErrorLog(const std::string& errorLog);
 		  void setMimeType(const TYPES_MAP& mimeType);
 		  bool setMimeType(const TYPES_PAIR& mimeType);
 		  void setLocations(const LOCATION_MAP& locations);
@@ -94,12 +90,10 @@ class Server {
 
 		bool	getAutoIndex() const;
 
-		std::string getErrorLog() const;
 		std::string	getHost() const;
 		std::string	getServerName() const;
 		std::string getRoot() const;
 		std::string getDefaultType() const;
-		std::string getAccessLog() const;
 
 		std::vector<std::string> getIndex() const;
 		std::vector<ERRPAGE_PAIR> getErrorPages() const;

@@ -20,8 +20,6 @@ Server *GenerateServer::NewServer(TOKEN_IT &it){
 			case LISTEN					: SetHostAndPort(*server, ++it); break;
 			case SERVER_NAME		: SetSingleValue(*server,it);		break;
 			case DEFAULT_TYPE		: SetSingleValue(*server, it);		break;
-			case ERROR_LOG			: SetSingleValue(*server, it);		break;
-			case ACCESS_LOG			: SetSingleValue(*server, it);		break;
 			case AUTO_INDEX			: SetSingleValue(*server, it);		break;
 			case OPEN_C_BRACKET :	break;
 			case COLON					:	break;
@@ -134,8 +132,6 @@ void GenerateServer::SetSingleValue(Server &ser,TOKEN_IT &it){
 	if (key == SERVER_NAME)				ser.setServerName(value);
 	else if (key == AUTO_INDEX)		ser.setAutoIndex(parseIndex(value));
 	else if (key == DEFAULT_TYPE)	ser.setDefaultType(value);
-	else if (key == ACCESS_LOG)		ser.setAccessLog(value);
-	else if (key == ERROR_LOG)		ser.setErrorLog(value);
 	else if (key == ROOT)					ser.setRoot(value);
 }
 
@@ -171,7 +167,7 @@ void	GenerateServer::handelOne(Server &ser,std::string line){
 	if (pos == line.npos){
 		if (line.size() > 5)
 			error("Port is grather tha max");
-			ser.setPort(atoi(line.c_str()));
+		ser.setPort(atoi(line.c_str()));
 	}
 	else
 		ser.setHost(line);

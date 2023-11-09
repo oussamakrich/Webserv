@@ -22,8 +22,6 @@ void Tokenizer::generateTokenMap(void){
 	SpecialWords["max_body_size"] = MAX_BODY_SIZE;
 	SpecialWords["error_page"] = ERROR_PAGES;
 	SpecialWords["default_type"] = DEFAULT_TYPE;
-	SpecialWords["error_log"] = ERROR_LOG;
-	SpecialWords["access_log"] = ACCESS_LOG;
 	SpecialWords["try_files"] = TRY_FILES;
 	SpecialWords["rewrite"] = REWRITE;
 	SpecialWords["autoindex"] = AUTO_INDEX;

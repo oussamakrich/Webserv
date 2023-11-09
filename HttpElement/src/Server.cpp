@@ -32,8 +32,6 @@ Server &Server::operator=(const Server &copy)
 		index = copy.index;
 		errorPages = copy.errorPages;
 		defaultType = copy.defaultType;
-		accessLog = copy.accessLog;
-		errorLog = copy.errorLog;
 		mimeType = copy.mimeType;
 		autoIndex = copy.autoIndex;
 		locations = copy.locations;
@@ -73,10 +71,6 @@ void Server::setErrorPage(const ERRPAGE_PAIR errorPage) {this->errorPages.push_b
 
 void Server::setDefaultType(const std::string& defaultType) { this->defaultType = defaultType; }
 
-void Server::setAccessLog(const std::string& accessLog) { this->accessLog = accessLog; }
-
-void Server::setErrorLog(const std::string& errorLog) { this->errorLog = errorLog; }
-
 void Server::setMimeType(const TYPES_MAP& mimeType) { this->mimeType = mimeType; }
 
 bool Server::setMimeType(const TYPES_PAIR& mimeType){ return this->mimeType.insert(mimeType).second;}
@@ -97,8 +91,6 @@ bool Server::getAutoIndex() const{return autoIndex;}
 
 int		Server::getClientMaxBodySize() const{return clientMaxBodySize;}
 
-std::string Server::getErrorLog() const{return errorLog;}
-
 std::string	Server::getHost() const{return host;}
 
 std::string	Server::getServerName() const{return serverName;}
@@ -106,8 +98,6 @@ std::string	Server::getServerName() const{return serverName;}
 std::string Server::getRoot() const{return root;}
 
 std::string Server::getDefaultType() const{return defaultType;}
-
-std::string Server::getAccessLog() const{return accessLog;}
 
 std::vector<std::string> Server::getIndex() const{return index;}
 
@@ -138,8 +128,6 @@ std::ostream &operator<<(std::ostream &out, Server &server){
 		out << server.getErrorPages()[i].first << " " << server.getErrorPages()[i].second << " ";
 	out << std::endl;
 	out << RED"\tdefaultType: " << GREEN << server.getDefaultType() << std::endl;
-	out << RED"\taccessLog: " << GREEN << server.getAccessLog() << std::endl;
-	out << RED"\terrorLog: "  << GREEN<< server.getErrorLog() << std::endl;
 	out << RED"\tmimeType: " << std::endl;
 
 	std::map<std::string, std::string> mime = server.getMimeType();
