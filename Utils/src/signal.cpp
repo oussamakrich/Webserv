@@ -6,7 +6,6 @@ void sigHandler(int sig)
 {
 	errno = 0;
 	std::cout << "server receive a Signal" << sig<<std::endl;
-	signal(sig, sigHandler);
 }
 
 void sigChange()
@@ -18,6 +17,7 @@ void sigChange()
 		signal(i, sigHandler);
 	}
 }
+
 void sigRestDefault()
 {
 	for (size_t i = 0; i <= 22; i++)

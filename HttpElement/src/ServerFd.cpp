@@ -3,6 +3,7 @@
 #include "../include/Global.hpp"
 #include "../../Response/include/GenerateResponse.hpp"
 #include "../../Uploader/include/Upload.hpp"
+#include <sys/poll.h>
 
 bool creatSocket(int *listen, addrinfo *MyAddr){
 	*listen = socket(MyAddr->ai_family , MyAddr->ai_socktype , 0);
@@ -67,10 +68,10 @@ void Server::acceptClient(){
 		return;
 	}
 	std::cout << serverName + " : new connection accepted" << std::endl;
-	newClient = new Client(this->clientMaxBodySize, clientFd);
+	pollfd &fd = Global::insertFd(clientFd);
+	newClient = new Client(this->clientMaxBodySize, fd);
 	newClient->setAddr(sockaddr);
 	this->clients.push_back(newClient);
-	Global::insertFd(clientFd);
 }
 
 ITT_CLIENT Server::findClient(pollfd pfd){

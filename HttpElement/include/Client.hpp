@@ -13,9 +13,9 @@ class Server;
 class Client{
 
 	public :
-		Client(int bodySize, int fd);
+		Client(int bodySize, pollfd &fd);
 		~Client();
-		pollfd					pfd;
+		pollfd					&pfd;
 
 	private:
 		std::time_t			lastTime;
