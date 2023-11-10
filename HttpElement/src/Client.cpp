@@ -11,16 +11,16 @@
 
 #define N_READ 50000
 
-Client::Client(int bodySize, pollfd &fd) : pfd(fd), reqBuff(bodySize){
+Client::Client(int bodySize, int fd) : reqBuff(bodySize){
 
 	lastTime = std::time(NULL);
 	IhaveResponse = false;
 	IhaveUpload = false;
 	IhaveCGI = false;
 	this->response = NULL;
-	// pfd.fd = fd;
-	// pfd.events = POLLIN | POLLOUT;
-	// pfd.revents = 0;
+	pfd.fd = fd;
+	pfd.events = POLLIN;
+	pfd.revents = 0;
 }
 
 Client::~Client(){

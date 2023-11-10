@@ -68,10 +68,10 @@ void Server::acceptClient(){
 		return;
 	}
 	std::cout << serverName + " : new connection accepted" << std::endl;
-	pollfd &fd = Global::insertFd(clientFd);
-	newClient = new Client(this->clientMaxBodySize, fd);
+	newClient = new Client(this->clientMaxBodySize, clientFd);
 	newClient->setAddr(sockaddr);
 	this->clients.push_back(newClient);
+	Global::insertFd(clientFd);
 }
 
 ITT_CLIENT Server::findClient(pollfd pfd){

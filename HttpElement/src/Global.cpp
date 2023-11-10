@@ -95,7 +95,7 @@ void Global::switchEvent(int fd, int Flag){
 	}
 }
 
-pollfd &Global::insertFd(int fd){
+void Global::insertFd(int fd){
 
 	struct pollfd pfd;
 
@@ -103,5 +103,4 @@ pollfd &Global::insertFd(int fd){
 	pfd.events = POLLIN;
 	pfd.revents = 0;
 	Global::gPollFds.push_back(pfd);
-	return Global::gPollFds.back();
 }
