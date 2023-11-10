@@ -2,6 +2,7 @@
 
 #include "GenerateResponse.hpp"
 #include "Response.hpp"
+#include <string>
 
 #define FILE 0
 #define DIRECTORY 1
@@ -39,7 +40,7 @@ class ResponseHandler
 		void serveFile(std::string path, size_t size);
 		void serveDirectory();
 		void _extract_resources_from_request();
-		bool checkCGI();
+		bool checkCGI(std::string path);
 		void handelCGI();
 		std::string GetFileName();
 
