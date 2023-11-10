@@ -34,7 +34,7 @@ int main (int argc, char **argv)
 
 		Global *WebServer = GenerateGlobalClass::generateGlobalClass(tokens);
 		// WebServer->print();
-		sigChange();
+		// sigChange();
 		WebServer->run();
 
 	}catch (std::exception &e) {

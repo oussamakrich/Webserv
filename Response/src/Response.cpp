@@ -58,7 +58,7 @@ void Response::sendErrorResponse(Server &ser ,int fd){
 		std::string error =  err.getErrorPage(ser);
 		send(fd, error.c_str(), error.size(), 0);
 }
-void Response::CgiHeaders(Request &req, std::ifstream &file, size_t sizeOfFile){
+void Response::CgiHeaders(bool keepAlive, std::ifstream &file, size_t sizeOfFile){
 	std::string header;
 	size_t pos;
 	size_t headerPos = 0;
@@ -80,11 +80,11 @@ void Response::CgiHeaders(Request &req, std::ifstream &file, size_t sizeOfFile){
 		setHeadr("Content-Length: 0");
 	else
 		setHeadr("Content-Length: " + convertCode(sizeOfFile - headerPos));
-	this->HeaderAndStart = GenerateResponse::generateHeaderAndSt(*this, req);
+	this->HeaderAndStart = GenerateResponse::generateHeaderAndSt(*this, keepAlive);
 	this->pos = headerPos;
 }
 
-bool Response::CgiRead(Request &req){
+bool Response::CgiRead(bool keepAlive){
 	path = cgiInfo.output;
 	size_t sizeOfFile;
 	isFile(path, sizeOfFile);
@@ -94,7 +94,7 @@ bool Response::CgiRead(Request &req){
 		setCode(500);
 		return false;
 	}
-	CgiHeaders(req, file, sizeOfFile);
+	CgiHeaders(keepAlive, file, sizeOfFile);
 	if (file.eof()){
 		file.close();
 		stillSend = false;
@@ -111,16 +111,22 @@ bool Response::CgiRead(Request &req){
 	return true;
 }
 
-bool Response::CgiResponse(Request &req){
+bool Response::CgiResponse(bool keepAlive){
 
 	int status;
 	if (Cgi::isFinished(cgiInfo, status)){
-		CgiRead(req);
+		if (status != 0){
+			setCode(500);
+			stillSend = false;
+			errrCgi	= true;
+			Cgi::CgiUnlink(cgiInfo);
+			return false;
+		}
+		CgiRead(keepAlive);
 		sendResponse();
 		return true;
 	}
 	if (Cgi::isTimeOut(cgiInfo)){
-		std::cout << "is Time out" << std::endl;
 		setCode(504);
 		Cgi::CgiUnlink(cgiInfo);
 		Cgi::KillCgi(cgiInfo);	

@@ -76,9 +76,9 @@ class Response{
 
 		bool sendResponse();
 		bool ReminderResponse();
-		bool CgiResponse(Request &req);
-		bool CgiRead(Request &req);
-		void CgiHeaders(Request &req, std::ifstream &file, size_t sizeOfFile);
+		bool CgiResponse(bool keepAlive);
+		bool CgiRead(bool keepAlive);
+		void CgiHeaders(bool keepAlive, std::ifstream &file, size_t sizeOfFile);
 
 		void sendErrorResponse(Server &ser, int fd);
 		void HandelLocation();

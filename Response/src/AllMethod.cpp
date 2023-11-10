@@ -91,9 +91,9 @@ void ResponseHandler::serveDirectory(){
 }
 
 
-bool ResponseHandler::checkCGI(){
+bool ResponseHandler::checkCGI(std::string path){
 	if (isLoacation){
-		return location->isCgiExtention(res.path);
+		return location->isCgiExtention(path);
 	}
 	else
 		return false;
@@ -117,7 +117,8 @@ void ResponseHandler::handelCGI(){
 void ResponseHandler::serveFile(std::string path, size_t size){
 
 	res.isCGI = false;
-	if (checkCGI()){
+	if (checkCGI(path)){
+		res.path = path;
 		handelCGI();
 		return;
 	}

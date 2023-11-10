@@ -13,7 +13,7 @@ class Server;
 class Client{
 
 	public :
-		Client(int bodySize, int fd);
+		Client(int bodySize, pollfd &fd);
 		~Client();
 		pollfd					pfd;
 		double TM;
@@ -27,7 +27,6 @@ class Client{
 	public:
 		RequestBuffer reqBuff;
 		Response *response;
-		Request		*req;
 		bool			IhaveResponse;
 		bool			IhaveCGI;
 		bool			keepAlive;

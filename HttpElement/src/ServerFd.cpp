@@ -3,27 +3,6 @@
 #include "../include/Global.hpp"
 #include "../../Response/include/GenerateResponse.hpp"
 #include "../../Uploader/include/Upload.hpp"
-#include <sys/time.h>
-
-std::string timeString(double tm)
-{
-	stringstream ss;
-	if (tm  > 1000000)
-		ss << tm / 1000000.0 << " s";
-	else if (tm  > 1000)
-		ss << tm / 1000 << " ms";
-	else
-		ss << tm  << " us";
-return ss.str();
-}
-static double GetTM()
-{
-	timeval tm;
-	double val;
-	gettimeofday(&tm, NULL);
-	val = tm.tv_sec * 1000000 + tm.tv_usec;
-	return val;
-}
 
 bool creatSocket(int *listen, addrinfo *MyAddr){
 	*listen = socket(MyAddr->ai_family , MyAddr->ai_socktype , 0);
@@ -87,15 +66,13 @@ void Server::acceptClient(){
 		std::cerr << "ERROR : Connection failed" << std::endl;
 		return;
 	}
+	std::cout << serverName + " : new connection accepted" << std::endl;
 	newClient = new Client(this->clientMaxBodySize, clientFd);
 	newClient->setAddr(sockaddr);
 	fcntl(clientFd, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
 	newClient->TM = GetTM();
 	this->clients.push_back(newClient);
 	Global::insertFd(clientFd);
-	std::cout << serverName + "new Client fd = " << clientFd << std::endl;
-	
-
 }
 ITT_CLIENT Server::findClient(pollfd pfd){
 	ITT_CLIENT it = clients.begin();

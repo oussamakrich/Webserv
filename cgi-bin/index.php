@@ -1,8 +1,8 @@
 
 <?php
 // phpinfo();
-sleep(5);
-// echo "Hello World!"
+echo "Hello World!";
+exit(5);
 ?>
 
 

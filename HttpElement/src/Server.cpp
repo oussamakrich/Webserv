@@ -14,7 +14,6 @@ Server::Server(){
 
 Server::~Server()
 {
-
 	for (std::map<std::string, Location*>::iterator it = locations.begin(); it != locations.end(); it++)
 		delete it->second;
 	locations.clear();
@@ -174,5 +173,3 @@ std::ostream &operator<<(std::ostream &out, Server &server){
 	}
 	return out;
 }
-
-

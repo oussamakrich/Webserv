@@ -11,16 +11,16 @@
 
 #define N_READ 50000
 
-Client::Client(int bodySize, int fd) : reqBuff(bodySize){
+Client::Client(int bodySize, pollfd &fd) : pfd(fd), reqBuff(bodySize){
 
 	lastTime = std::time(NULL);
 	IhaveResponse = false;
 	IhaveUpload = false;
 	IhaveCGI = false;
 	this->response = NULL;
-	pfd.fd = fd;
-	pfd.events = POLLIN | POLLOUT;
-	pfd.revents = 0;
+	// pfd.fd = fd;
+	// pfd.events = POLLIN | POLLOUT;
+	// pfd.revents = 0;
 }
 
 Client::~Client(){
@@ -29,10 +29,12 @@ Client::~Client(){
 
 int Client::getFd(){return pfd.fd; }
 
-bool Client::ReadRequest(){
+bool Client::ReadRequest(){ //TODO : send 500 if read fail
 
 	char *buffer;
-	buffer = new char[N_READ];
+	buffer = new (std::nothrow) char[N_READ];
+	if (!buffer)
+		return false;
 	memset(buffer, 0, N_READ);
 	status = recv(pfd.fd, buffer, N_READ, 0);
 	if (status == -1 || status == 0)
@@ -93,9 +95,8 @@ bool Client::OldRequest(ITT_CLIENT it, Server &ser){
 
 bool Client::CgiRequest(ITT_CLIENT it, Server &ser){
 	switchEvent(this->pfd.fd, POLLOUT);
-	if (response->CgiResponse(*req)){
+	if (response->CgiResponse(this->keepAlive)){
 		CGIFinish = true;
-		delete req;
 		IhaveResponse = response->stillSend;
 		if (!IhaveResponse){
 			switchEvent(this->pfd.fd, POLLIN);
@@ -165,15 +166,13 @@ bool Client::NewRequest(ITT_CLIENT it, Server &ser){
 	}
 	Server &server = Global::FindServer(req->getHeaders(),  ser);
 	response = GenerateResponse::generateResponse(server, *req, this->pfd.fd);
+	this->keepAlive = req->getConnection();
+	delete req;
 	IhaveCGI = response->isCGI;
-	if (response->isCGI){
-		this->req = req;
+	if (response->isCGI)
 		return true;
-	}
-	if (!response->sendResponse()){
-		delete req;
+	if (!response->sendResponse())
 		return false;
-	}
 	IhaveUpload = response->iHaveUpload;
 	IhaveResponse = response->stillSend;
 	if (!IhaveResponse){
@@ -181,7 +180,5 @@ bool Client::NewRequest(ITT_CLIENT it, Server &ser){
 		response = NULL;
 		switchEvent(this->pfd.fd, POLLIN);
 	}
-	this->keepAlive = req->getConnection();
-	delete req;
 	return true;
 }
