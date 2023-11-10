@@ -26,7 +26,6 @@ class Client{
 	public:
 		RequestBuffer reqBuff;
 		Response *response;
-		Request		*req;
 		bool			IhaveResponse;
 		bool			IhaveCGI;
 		bool			keepAlive;
