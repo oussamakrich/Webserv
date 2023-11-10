@@ -1,7 +1,6 @@
 
 #include "../include/Global.hpp"
 #include <sys/poll.h>
-
 std::vector<struct pollfd> Global::gPollFds =  std::vector<struct pollfd>();
 std::vector<std::string> Global::serverNames =  std::vector<std::string>();
 std::vector<Server *> Global::servers =  std::vector<Server *>();
@@ -71,17 +70,22 @@ void  Global::run()
 	}
 	while(true){
 		checkTimeOut(servers);
-		int pollStatus = poll(this->gPollFds.data(), this->gPollFds.size(), -1);
+		cout << "\t\t ================ Wait For new Evnet ================ SIZE " << gPollFds.size() << " \n ";
+		int pollStatus = poll(this->gPollFds.data(), this->gPollFds.size(),0);
 		if (pollStatus == -1) 
 		{
-
-			perror("ERROR IN POLL ");
+			std::cout << "POLL : FILA\n";
 			continue;
 		}
-		for(unsigned int i =0; i < gPollFds.size() && pollStatus; i++){
+		for(unsigned int i =0; i < gPollFds.size(); i++){
 			if (pollStatus && ((gPollFds[i].revents & POLLIN) || (gPollFds[i].revents & POLLOUT))){
+			
 				this->callHandelFds(gPollFds[i]);
 				pollStatus--;
+			}
+			else if (gPollFds[i].revents  != 0)
+			{
+				std::cout << "\n\nERRR______________________________________________________GOGO\n\n";
 			}
 		}
 	}
@@ -105,3 +109,5 @@ void Global::insertFd(int fd){
 	pfd.revents = 0;
 	Global::gPollFds.push_back(pfd);
 }
+
+

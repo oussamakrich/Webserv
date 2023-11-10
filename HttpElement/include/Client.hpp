@@ -16,6 +16,7 @@ class Client{
 		Client(int bodySize, int fd);
 		~Client();
 		pollfd					pfd;
+		double TM;
 
 	private:
 		std::time_t			lastTime;

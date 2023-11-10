@@ -3,6 +3,27 @@
 #include "../include/Global.hpp"
 #include "../../Response/include/GenerateResponse.hpp"
 #include "../../Uploader/include/Upload.hpp"
+#include <sys/time.h>
+
+std::string timeString(double tm)
+{
+	stringstream ss;
+	if (tm  > 1000000)
+		ss << tm / 1000000.0 << " s";
+	else if (tm  > 1000)
+		ss << tm / 1000 << " ms";
+	else
+		ss << tm  << " us";
+return ss.str();
+}
+static double GetTM()
+{
+	timeval tm;
+	double val;
+	gettimeofday(&tm, NULL);
+	val = tm.tv_sec * 1000000 + tm.tv_usec;
+	return val;
+}
 
 bool creatSocket(int *listen, addrinfo *MyAddr){
 	*listen = socket(MyAddr->ai_family , MyAddr->ai_socktype , 0);
@@ -66,13 +87,16 @@ void Server::acceptClient(){
 		std::cerr << "ERROR : Connection failed" << std::endl;
 		return;
 	}
-	std::cout << serverName + " : new connection accepted" << std::endl;
 	newClient = new Client(this->clientMaxBodySize, clientFd);
 	newClient->setAddr(sockaddr);
+	fcntl(clientFd, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
+	newClient->TM = GetTM();
 	this->clients.push_back(newClient);
 	Global::insertFd(clientFd);
-}
+	std::cout << serverName + "new Client fd = " << clientFd << std::endl;
+	
 
+}
 ITT_CLIENT Server::findClient(pollfd pfd){
 	ITT_CLIENT it = clients.begin();
 
@@ -84,7 +108,12 @@ ITT_CLIENT Server::findClient(pollfd pfd){
 
 void Server::closeConnection(ITT_CLIENT it){
 	Client *client = *it;
-	std::cout << "connection closed : " << client->getFd() << std::endl;
+	std::cout << std::boolalpha;
+	std::cout << "--------------------------------------------\n";
+	std::cout << "connection closed:" << client->getFd() << " time " <<  timeString(GetTM() - client->TM ) <<" us"<< std::endl;
+	std::cout <<"CGI STATUS : " << client->CGIFinish << std::endl;
+	std::cout << "" <<( client->pfd.events  ==  POLLOUT ? "POLLOUT" :  "POOLIN ?");
+	std::cout<<  "  Keep ALive :" << client->keepAlive;
 	clients.erase(it);
 	Global::removeFd(client->getFd());
 	delete client;
@@ -132,15 +161,17 @@ bool Server::handelFd(struct pollfd pfd){
 void Server::checkTimeOut(){
 	ITT_CLIENT it = clients.begin();
 	Client *client;
+		std::cout << "\t\t\t@#########################< STATRT >################################>" << std::endl;
 	while (it != clients.end()){
 		client = *it;
 		std::time_t tm = client->getLastTime();
 		std::time_t now = std::time(NULL);
-		if(now - tm >= TIME_OUT){
-			std::cout << "client deleted" << std::endl;
+		if(now - tm >= 1){
+	 		std::cout << "Client fd: " << client->getFd()  << "TIME : " << now - tm<< "\n";
 			closeConnection(it);
 			continue;
 		}
 		it++;
 	}
+			std::cout << "\t\t\t@#########################< END  >################################>" << std::endl;
 }
