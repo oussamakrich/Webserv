@@ -49,13 +49,14 @@ string Cgi::getRandomName(string root, string postfix)
 {
 	try
 	{
-		time_t tm;
-		time(&tm);
+	
+		timeval tm;
+    	gettimeofday(&tm, nullptr);
+
 		std::stringstream ss;
 		ss <<root;
-
 		ss << "/tmp-";
-		ss << tm;
+		ss <<tm.tv_sec << "@" << tm.tv_usec;
 		ss << postfix;
 		ss << ".bin";
 		return ss.str();

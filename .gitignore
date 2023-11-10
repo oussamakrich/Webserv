@@ -12,4 +12,3 @@ MyLab
 .gitignore
 ./tmp/*
 config.conf
-
