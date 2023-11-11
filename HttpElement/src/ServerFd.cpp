@@ -93,19 +93,8 @@ bool Server::handelClient(ITT_CLIENT it){
 
 	Client *client = *it;
 	client->setLastTime(time(NULL));
-	if (client->IhaveUpload){
-		Upload reminder(*this, *client->response);
-		client->IhaveUpload = client->response->iHaveUpload;
-		if (!client->IhaveUpload)
-		{
-			client->response->setMsg(GenerateResponse::generateMsg(client->response->getCode()));;
-			client->response->setHeaderAndStart(GenerateResponse::generateHeaderAndSt(*client->response, client->keepAlive));
-			client->response->sendResponse();
-			client->IhaveResponse = false;
-			
-		}
-
-	}
+	if (client->IhaveUpload)
+		client->ClientUpload(*this);
 	else if (client->IhaveCGI && !client->CGIFinish)
 		client->CgiRequest(it, *this);
 	else if (client->IhaveResponse)

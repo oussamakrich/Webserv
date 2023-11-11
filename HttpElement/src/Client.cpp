@@ -3,6 +3,7 @@
 #include "../include/Global.hpp"
 #include "../include/Server.hpp"
 #include "../../Response/include/GenerateResponse.hpp"
+#include "../../Uploader/include/Upload.hpp"
 
 #define N_READ 50000
 
@@ -108,29 +109,18 @@ bool Client::CgiRequest(ITT_CLIENT it, Server &ser){
 	return false;
 }
 
-Server &Global::FindServer(const MAP_STRING &headers, Server &ser){
+void Client::ClientUpload(Server &ser){
 
-	std::string value;
-	//TODO : first check if host is only alpha
-
-	value = headers.at("Host");
-	if (value.empty())
-		return ser;
-	stringstream ss(value);
-	std::getline(ss, value, ':');
-
-	std::vector<std::string>::iterator it;
-
-	it = std::find(serverNames.begin(), serverNames.end(), value);
-	if (it == serverNames.end() || value == ser.getServerName())
-		return ser;
-
-	size_t size = servers.size();
-	for (size_t i = 0;i < size; i++){
-		if (servers[i]->getServerName() == value && servers[i]->getPort() == ser.getPort() && servers[i]->getHost() == ser.getHost())
-			return *servers[i];
-	}
-	return ser;
+		Upload reminder(ser, *response);
+		IhaveUpload = response->iHaveUpload;
+		if (!IhaveUpload)
+		{
+			response->setMsg(GenerateResponse::generateMsg(response->getCode()));;
+			response->setHeaderAndStart(GenerateResponse::generateHeaderAndSt(*response, keepAlive));
+			response->sendResponse();
+			IhaveResponse = false;
+			switchEvent(this->fd, POLLIN);
+		}
 }
 
 
