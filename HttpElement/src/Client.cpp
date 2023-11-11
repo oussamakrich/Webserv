@@ -3,11 +3,6 @@
 #include "../include/Global.hpp"
 #include "../include/Server.hpp"
 #include "../../Response/include/GenerateResponse.hpp"
-#include <fstream>
-#include <sstream>
-#include <string>
-#include <sys/_types/_size_t.h>
-#include <vector>
 
 #define N_READ 50000
 
@@ -40,7 +35,7 @@ bool Client::ReadRequest(){ //TODO : send 500 if read fail
 		delete  buffer;
 		return false;
 	}
-	int level = reqBuff.insertBuffer(buffer, status);
+	reqBuff.insertBuffer(buffer, status);
 	delete buffer;
 	return true;
 }
@@ -139,7 +134,7 @@ Server &Global::FindServer(const MAP_STRING &headers, Server &ser){
 }
 
 
-bool Client::NewRequest(ITT_CLIENT it, Server &ser){
+bool Client::NewRequest(Server &ser){
 	Request *req;
 
 	this->keepAlive = true;

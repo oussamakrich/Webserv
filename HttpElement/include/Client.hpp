@@ -38,7 +38,7 @@ class Client{
 		Request *getRequest();
 		std::time_t	getLastTime();
 
-		bool NewRequest(ITT_CLIENT	it, Server &ser);
+		bool NewRequest(Server &ser);
 		bool OldRequest(ITT_CLIENT it, Server &ser);
 		bool CgiRequest(ITT_CLIENT it, Server &ser);
 		void Error();

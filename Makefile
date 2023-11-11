@@ -2,28 +2,28 @@ NAME = webserver
 
 SRC =	./HttpElement/src/Client.cpp\
 		./HttpElement/src/Global.cpp\
-		./HttpElement/src/Location.cpp\
 		./HttpElement/src/Server.cpp\
 		./HttpElement/src/ServerFd.cpp\
-		./main.cpp\
 		./Parsing/src/GenerateGlobalClass.cpp\
-		./Parsing/src/GenerateLocation.cpp\
 		./Parsing/src/GenerateServer.cpp\
+		./Utils/src/UrlEncoder.cpp\
+		./ErrorResponse/src/ErrorResponse.cpp\
+		./ErrorResponse/src/GenerateError.cpp\
+		./Response/src/Response.cpp\
+		./Response/src/GenerateResponse.cpp\
+		./Response/src/AllMethod.cpp\
+		./HttpElement/src/Location.cpp\
+		./main.cpp\
+		./Parsing/src/GenerateLocation.cpp\
 		./Parsing/src/Tokenizer.cpp\
 		./Utils/src/Logger.cpp\
 		./Utils/src/printTokens.cpp\
 		./Utils/src/trim.cpp\
-		./Utils/src/UrlEncoder.cpp\
 		./Utils/src/DirListing.cpp\
-		./ErrorResponse/src/ErrorResponse.cpp\
-		./ErrorResponse/src/GenerateError.cpp\
 		./Parsing/src/ParsRequest.cpp\
 		./Request/Buffer/RequestBuffer.cpp\
 		./Request/Buffer/Byte.cpp\
 		./HttpElement/src/Request.cpp\
-		./Response/src/Response.cpp\
-		./Response/src/GenerateResponse.cpp\
-		./Response/src/AllMethod.cpp\
 		./HttpElement/src/Cgi.cpp\
 		./Utils/src/signal.cpp\
 		./Uploader/src/Upload.cpp \
@@ -33,23 +33,23 @@ SRC =	./HttpElement/src/Client.cpp\
 
 HEADER =	./HttpElement/include/Client.hpp \
 			./HttpElement/include/Global.hpp \
-			./HttpElement/include/Location.hpp \
+			./Response/include/Response.hpp\
 			./HttpElement/include/Server.hpp \
-			./include/includes.hpp \
 			./Parsing/include/GenerateGlobalClass.hpp \
-			./Parsing/include/GenerateLocation.hpp \
+			./ErrorResponse/include/ErrorResponse.hpp\
+			./ErrorResponse/include/GenerateError.hpp\
 			./Parsing/include/GenerateServer.hpp \
+			./include/includes.hpp \
+			./Response/include/GenerateResponse.hpp\
+			./Response/include/AllMethod.hpp\
+			./HttpElement/include/Location.hpp \
+			./Parsing/include/GenerateLocation.hpp \
 			./Parsing/include/Tokenizer.hpp \
 			./Utils/include/Logger.hpp\
 			./Utils/include/DirListing.hpp\
-			./ErrorResponse/include/ErrorResponse.hpp\
-			./ErrorResponse/include/GenerateError.hpp\
 			./Parsing/include/ParsRequest.hpp\
 			./Request/Buffer/RequestBuffer.hpp\
 			./HttpElement/include/Request.hpp\
-			./Response/include/Response.hpp\
-			./Response/include/GenerateResponse.hpp\
-			./Response/include/AllMethod.hpp\
 			./HttpElement/include/Cgi.hpp\
 			./Request/Buffer/Byte.hpp\
 			./Uploader/include/Upload.hpp \
@@ -58,7 +58,7 @@ HEADER =	./HttpElement/include/Client.hpp \
 
 OBJ = $(SRC:.cpp=.o)
 
-FLAGS = -g #-fsanitize=address -g #-Wall -Wextra -Werror -std=c++98
+FLAGS = -fsanitize=address -g -Wall -Wextra -Werror -std=c++98
 
 all:  $(NAME)
 

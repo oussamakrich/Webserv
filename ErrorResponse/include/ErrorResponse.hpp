@@ -21,6 +21,6 @@ class ErrorResponse{
 		std::string getErrorMsg();
 		std::string getErrorBody();
 		int 				getErrorCode();
-		std::string getErrorPage(Server &serv);
+		std::string getErrorPage();
 
 };

@@ -83,29 +83,5 @@ class Response{
 		void sendErrorResponse(Server &ser, int fd);
 		void HandelLocation();
 
-		char *strjoin(const char *s1, char *s2, size_t size1, size_t size2)
-		{
-			char	*tmp;
-			int		i;
-			int		j;
-
-			i = 0;
-			j = 0;
-			tmp = new char[size1 + size2 + 1];
-			while (i < size1)
-			{
-				tmp[i] = s1[i];
-				i++;
-			}
-			while (j < size2)
-			{
-				tmp[i + j] = s2[j];
-				j++;
-			}
-			if (size2 > 0)
-				delete[] s2;
-			return (tmp);
-		}
-
 
 };

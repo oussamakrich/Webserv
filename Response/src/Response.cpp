@@ -55,9 +55,12 @@ void Response::setHeaderAndStart(std::string header){this->HeaderAndStart = head
 void Response::sendErrorResponse(Server &ser ,int fd){
 		stillSend = false;
 		ErrorResponse err = GenerateError::generateError(this->code, this->errorPage);
-		std::string error =  err.getErrorPage(ser);
+		std::string error =  err.getErrorPage();
 		send(fd, error.c_str(), error.size(), 0);
 }
+
+
+
 void Response::CgiHeaders(bool keepAlive, std::ifstream &file, size_t sizeOfFile){
 	std::string header;
 	size_t pos;
