@@ -153,7 +153,7 @@ void ResponseHandler::serveFile(std::string path, size_t size){
 void ResponseHandler::_extract_resources_from_request()
 {
 	std::string contentType = req.getHeader("Content-Type");
-	int pos = contentType.find("boundary=");
+	unsigned long pos = contentType.find("boundary=");
 	if (pos == std::string::npos)
 	{
 		std::cout << YELLOW"Warning:"<<  RESET" unable to upload the file\n";
@@ -162,7 +162,7 @@ void ResponseHandler::_extract_resources_from_request()
 		return;
 	}
 	pos += 9;
-	int end = contentType.find(";", pos);
+	unsigned long end = contentType.find(";", pos);
 	if (end == std::string::npos)
 		res._boundary = contentType.substr(pos);
 	else
@@ -178,7 +178,7 @@ void ResponseHandler::_extract_resources_from_request()
 
 std::string ResponseHandler::GetFileName()
 {
-	long long pos;
+	unsigned long pos;
 	if ((req.getHeader("Content-Disposition")).empty())
 	{
 		std::string path = req.getPath();

@@ -1,4 +1,6 @@
 #include "RequestBuffer.hpp"
+#include "../../HttpElement/include/Cgi.hpp"
+
 #include <sstream>
 #include <fstream>
 
@@ -149,7 +151,7 @@ int RequestBuffer::_headers_handler()
 
 int	RequestBuffer::_get_body_level()
 {
-	int _pos = _headers.find("Transfer-Encoding: ");
+	unsigned long _pos = _headers.find("Transfer-Encoding: ");
 	if (_pos != std::string::npos)
 	{
 		_pos += 19;
@@ -190,14 +192,14 @@ int	RequestBuffer::_get_body_level()
 
 int RequestBuffer::_content_length_handler()
 {
-	if (_body_path.size() == 0)	{_body_path = _generate_tmp_file_path();}
+	if (_body_path.size() == 0)	{_body_path = Cgi::getRandomName("/tmp/", "omm");}
 	std::ofstream _file(_body_path, std::ios::out | std::ios::binary | std::ios::app);
 	if (_file.is_open() == false)
 	{
 		std::cout << RED"Inernal server error: " << "failed to create a tmp file." << _body_path << std::endl;
 		return (_status = 507, _status);
 	}
-	if (_buffer.size() >= _contentLength)
+	if ((_buffer.size()) >= static_cast<unsigned long>(_contentLength))
 	{
 		_file.write(_buffer.getData(), _contentLength);
 		_file.close();
@@ -268,14 +270,14 @@ int	RequestBuffer::_chunked_handler()
 	if (_chunkSize == 0)	return (_status = 1, _status);
 	else
 	{
-		if (_body_path.size() == 0)	{_body_path = _generate_tmp_file_path();}
+		if (_body_path.size() == 0)	{_body_path = Cgi::getRandomName("/tmp/", "omm");}
 		std::ofstream _file(_body_path, std::ios::out | std::ios::binary | std::ios::app);
 		if (_file.is_open() == false)
 		{
 			std::cout << RED"Inernal server error: " << "failed to create a tmp file." << _body_path << std::endl;
 			return (_status = 507, _status);
 		}
-		if (_buffer.size() >= _chunkSize)
+		if (static_cast<int>(_buffer.size()) >= _chunkSize)
 		{
 			_file.write(_buffer.getData(), _chunkSize);
 			_file.close();
@@ -300,7 +302,7 @@ int RequestBuffer::_multipart_handler()
 	int _pos;
 	if (_body_path.size() == 0)
 	{
-		_body_path = _generate_tmp_file_path();
+		_body_path = Cgi::getRandomName("/tmp/", "omm");
 	}
 	std::ofstream _file(_body_path, std::ios::out | std::ios::binary |
 	std::ios::app);

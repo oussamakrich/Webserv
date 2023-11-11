@@ -1,6 +1,11 @@
 NAME = webserver
 
-SRC =	./HttpElement/src/Client.cpp\
+SRC =	./Request/Buffer/RequestBuffer.cpp\
+		./Parsing/src/Tokenizer.cpp\
+		./Uploader/src/Upload.cpp \
+		./Request/Buffer/Byte.cpp\
+		./main.cpp\
+		./HttpElement/src/Client.cpp\
 		./HttpElement/src/Global.cpp\
 		./HttpElement/src/Server.cpp\
 		./HttpElement/src/ServerFd.cpp\
@@ -13,20 +18,15 @@ SRC =	./HttpElement/src/Client.cpp\
 		./Response/src/GenerateResponse.cpp\
 		./Response/src/AllMethod.cpp\
 		./HttpElement/src/Location.cpp\
-		./main.cpp\
 		./Parsing/src/GenerateLocation.cpp\
-		./Parsing/src/Tokenizer.cpp\
 		./Utils/src/Logger.cpp\
 		./Utils/src/printTokens.cpp\
 		./Utils/src/trim.cpp\
 		./Utils/src/DirListing.cpp\
 		./Parsing/src/ParsRequest.cpp\
-		./Request/Buffer/RequestBuffer.cpp\
-		./Request/Buffer/Byte.cpp\
 		./HttpElement/src/Request.cpp\
 		./HttpElement/src/Cgi.cpp\
 		./Utils/src/signal.cpp\
-		./Uploader/src/Upload.cpp \
 
 
 
@@ -58,7 +58,7 @@ HEADER =	./HttpElement/include/Client.hpp \
 
 OBJ = $(SRC:.cpp=.o)
 
-FLAGS = -g #-fsanitize=address  #-Wall -Wextra -Werror -std=c++98
+FLAGS = -g -fsanitize=address  -Wall -Wextra -Werror -std=c++98
 
 all:  $(NAME)
 

@@ -1,4 +1,5 @@
 #include "Byte.hpp"
+#include <sys/_types/_size_t.h>
 
 
 char *strdup(const char *s, int size)
@@ -74,17 +75,17 @@ Byte::~Byte()
 
 int Byte::find(const char *_to_find, int _len) const
 {
-	int		i;
-	int		j;
+	size_t		i;
+	size_t		j;
 	i = 0;
 	j = 0;
 	while (i < _size)
 	{
 		if (_data[i] == _to_find[j])
 		{
-			while ((i + j) < _size && _data[i + j] == _to_find[j] && j < _len)
+			while ((i + j) < _size && _data[i + j] == _to_find[j] && j < static_cast<size_t>(_len))
 				j++;
-			if (j == _len)
+			if (j == static_cast<size_t>(_len))
 				return (i);
 			j = 0;
 		}
@@ -95,7 +96,7 @@ int Byte::find(const char *_to_find, int _len) const
 
 char *Byte::substr(int start, int len) const
 {
-	if (start < 0 || start > _size || len <= 0 || len > _size - start)
+	if (start < 0 || static_cast<size_t>(start) > _size || len <= 0 || static_cast<size_t>(len) > _size - static_cast<size_t>(start))
 		return NULL;
 	char *ret = NULL;
 	try {
@@ -104,13 +105,13 @@ char *Byte::substr(int start, int len) const
 		std::cout << e.what() << std::endl;
 		return NULL;
 	}
-	std::memmove(ret, _data + start, len);
+	std::memmove(ret, _data + static_cast<size_t>(start), len);
 	return ret;
 }
 
 char *Byte::substr(int start)
 {
-	if (start < 0 || start > _size || _size - start <= 0)
+	if (start < 0 || static_cast<size_t>(start) > _size || _size - static_cast<size_t>(start) <= 0)
 		return NULL;
 	char *ret = NULL;
 	try {
