@@ -1,6 +1,7 @@
 #include "RequestBuffer.hpp"
 #include <sstream>
 #include <fstream>
+#include <sys/_types/_size_t.h>
 
 std::string const&							RequestBuffer::getBody() const {return _body_path;};
 int											RequestBuffer::getBodySize() {return (_buffer.size());};
@@ -149,7 +150,7 @@ int RequestBuffer::_headers_handler()
 
 int	RequestBuffer::_get_body_level()
 {
-	int _pos = _headers.find("Transfer-Encoding: ");
+	size_t _pos = _headers.find("Transfer-Encoding: ");
 	if (_pos != std::string::npos)
 	{
 		_pos += 19;
@@ -197,7 +198,7 @@ int RequestBuffer::_content_length_handler()
 		std::cout << RED"Inernal server error: " << "failed to create a tmp file." << _body_path << std::endl;
 		return (_status = 507, _status);
 	}
-	if (_buffer.size() >= _contentLength)
+	if (_buffer.size() >= static_cast<size_t>(_contentLength))
 	{
 		_file.write(_buffer.getData(), _contentLength);
 		_file.close();
@@ -275,7 +276,7 @@ int	RequestBuffer::_chunked_handler()
 			std::cout << RED"Inernal server error: " << "failed to create a tmp file." << _body_path << std::endl;
 			return (_status = 507, _status);
 		}
-		if (_buffer.size() >= _chunkSize)
+		if (_buffer.size() >= static_cast<size_t>(_chunkSize))
 		{
 			_file.write(_buffer.getData(), _chunkSize);
 			_file.close();

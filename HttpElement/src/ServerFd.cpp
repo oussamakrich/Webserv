@@ -66,7 +66,8 @@ void Server::acceptClient(){
 		std::cerr << "ERROR : Connection failed" << std::endl;
 		return;
 	}
-	std::cout << serverName + " : new connection accepted" << std::endl;
+	// std::cout << serverName + " : new connection accepted" << std::endl;
+	std::cout << "FD: " << clientFd << std::endl;
 	newClient = new Client(this->clientMaxBodySize, clientFd);
 	newClient->setAddr(sockaddr);
 	this->clients.push_back(newClient);
@@ -84,7 +85,7 @@ ITT_CLIENT Server::findClient(pollfd pfd){
 
 void Server::closeConnection(ITT_CLIENT it){
 	Client *client = *it;
-	std::cout << "connection closed : " << client->getFd() << std::endl;
+	// std::cout << "connection closed : " << client->getFd() << std::endl;
 	clients.erase(it);
 	Global::removeFd(client->getFd());
 	delete client;

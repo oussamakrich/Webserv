@@ -1,35 +1,30 @@
 NAME = webserver
 
-SRC =	./HttpElement/src/Client.cpp\
+SRC =	./Request/Buffer/RequestBuffer.cpp\
+		./Request/Buffer/Byte.cpp\
+		./Parsing/src/Tokenizer.cpp\
+		./Uploader/src/Upload.cpp \
+		./Utils/src/trim.cpp\
+		./main.cpp\
+		./HttpElement/src/Client.cpp\
 		./HttpElement/src/Global.cpp\
 		./HttpElement/src/Location.cpp\
 		./HttpElement/src/Server.cpp\
 		./HttpElement/src/ServerFd.cpp\
-		./main.cpp\
 		./Parsing/src/GenerateGlobalClass.cpp\
 		./Parsing/src/GenerateLocation.cpp\
 		./Parsing/src/GenerateServer.cpp\
-		./Parsing/src/Tokenizer.cpp\
-		./Utils/src/Logger.cpp\
-		./Utils/src/printTokens.cpp\
-		./Utils/src/trim.cpp\
 		./Utils/src/UrlEncoder.cpp\
 		./Utils/src/DirListing.cpp\
 		./ErrorResponse/src/ErrorResponse.cpp\
 		./ErrorResponse/src/GenerateError.cpp\
 		./Parsing/src/ParsRequest.cpp\
-		./Request/Buffer/RequestBuffer.cpp\
-		./Request/Buffer/Byte.cpp\
 		./HttpElement/src/Request.cpp\
 		./Response/src/Response.cpp\
 		./Response/src/GenerateResponse.cpp\
 		./Response/src/AllMethod.cpp\
 		./HttpElement/src/Cgi.cpp\
 		./Utils/src/signal.cpp\
-		./Uploader/src/Upload.cpp \
-
-
-
 
 HEADER =	./HttpElement/include/Client.hpp \
 			./HttpElement/include/Global.hpp \
@@ -58,7 +53,7 @@ HEADER =	./HttpElement/include/Client.hpp \
 
 OBJ = $(SRC:.cpp=.o)
 
-FLAGS = -g #-fsanitize=address -g #-Wall -Wextra -Werror -std=c++98
+FLAGS = -g -fsanitize=address #-Wall -Wextra -Werror -std=c++98
 
 all:  $(NAME)
 

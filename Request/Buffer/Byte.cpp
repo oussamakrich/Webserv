@@ -1,4 +1,5 @@
 #include "Byte.hpp"
+#include <sys/_types/_size_t.h>
 
 
 char *strdup(const char *s, int size)
@@ -72,10 +73,10 @@ Byte::~Byte()
 	_size = 0;
 }
 
-int Byte::find(const char *_to_find, int _len) const
+int Byte::find(const char *_to_find, size_t _len) const
 {
-	int		i;
-	int		j;
+	size_t		i;
+	size_t		j;
 	i = 0;
 	j = 0;
 	while (i < _size)
@@ -93,7 +94,7 @@ int Byte::find(const char *_to_find, int _len) const
 	return (-1);
 }
 
-char *Byte::substr(int start, int len) const
+char *Byte::substr(size_t start, size_t len) const
 {
 	if (start < 0 || start > _size || len <= 0 || len > _size - start)
 		return NULL;
@@ -108,7 +109,7 @@ char *Byte::substr(int start, int len) const
 	return ret;
 }
 
-char *Byte::substr(int start)
+char *Byte::substr(size_t start)
 {
 	if (start < 0 || start > _size || _size - start <= 0)
 		return NULL;

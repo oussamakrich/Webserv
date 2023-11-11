@@ -69,7 +69,11 @@ std::time_t Client::getLastTime(){ return lastTime;}
 void Client::setLastTime(std::time_t tm){ this->lastTime = tm;}
 
 void Client::switchEvent(int fd, int Flag){
-	pfd.events = Flag;
+
+	
+		pfd.events = Flag;
+
+	// pfd.events = Flag;
 	Global::switchEvent(fd, Flag);
 }
 

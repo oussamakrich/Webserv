@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <string>
+#include <sys/_types/_size_t.h>
 
 class Byte{
 
@@ -21,11 +22,11 @@ class Byte{
 
 		~Byte();
 
-		int find(const char *_to_find, int _len) const;
+		int find(const char *_to_find, size_t _len) const;
 
-		char *substr(int start, int len) const;
+		char *substr(size_t start, size_t len) const;
 
-		char *substr(int start);
+		char *substr(size_t start);
 
 		void resize(size_t _start);
 

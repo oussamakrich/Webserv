@@ -42,6 +42,7 @@ void Global::removeFd(int fd){
 	for(unsigned int i=0; i < gPollFds.size(); i++){
 			if (gPollFds[i].fd == fd){
 				close(gPollFds[i].fd);
+				gPollFds[i].fd = -1;
 				gPollFds.erase(gPollFds.begin() + i);
 				break ;
 		}
@@ -71,7 +72,7 @@ void  Global::run()
 	}
 	while(true){
 		checkTimeOut(servers);
-		int pollStatus = poll(this->gPollFds.data(), this->gPollFds.size(), -1);
+		int pollStatus = poll(this->gPollFds.data(), this->gPollFds.size(), 1);
 		if (pollStatus == -1) {
 			perror("poll");
 			continue;
@@ -88,7 +89,16 @@ void  Global::run()
 void Global::switchEvent(int fd, int Flag){
 	for (unsigned int i = 0; i < gPollFds.size(); i++){
 		if (gPollFds[i].fd == fd){
+			// if (Flag == POLLIN)
+			// 	gPollFds[i].events = POLLIN;
+			// else if (Flag == POLLOUT)
+			// 	gPollFds[i].events = POLLOUT;
+			// else if (Flag == (POLLIN | POLLOUT))
+			// 	gPollFds[i].events = POLLIN | POLLOUT;
+			// else if (Flag == 0)
+			// 	gPollFds[i].events = 0;
 			gPollFds[i].events = Flag;
+
 			break ;
 		}
 	}
