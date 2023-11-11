@@ -70,8 +70,8 @@ void  Global::run()
 	}
 	while(true){
 		checkTimeOut(servers);
-		cout << "\t\t ================ Wait For new Evnet ================ SIZE " << gPollFds.size() << " \n ";
-		int pollStatus = poll(this->gPollFds.data(), this->gPollFds.size(),0);
+		cout << "\r\t\t ================ Wait For new Evnet ================ SIZE " << gPollFds.size() << " \n ";
+		int pollStatus = poll(this->gPollFds.data(), this->gPollFds.size(), -1);
 		if (pollStatus == -1) 
 		{
 			std::cout << "POLL : FILA\n";
@@ -79,13 +79,8 @@ void  Global::run()
 		}
 		for(unsigned int i =0; i < gPollFds.size(); i++){
 			if (pollStatus && ((gPollFds[i].revents & POLLIN) || (gPollFds[i].revents & POLLOUT))){
-			
 				this->callHandelFds(gPollFds[i]);
 				pollStatus--;
-			}
-			else if (gPollFds[i].revents  != 0)
-			{
-				std::cout << "\n\nERRR______________________________________________________GOGO\n\n";
 			}
 		}
 	}
@@ -100,7 +95,7 @@ void Global::switchEvent(int fd, int Flag){
 	}
 }
 
-pollfd &Global::insertFd(int fd){
+void Global::insertFd(int fd){
 
 	struct pollfd pfd;
 
@@ -108,7 +103,6 @@ pollfd &Global::insertFd(int fd){
 	pfd.events = POLLIN;
 	pfd.revents = 0;
 	Global::gPollFds.push_back(pfd);
-	return Global::gPollFds.back();
 }
 
 

@@ -11,23 +11,21 @@
 
 #define N_READ 50000
 
-Client::Client(int bodySize, pollfd &fd) : pfd(fd), reqBuff(bodySize){
+Client::Client(int bodySize, int fd) : reqBuff(bodySize){
 
 	lastTime = std::time(NULL);
 	IhaveResponse = false;
 	IhaveUpload = false;
 	IhaveCGI = false;
 	this->response = NULL;
-	// pfd.fd = fd;
-	// pfd.events = POLLIN | POLLOUT;
-	// pfd.revents = 0;
+	this->fd = fd;
 }
 
 Client::~Client(){
 	delete this->response;
 }
 
-int Client::getFd(){return pfd.fd; }
+int Client::getFd(){return fd; }
 
 bool Client::ReadRequest(){ //TODO : send 500 if read fail
 
@@ -36,7 +34,7 @@ bool Client::ReadRequest(){ //TODO : send 500 if read fail
 	if (!buffer)
 		return false;
 	memset(buffer, 0, N_READ);
-	status = recv(pfd.fd, buffer, N_READ, 0);
+	status = recv(this->fd, buffer, N_READ, 0);
 	if (status == -1 || status == 0)
 	{
 		delete  buffer;
@@ -71,7 +69,6 @@ std::time_t Client::getLastTime(){ return lastTime;}
 void Client::setLastTime(std::time_t tm){ this->lastTime = tm;}
 
 void Client::switchEvent(int fd, int Flag){
-	pfd.events = Flag;
 	Global::switchEvent(fd, Flag);
 }
 
@@ -94,12 +91,12 @@ bool Client::OldRequest(ITT_CLIENT it, Server &ser){
 }
 
 bool Client::CgiRequest(ITT_CLIENT it, Server &ser){
-	switchEvent(this->pfd.fd, POLLOUT);
+	switchEvent(this->fd, POLLOUT);
 	if (response->CgiResponse(this->keepAlive)){
 		CGIFinish = true;
 		IhaveResponse = response->stillSend;
 		if (!IhaveResponse){
-			switchEvent(this->pfd.fd, POLLIN);
+			switchEvent(this->fd, POLLIN);
 			response->isCGI = false;
 			Cgi::CgiUnlink(response->cgiInfo);
 			delete response;
@@ -153,19 +150,19 @@ bool Client::NewRequest(ITT_CLIENT it, Server &ser){
 	}
 	if (!isRequestAvailable())
 		return true;
-	switchEvent(this->pfd.fd, POLLOUT);
+	switchEvent(this->fd, POLLOUT);
 	req = getRequest();
 	reqBuff.clear();
 	if (req->getType() < 0)
 	{
-		this->response = new Response(this->pfd.fd);
+		this->response = new Response(this->fd);
 		response->errorPage = ser.getErrorPages();
 		response->setCode(req->getErrorCode());
 		delete req;
 		return false;
 	}
 	Server &server = Global::FindServer(req->getHeaders(),  ser);
-	response = GenerateResponse::generateResponse(server, *req, this->pfd.fd);
+	response = GenerateResponse::generateResponse(server, *req, this->fd);
 	this->keepAlive = req->getConnection();
 	delete req;
 	IhaveCGI = response->isCGI;
@@ -178,7 +175,7 @@ bool Client::NewRequest(ITT_CLIENT it, Server &ser){
 	if (!IhaveResponse){
 		delete  response;
 		response = NULL;
-		switchEvent(this->pfd.fd, POLLIN);
+		switchEvent(this->fd, POLLIN);
 	}
 	return true;
 }

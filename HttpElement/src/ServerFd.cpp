@@ -69,8 +69,6 @@ void Server::acceptClient(){
 	std::cout << serverName + " : new connection accepted" << std::endl;
 	newClient = new Client(this->clientMaxBodySize, clientFd);
 	newClient->setAddr(sockaddr);
-	fcntl(clientFd, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
-	newClient->TM = GetTM();
 	this->clients.push_back(newClient);
 	Global::insertFd(clientFd);
 }
@@ -85,12 +83,6 @@ ITT_CLIENT Server::findClient(pollfd pfd){
 
 void Server::closeConnection(ITT_CLIENT it){
 	Client *client = *it;
-	std::cout << std::boolalpha;
-	std::cout << "--------------------------------------------\n";
-	std::cout << "connection closed:" << client->getFd() << " time " <<  timeString(GetTM() - client->TM ) <<" us"<< std::endl;
-	std::cout <<"CGI STATUS : " << client->CGIFinish << std::endl;
-	std::cout << "" <<( client->pfd.events  ==  POLLOUT ? "POLLOUT" :  "POOLIN ?");
-	std::cout<<  "  Keep ALive :" << client->keepAlive;
 	clients.erase(it);
 	Global::removeFd(client->getFd());
 	delete client;
@@ -138,17 +130,17 @@ bool Server::handelFd(struct pollfd pfd){
 void Server::checkTimeOut(){
 	ITT_CLIENT it = clients.begin();
 	Client *client;
-		std::cout << "\t\t\t@#########################< STATRT >################################>" << std::endl;
+	
 	while (it != clients.end()){
 		client = *it;
 		std::time_t tm = client->getLastTime();
 		std::time_t now = std::time(NULL);
-		if(now - tm >= 1){
+		if(now - tm >= TIME_OUT){
 	 		std::cout << "Client fd: " << client->getFd()  << "TIME : " << now - tm<< "\n";
+			exit(0);
 			closeConnection(it);
 			continue;
 		}
 		it++;
 	}
-			std::cout << "\t\t\t@#########################< END  >################################>" << std::endl;
 }
