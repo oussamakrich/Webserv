@@ -75,7 +75,7 @@ const string							&Location::getDefaultTypes()    const    { return    default_
 const string							&Location::getRoot()            const    { return    root;                }
 const string                      		&Location::getPath() 		    const    { return    path;                }
 const string                 			Location::getUri() 		        const    { return    root + path;         }
-const int 								Location::getRedirectionCode()  const    {		return redirection_code; }
+	int 								Location::getRedirectionCode()  const    {		return redirection_code; }
 const string 						    &Location::getRedirectionText()  const   {  return redirection_text;    }
 const string							Location::getCgiBinFor(string file) const
 {

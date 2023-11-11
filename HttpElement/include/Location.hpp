@@ -58,7 +58,7 @@ public :
 		const string                			&getRoot() 								const;
 		const string                      		&getPath() 								const;
 		const string                 			getUri() 								const; // uri = root + path;
-		const int 								getRedirectionCode()					const;
+		int 									getRedirectionCode()					const;
 		const string 							&getRedirectionText()					const;
 		const map<string, string>				&getCgi()								const;
 		const string							getCgiBinFor(string file)				const;
