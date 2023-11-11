@@ -70,7 +70,7 @@ void Client::switchEvent(int fd, int Flag){
 bool Client::OldRequest(ITT_CLIENT it, Server &ser){
 
 	if (!response->ReminderResponse() && !response->errorInSend){
-		response->sendErrorResponse(ser, getFd());
+		response->sendErrorResponse(getFd());
 		ser.closeConnection(it);
 		return true;
 	}
@@ -101,7 +101,7 @@ bool Client::CgiRequest(ITT_CLIENT it, Server &ser){
 	}
 	if (response->errrCgi){
 		IhaveResponse = false;
-		response->sendErrorResponse(ser, getFd());
+		response->sendErrorResponse(getFd());
 		ser.closeConnection(it);
 		return true;
 	}

@@ -53,7 +53,7 @@ std::string UrlEncode(std::string simpleStr)
     return codedStr;
 }
 
-char *strjoin(const char *s1, char *s2, size_t size1, size_t size2)
+char *Responsejoin(const char *s1, char *s2, size_t size1, size_t size2)
 {
 	char		*tmp;
 	size_t	i;

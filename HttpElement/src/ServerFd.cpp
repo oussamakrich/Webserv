@@ -101,8 +101,8 @@ bool Server::handelClient(ITT_CLIENT it){
 		client->CgiRequest(it, *this);
 	else if (client->IhaveResponse)
 		client->OldRequest(it, *this);
-	else if (!client->NewRequest(it, *this) && !client->response->errorInSend){
-		client->response->sendErrorResponse(*this, client->getFd());
+	else if (!client->NewRequest(*this) && !client->response->errorInSend){
+		client->response->sendErrorResponse(client->getFd());
 		closeConnection(it);
 		return true;
 	}

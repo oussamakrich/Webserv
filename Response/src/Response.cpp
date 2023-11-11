@@ -52,7 +52,7 @@ void Response::setHeadr(std::string header){ this->headers.push_back(header);}
 
 void Response::setHeaderAndStart(std::string header){this->HeaderAndStart = header;}
 
-void Response::sendErrorResponse(Server &ser ,int fd){
+void Response::sendErrorResponse(int fd){
 		stillSend = false;
 		ErrorResponse err = GenerateError::generateError(this->code, this->errorPage);
 		std::string error =  err.getErrorPage();
@@ -145,7 +145,7 @@ bool Response::sendResponse(){
 	errorInSend = false;
 	if (this->code >= 400)
 		return false;
-	const char *resp = this->strjoin(HeaderAndStart.c_str(), buffer, HeaderAndStart.size(), bufferSize);
+	const char *resp = Responsejoin(HeaderAndStart.c_str(), buffer, HeaderAndStart.size(), bufferSize);
 	buffer = NULL;
 	int ret = send(fd, resp, HeaderAndStart.size() + bufferSize, 0);
 	delete  resp;
