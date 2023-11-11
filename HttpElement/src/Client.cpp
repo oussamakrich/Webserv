@@ -161,7 +161,7 @@ bool Client::NewRequest(Server &ser){
 	this->keepAlive = req->getConnection();
 	delete req;
 	IhaveCGI = response->isCGI;
-	if (response->isCGI)
+	if (response->isCGI || response->iHaveUpload)
 		return true;
 	if (!response->sendResponse())
 		return false;

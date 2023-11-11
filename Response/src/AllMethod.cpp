@@ -156,7 +156,7 @@ void ResponseHandler::_extract_resources_from_request()
 	unsigned long pos = contentType.find("boundary=");
 	if (pos == std::string::npos)
 	{
-		std::cout << YELLOW"Warning:"<<  RESET" unable to upload the file\n";
+		std::cout << YELLOW"Warning:"<<  RESET" unable to upload the file (1)\n";
 		res.setCode(500);
 		res.stillSend = false;
 		return;

@@ -96,6 +96,13 @@ bool Server::handelClient(ITT_CLIENT it){
 	if (client->IhaveUpload){
 		Upload reminder(*this, *client->response);
 		client->IhaveUpload = client->response->iHaveUpload;
+		if (!client->IhaveUpload)
+		{
+			client->response->sendResponse();
+			client->IhaveResponse = false;
+			
+		}
+
 	}
 	else if (client->IhaveCGI && !client->CGIFinish)
 		client->CgiRequest(it, *this);
@@ -130,7 +137,7 @@ bool Server::handelFd(struct pollfd pfd){
 void Server::checkTimeOut(){
 	ITT_CLIENT it = clients.begin();
 	Client *client;
-	
+
 	while (it != clients.end()){
 		client = *it;
 		std::time_t tm = client->getLastTime();

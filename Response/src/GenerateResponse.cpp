@@ -11,7 +11,7 @@ Response *GenerateResponse::generateResponse(Server &ser, Request &req, int fd){
 	res->errorPage = ser.getErrorPages();
 	ResponseHandler Handler(ser, req, *res);
 
-
+	
 	res->setMsg(generateMsg(res->getCode()));
 	res->setHeaderAndStart(generateHeaderAndSt(*res, req.getConnection()));
 
