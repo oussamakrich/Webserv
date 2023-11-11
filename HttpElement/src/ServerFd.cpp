@@ -100,7 +100,6 @@ bool Server::handelClient(ITT_CLIENT it){
 		{
 			client->response->sendResponse();
 			client->IhaveResponse = false;
-			
 		}
 
 	}

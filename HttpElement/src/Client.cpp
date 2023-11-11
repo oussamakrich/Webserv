@@ -161,11 +161,12 @@ bool Client::NewRequest(Server &ser){
 	this->keepAlive = req->getConnection();
 	delete req;
 	IhaveCGI = response->isCGI;
+	IhaveUpload = response->iHaveUpload;
+	IhaveResponse = response->stillSend;
 	if (response->isCGI || response->iHaveUpload)
 		return true;
 	if (!response->sendResponse())
 		return false;
-	IhaveUpload = response->iHaveUpload;
 	IhaveResponse = response->stillSend;
 	if (!IhaveResponse){
 		delete  response;

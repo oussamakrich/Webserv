@@ -167,7 +167,6 @@ void ResponseHandler::_extract_resources_from_request()
 		res._boundary = contentType.substr(pos);
 	else
 		res._boundary = contentType.substr(pos, end - pos);
-	// trim the boundary from the quotes
 	if (res._boundary[0] == '"')
 		res._boundary = res._boundary.substr(1, res._boundary.size() - 2);
 	if (res._boundary[res._boundary.size() - 1] == '"')
