@@ -159,14 +159,14 @@ bool Client::NewRequest(Server &ser){
 	Server &server = Global::FindServer(req->getHeaders(),  ser);
 	response = GenerateResponse::generateResponse(server, *req, this->fd);
 	this->keepAlive = req->getConnection();
+	this->IhaveResponse = response->stillSend;
+	this->IhaveUpload = response->iHaveUpload;
 	delete req;
 	IhaveCGI = response->isCGI;
 	if (response->isCGI || response->iHaveUpload)
 		return true;
 	if (!response->sendResponse())
 		return false;
-	IhaveUpload = response->iHaveUpload;
-	IhaveResponse = response->stillSend;
 	if (!IhaveResponse){
 		delete  response;
 		response = NULL;

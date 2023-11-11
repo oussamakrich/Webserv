@@ -98,6 +98,8 @@ bool Server::handelClient(ITT_CLIENT it){
 		client->IhaveUpload = client->response->iHaveUpload;
 		if (!client->IhaveUpload)
 		{
+			client->response->setMsg(GenerateResponse::generateMsg(client->response->getCode()));;
+			client->response->setHeaderAndStart(GenerateResponse::generateHeaderAndSt(*client->response, client->keepAlive));
 			client->response->sendResponse();
 			client->IhaveResponse = false;
 			

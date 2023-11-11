@@ -70,7 +70,7 @@ void  Global::run()
 	}
 	while(true){
 		checkTimeOut(servers);
-		//cout << "\r\t\t ================ Wait For new Evnet ================ SIZE " << gPollFds.size() << " \n ";
+		cout << "\r\t\t ================ Wait For new Evnet ================ SIZE " << gPollFds.size() << " \n ";
 		int pollStatus = poll(this->gPollFds.data(), this->gPollFds.size(), -1);
 		if (pollStatus == -1) 
 		{

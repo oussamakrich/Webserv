@@ -252,6 +252,7 @@ void ResponseHandler::ResponseHandlere(Server &ser, Request &req, Response &res)
 {
 	LOCATION_ITT it;
 
+	std::cout <<"yes"  << std::endl;
 	if (isLocation(it)) {
 		isLoacation = true;
 		location = it->second;
