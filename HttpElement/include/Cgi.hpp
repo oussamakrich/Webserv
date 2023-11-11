@@ -6,6 +6,7 @@ using namespace std;
 
 #define STATIC_VAR_NUM 7
 
+#define CGITIME_OUT 60; // TODO: 
 struct s_cgiInfo
 {
 	int code;
@@ -19,10 +20,12 @@ typedef struct s_cgiInfo t_cgiInfo;
 
 class Cgi
 {
+	
+#define 	INTERNAL_ERROR  InternalError();
 private:
 
 public:
-	static	t_cgiInfo	INTERNAL_ERROR;
+		
 	static	t_cgiInfo	Run(Request &req, std::string  &bin, std::string &path);
 	static	char **makeEnv(Request &req, std::string &path);
 	static	char **MakeArgs(string &bin, string &path);
@@ -35,6 +38,7 @@ public:
 	static	void CgiUnlink(t_cgiInfo info);
 	static	bool  isTimeOut(t_cgiInfo &info);
 	static	bool KillCgi(t_cgiInfo &info);
+	static	t_cgiInfo InternalError(); 
 
 };
 

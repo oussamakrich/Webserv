@@ -5,12 +5,19 @@
 #include <sys/wait.h>
 #include <sys/time.h>
 #include <signal.h>
+#include <libgen.h>
 
 
-#define TIME_OUT 90 // second
-
-
-t_cgiInfo Cgi::INTERNAL_ERROR = {500, -1, "", ""};
+t_cgiInfo Cgi::InternalError()
+{
+	t_cgiInfo t;
+	t.code =  500;
+	t.pid = -1;
+	t.input = "";
+	t.output = "";
+	t.time = 0;
+	return t;
+}
 
 t_cgiInfo  Cgi::Run(Request &req, std::string  &bin, std::string &path)
 {
@@ -29,7 +36,7 @@ t_cgiInfo  Cgi::Run(Request &req, std::string  &bin, std::string &path)
 	info.output = getRandomName("/tmp/", "-cgi-output"); //TODO: select root , default rot is /tmp
 	info.input  = req.getBody(); //TODO: select root , default rot is /tmp
 	info.code  	= 0;
-	info.time		=  time(NULL);
+	info.time	=  time(NULL);
 	info.pid =  fork();
 	if (info.pid == -1)
 	{
@@ -84,9 +91,13 @@ void Cgi::cgiProcess(t_cgiInfo &info, Request &req, char **env,  char **args)
 	{
 		int ifd = 0;
 		int ofd = 0;
+
+		char *parent = dirname(strdup(args[1]));
+		if (chdir(parent) == -1) throw std::runtime_error("cgi  Cant Change Dir !");
+		delete parent;
 		if (req.getType()  == Request::POST)
 		{
-			int ifd = open(info.input.c_str(), O_RDONLY, 0777);
+			ifd = open(info.input.c_str(), O_RDONLY, 0777);
 			if (ifd == -1)	throw std::runtime_error("cgi  process can't creat input file");
 			if (dup2(ifd, 0) == -1)			throw std::runtime_error("cgi poress cant dup stdinput wth input file");
 			close(ifd);
@@ -248,7 +259,7 @@ bool Cgi::isTimeOut(t_cgiInfo &info)
 {
 	time_t  tm;
 	time(&tm);
-	return tm - info.time > TIME_OUT;
+	return tm - info.time > CGITIME_OUT;
 }
 
 bool Cgi::KillCgi(t_cgiInfo &info)
