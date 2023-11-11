@@ -152,58 +152,57 @@ void ResponseHandler::serveFile(std::string path, size_t size){
 
 void ResponseHandler::_extract_resources_from_request()
 {
-	// std::string contentType = req.getHeader("Content-Type");
-	// int pos = contentType.find("boundary=");
-	// if (pos == std::string::npos)
-	// {
-	// 	std::cout << YELLOW"Warning:"<<  RESET" unable to upload the file\n";
-	// 	res.setCode(500);
-	// 	res.stillSend = false;
-	// 	return;
-	// }
-	// pos += 9;
-	// int end = contentType.find(";", pos);
-	// if (end == std::string::npos)
-	// 	res._boundary = contentType.substr(pos);
-	// else
-	// 	res._boundary = contentType.substr(pos, end - pos);
-	// // trim the boundary from the quotes
-	// if (res._boundary[0] == '"')
-	// 	res._boundary = res._boundary.substr(1, res._boundary.size() - 2);
-	// if (res._boundary[res._boundary.size() - 1] == '"')
-	// 	res._boundary = res._boundary.substr(0, res._boundary.size() - 1);
-	// res._boundary = "--" + res._boundary;
-	// res._source_file = req.getBody();
+	std::string contentType = req.getHeader("Content-Type");
+	int pos = contentType.find("boundary=");
+	if (pos == std::string::npos)
+	{
+		std::cout << YELLOW"Warning:"<<  RESET" unable to upload the file\n";
+		res.setCode(500);
+		res.stillSend = false;
+		return;
+	}
+	pos += 9;
+	int end = contentType.find(";", pos);
+	if (end == std::string::npos)
+		res._boundary = contentType.substr(pos);
+	else
+		res._boundary = contentType.substr(pos, end - pos);
+	// trim the boundary from the quotes
+	if (res._boundary[0] == '"')
+		res._boundary = res._boundary.substr(1, res._boundary.size() - 2);
+	if (res._boundary[res._boundary.size() - 1] == '"')
+		res._boundary = res._boundary.substr(0, res._boundary.size() - 1);
+	res._boundary = "--" + res._boundary;
+	res._source_file = req.getBody();
 }
 
 std::string ResponseHandler::GetFileName()
 {
-	// long long pos;
-	// if ((req.getHeader("Content-Disposition")).empty())
-	// {
-	// 	std::string path = req.getPath();
-	// 	pos = path.find_last_of('/');
-	// 	if (pos == std::string::npos)
-	// 		return path;
-	// 	return path.substr(pos + 1);
-	// }
-	// std::string disposition = req.getHeader("Content-Disposition");
-	//
-	// pos = disposition.find("filename=");
-	// if (pos == std::string::npos)
-	// {
-	// 	std::string path = req.getPath();
-	// 	size_t pos = path.find_last_of('/');
-	// 	if (pos == std::string::npos)
-	// 		return path;
-	// 	return path.substr(pos + 1);
-	// }
-	// pos += 10;
-	// size_t end = disposition.find(";", pos);
-	// if (end == std::string::npos)
-	// 	return disposition.substr(pos);
-	// return disposition.substr(pos, end - pos);
-	return "";
+	long long pos;
+	if ((req.getHeader("Content-Disposition")).empty())
+	{
+		std::string path = req.getPath();
+		pos = path.find_last_of('/');
+		if (pos == std::string::npos)
+			return path;
+		return path.substr(pos + 1);
+	}
+	std::string disposition = req.getHeader("Content-Disposition");
+
+	pos = disposition.find("filename=");
+	if (pos == std::string::npos)
+	{
+		std::string path = req.getPath();
+		size_t pos = path.find_last_of('/');
+		if (pos == std::string::npos)
+			return path;
+		return path.substr(pos + 1);
+	}
+	pos += 10;
+	size_t end = disposition.find(";", pos);
+	if (end == std::string::npos)
+		return disposition.substr(pos);
+	return disposition.substr(pos, end - pos);
 }
 
 

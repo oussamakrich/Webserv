@@ -19,7 +19,7 @@ Response *GenerateResponse::generateResponse(Server &ser, Request &req, int fd){
 }
 
 void extractStatus(Response &res, std::string header){
-	std::vector<std::string> cc = splitStream(header, ' ');
+	std::vector<std::string> cc = splitStream(header);
 	res.setCode(std::atoi(cc[1].c_str()));
 	res.setMsg(cc[2]);
 }

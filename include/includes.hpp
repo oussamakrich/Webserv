@@ -113,7 +113,7 @@ void sigChange();
 void sigRestDefault();
 void sigHandler(int sig);
 
-std::vector<std::string> splitStream(const std::string& str, char delimiter);
+std::vector<std::string> splitStream(const std::string& str);
 
 void removeSlash(std::string &path);
 
