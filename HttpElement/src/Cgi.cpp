@@ -259,7 +259,7 @@ bool Cgi::isTimeOut(t_cgiInfo &info)
 {
 	time_t  tm;
 	time(&tm);
-	return tm - info.time > TIME_OUT;
+	return tm - info.time > CGITIME_OUT;
 }
 
 bool Cgi::KillCgi(t_cgiInfo &info)

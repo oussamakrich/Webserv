@@ -3,11 +3,6 @@
 #include "../include/Global.hpp"
 #include "../include/Server.hpp"
 #include "../../Response/include/GenerateResponse.hpp"
-#include <fstream>
-#include <sstream>
-#include <string>
-#include <sys/_types/_size_t.h>
-#include <vector>
 
 #define N_READ 50000
 
@@ -40,7 +35,7 @@ bool Client::ReadRequest(){ //TODO : send 500 if read fail
 		delete  buffer;
 		return false;
 	}
-	int level = reqBuff.insertBuffer(buffer, status);
+	reqBuff.insertBuffer(buffer, status);
 	delete buffer;
 	return true;
 }
@@ -75,7 +70,7 @@ void Client::switchEvent(int fd, int Flag){
 bool Client::OldRequest(ITT_CLIENT it, Server &ser){
 
 	if (!response->ReminderResponse() && !response->errorInSend){
-		response->sendErrorResponse(ser, getFd());
+		response->sendErrorResponse(getFd());
 		ser.closeConnection(it);
 		return true;
 	}
@@ -106,7 +101,7 @@ bool Client::CgiRequest(ITT_CLIENT it, Server &ser){
 	}
 	if (response->errrCgi){
 		IhaveResponse = false;
-		response->sendErrorResponse(ser, getFd());
+		response->sendErrorResponse(getFd());
 		ser.closeConnection(it);
 		return true;
 	}
@@ -139,7 +134,7 @@ Server &Global::FindServer(const MAP_STRING &headers, Server &ser){
 }
 
 
-bool Client::NewRequest(ITT_CLIENT it, Server &ser){
+bool Client::NewRequest(Server &ser){
 	Request *req;
 
 	this->keepAlive = true;
@@ -164,14 +159,14 @@ bool Client::NewRequest(ITT_CLIENT it, Server &ser){
 	Server &server = Global::FindServer(req->getHeaders(),  ser);
 	response = GenerateResponse::generateResponse(server, *req, this->fd);
 	this->keepAlive = req->getConnection();
+	this->IhaveResponse = response->stillSend;
+	this->IhaveUpload = response->iHaveUpload;
 	delete req;
 	IhaveCGI = response->isCGI;
-	if (response->isCGI)
+	if (response->isCGI || response->iHaveUpload)
 		return true;
 	if (!response->sendResponse())
 		return false;
-	IhaveUpload = response->iHaveUpload;
-	IhaveResponse = response->stillSend;
 	if (!IhaveResponse){
 		delete  response;
 		response = NULL;

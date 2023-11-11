@@ -96,13 +96,22 @@ bool Server::handelClient(ITT_CLIENT it){
 	if (client->IhaveUpload){
 		Upload reminder(*this, *client->response);
 		client->IhaveUpload = client->response->iHaveUpload;
+		if (!client->IhaveUpload)
+		{
+			client->response->setMsg(GenerateResponse::generateMsg(client->response->getCode()));;
+			client->response->setHeaderAndStart(GenerateResponse::generateHeaderAndSt(*client->response, client->keepAlive));
+			client->response->sendResponse();
+			client->IhaveResponse = false;
+			
+		}
+
 	}
 	else if (client->IhaveCGI && !client->CGIFinish)
 		client->CgiRequest(it, *this);
 	else if (client->IhaveResponse)
 		client->OldRequest(it, *this);
-	else if (!client->NewRequest(it, *this) && !client->response->errorInSend){
-		client->response->sendErrorResponse(*this, client->getFd());
+	else if (!client->NewRequest(*this) && !client->response->errorInSend){
+		client->response->sendErrorResponse(client->getFd());
 		closeConnection(it);
 		return true;
 	}
@@ -130,7 +139,7 @@ bool Server::handelFd(struct pollfd pfd){
 void Server::checkTimeOut(){
 	ITT_CLIENT it = clients.begin();
 	Client *client;
-	
+
 	while (it != clients.end()){
 		client = *it;
 		std::time_t tm = client->getLastTime();
