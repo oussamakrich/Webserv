@@ -54,7 +54,7 @@ bool DirListing::getDirlistigHtml(const std::string path, std::string &output, s
     dirent *ent = NULL;
     removeSlash(vt_path);
     dir  = opendir(path.c_str());
-	std::string htmlContent;
+	std::string htmlContent = "";
     if (dir == NULL) return false;
     while ( (ent =  readdir(dir)) != NULL)
     {
