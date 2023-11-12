@@ -20,7 +20,10 @@ Response::Response(int fd){
 	this->errrCgi = false;
 }
 
-Response::~Response(){}
+Response::~Response(){
+	if (this->buffer != NULL)
+		delete [] this->buffer;
+}
 
 int Response::getCode(){ return this->code;}
 
@@ -163,10 +166,10 @@ bool Response::ReminderResponse(){
 		setCode(500);
 		return false;
 	}
-	char *buffer = new char[R_READ];
+	buffer = new char[R_READ];
 	file.seekg(pos);
 	file.read(buffer, R_READ);
-	setBuffer(buffer, file.gcount());
+	bufferSize =  file.gcount();
 	pos += file.gcount();
 	stillSend = true;
 	if (file.eof())
@@ -179,6 +182,7 @@ bool Response::ReminderResponse(){
 		pos -= file.gcount() - ret;
 	}
 	delete [] buffer;
+	buffer = NULL;
 	if (ret == -1 || ret == 0)
 	{
 		std::cout << "Error send reminder : " << ret << std::endl;
