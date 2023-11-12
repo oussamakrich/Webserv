@@ -4,8 +4,6 @@
 #include "../../HttpElement/include/Server.hpp"
 #include "../include/GenerateResponse.hpp"
 #include "../../include/includes.hpp"
-#include <fstream>
-#include <sys/_types/_size_t.h>
 
 
 Response::Response(int fd){

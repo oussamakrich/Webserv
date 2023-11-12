@@ -110,6 +110,7 @@ bool Server::handelClient(ITT_CLIENT it){
 	}
 	if (!client->keepAlive && !client->IhaveResponse)
 		closeConnection(it);
+	// client->setLastTime(time(NULL));
 	return true;
 }
 

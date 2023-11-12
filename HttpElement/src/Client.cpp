@@ -33,11 +33,11 @@ bool Client::ReadRequest(){ //TODO : send 500 if read fail
 	status = recv(this->fd, buffer, N_READ, 0);
 	if (status == -1 || status == 0)
 	{
-		delete  buffer;
+		delete  [] buffer;
 		return false;
 	}
 	reqBuff.insertBuffer(buffer, status);
-	delete buffer;
+	delete [] buffer;
 	return true;
 }
 

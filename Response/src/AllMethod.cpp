@@ -273,6 +273,8 @@ void ResponseHandler::ResponseHandlere(Server &ser, Request &req, Response &res)
 			return ;
 		}
 		defaultType = location->getDefaultTypes();
+		if (defaultType.empty())
+			defaultType = ser.getDefaultType();
 		autoindex = location->isAutoIndex();
 		root = location->getRoot();
 		indexes = location->getIndexesList();
