@@ -132,7 +132,7 @@ bool Response::CgiResponse(bool keepAlive){
 	if (Cgi::isTimeOut(cgiInfo)){
 		setCode(504);
 		Cgi::CgiUnlink(cgiInfo);
-		Cgi::KillCgi(cgiInfo);	
+		Cgi::KillCgi(cgiInfo);
 		stillSend = false;
 		errrCgi	= true;
 		return false;
@@ -148,8 +148,9 @@ bool Response::sendResponse(){
 	const char *resp = Responsejoin(HeaderAndStart.c_str(), buffer, HeaderAndStart.size(), bufferSize);
 	buffer = NULL;
 	int ret = send(fd, resp, HeaderAndStart.size() + bufferSize, 0);
-	delete  resp;
-	if (ret == -1 || ret == 0){
+	delete []  resp;
+	if (ret == -1 || ret == 0)
+	{
 	 std::cout << "Error send" << std::endl;
 		errorInSend = true;
 		return false;
@@ -159,7 +160,7 @@ bool Response::sendResponse(){
 
 bool Response::ReminderResponse(){
 	errorInSend = false;
-	std::ifstream file(path.c_str());
+	std::ifstream file(path.c_str(), std::ios::in | std::ios::binary);
 	if (!file.is_open()){
 		setCode(500);
 		return false;
@@ -174,6 +175,11 @@ bool Response::ReminderResponse(){
 		stillSend = false;
 	file.close();
 	int ret = send(fd, buffer, bufferSize, 0);
+	if (file.gcount() != ret)
+	{
+		std::cout << "ret: " << ret << " count: " << file.gcount() << std::endl;
+		pos -= file.gcount() - ret;
+	}
 	delete [] buffer;
 	if (ret == -1 || ret == 0)
 	{

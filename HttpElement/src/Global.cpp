@@ -70,13 +70,17 @@ void  Global::run()
 	}
 	while(true){
 		checkTimeOut(servers);
+		std::cout << "try pool\n";
+
 		int pollStatus = poll(this->gPollFds.data(), this->gPollFds.size(), -1);
+		std::cout << "after try pool\n";
 		if (pollStatus == -1)
 		{
 			std::cerr << "POLL FAILED" << std::endl;
 			continue;
 		}
-		for(unsigned int i =0; i < gPollFds.size(); i++){
+		for( int i = gPollFds.size() - 1 ; i >= 0; i--){
+			std::cout << "index " << i << std::endl;;
 			if (pollStatus && ((gPollFds[i].revents & POLLIN) || (gPollFds[i].revents & POLLOUT))){
 				this->callHandelFds(gPollFds[i]);
 				pollStatus--;
@@ -84,6 +88,16 @@ void  Global::run()
 		}
 	}
 }
+
+
+/*
+for(unsigned int i =0; i < gPollFds.size(); i++){
+			if (pollStatus && ((gPollFds[i].revents & POLLIN) || (gPollFds[i].revents & POLLOUT))){
+				this->callHandelFds(gPollFds[i]);
+				pollStatus--;
+			}
+		}
+*/
 
 Server &Global::FindServer(const MAP_STRING &headers, Server &ser){
 
