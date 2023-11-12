@@ -4,6 +4,7 @@
 #include "../../Response/include/GenerateResponse.hpp"
 #include "../../Uploader/include/Upload.hpp"
 #include <new>
+#include "../../Utils/include/Logger.hpp"
 
 bool creatSocket(int *listen, addrinfo *MyAddr){
 	*listen = socket(MyAddr->ai_family , MyAddr->ai_socktype , 0);
@@ -76,6 +77,8 @@ void Server::acceptClient(){
 	}
 	newClient->setAddr(sockaddr);
 	newClient->id = generateId();
+	Logger::fastLog(Logger::INFO, "./Log/" + (newClient->id),  "Accept new client");
+	std::cout << "Accept new client with the id: " << newClient->id << std::endl;
 	this->clients.push_back(newClient);
 	Global::insertFd(clientFd);
 }
@@ -90,6 +93,7 @@ ITT_CLIENT Server::findClient(pollfd pfd){
 
 void Server::closeConnection(ITT_CLIENT it){
 	Client *client = *it;
+	Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "client closed the connection");
 	clients.erase(it);
 	Global::removeFd(client->getFd());
 	delete client;
@@ -101,6 +105,7 @@ bool Server::handelClient(ITT_CLIENT it){
 	Client *client = *it;
 	Global::id = client->id;
 	client->setLastTime(time(NULL));
+	Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "set last time: " + convertCode((client->getLastTime())));
 	if (client->IhaveUpload)
 		client->ClientUpload(*this);
 	else if (client->IhaveCGI && !client->CGIFinish)
@@ -108,6 +113,7 @@ bool Server::handelClient(ITT_CLIENT it){
 	else if (client->IhaveResponse)
 		client->OldRequest(it, *this);
 	else if (!client->NewRequest(*this) && !client->response->errorInSend){
+		Logger::fastLog(Logger::ERROR, "./Log/" + client->id,  " error while handling new requeset");
 		client->response->sendErrorResponse(client->getFd());
 		closeConnection(it);
 		return true;
@@ -144,6 +150,8 @@ void Server::checkTimeOut(){
 		std::time_t now = std::time(NULL);
 		if(now - tm >= TIME_OUT){
 	 		std::cout << "Client fd: " << client->getFd()  << "TIME : " << now - tm<< "\n";
+			Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "client timeout");
+
 			closeConnection(it);
 			continue;
 		}

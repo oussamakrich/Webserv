@@ -7,6 +7,7 @@
 
 #define N_READ 50000
 
+#include "../../Utils/include/Logger.hpp"
 Client::Client(int bodySize, int fd) : reqBuff(bodySize){
 
 	lastTime = std::time(NULL);
@@ -39,6 +40,9 @@ bool Client::ReadRequest(){ //TODO : send 500 if read fail
 		return false;
 	}
 	reqBuff.insertBuffer(buffer, status);
+	Logger::fastLog(Logger::INFO, "./Log/" + id,  "------------------- Start buffer request -------------------");
+	Logger::fastLog(Logger::INFO, "./Log/" + id,  buffer);
+	Logger::fastLog(Logger::INFO, "./Log/" + id,  "------------------ End buffer request --------------------");
 	delete [] buffer;
 	return true;
 }
@@ -73,6 +77,7 @@ void Client::switchEvent(int fd, int Flag){
 bool Client::OldRequest(ITT_CLIENT it, Server &ser){
 
 	if (!response->ReminderResponse() && !response->errorInSend){
+		Logger::fastLog(Logger::ERROR, "./Log/" + id,  " error while handling old requeset");
 		ser.closeConnection(it);
 		return true;
 	}
@@ -124,31 +129,45 @@ void Client::ClientUpload(Server &ser){
 		}
 }
 
+#include "../../Utils/include/Logger.hpp"
 
 bool Client::NewRequest(Server &ser){
 	Request *req;
 
 	this->keepAlive = true;
-	if (!ReadRequest()){ //TODO : send 500 if read fail
+	if (!ReadRequest())
+	{ //TODO : send 500 if read fail
 		this->keepAlive = false;
 		this->IhaveResponse = false;
 		return true;
 	}
 	if (!isRequestAvailable())
+	{
+		Logger::fastLog(Logger::INFO, "./Log/" + id,  "request not available");
 		return true;
+	}
+
+	Logger::fastLog(Logger::INFO, "./Log/" + id,  "request is available");
 	switchEvent(this->fd, POLLOUT);
+	Logger::fastLog(Logger::INFO, "./Log/" + id,  "switch event to POLLOUT");
 	req = getRequest();
+	Logger::fastLog(Logger::INFO, "./Log/" + id, ("get request path: " + req->getPath()));
 	reqBuff.clear();
 	if (req->getType() < 0)
 	{
+		Logger::fastLog(Logger::INFO, "./Log/" + id,  "Bad request");
 		this->response = new Response(this->fd);
 		response->errorPage = ser.getErrorPages();
 		response->setCode(req->getErrorCode());
 		delete req;
 		return false;
 	}
-	Server &server = Global::FindServer(req->getHeaders(),  ser);
-	response = GenerateResponse::generateResponse(server, *req, this->fd);
+	// Server &server = Global::FindServer(req->getHeaders(),  ser);
+
+	response = GenerateResponse::generateResponse(ser, *req, this->fd);
+
+	Logger::fastLog(Logger::INFO, "./Log/" + id,  "response generated");
+
 	this->keepAlive = req->getConnection();
 	delete req;
 	IhaveCGI = response->isCGI;

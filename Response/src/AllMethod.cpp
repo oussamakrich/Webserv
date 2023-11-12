@@ -3,7 +3,8 @@
 #include "../../Utils/include/DirListing.hpp"
 #include "../../Uploader/include/Upload.hpp"
 #include <cstdlib>
-
+#include "../../Utils/include/Logger.hpp"
+#include "../../HttpElement/include/Global.hpp"
 ResponseHandler::ResponseHandler(Server &ser, Request &req, Response &res) : ser(ser), req(req), res(res)
 {
 	ResponseHandlere(ser, req, res);
@@ -217,6 +218,7 @@ std::string ResponseHandler::GetFileName()
 
 
 void ResponseHandler::simpleGet(){
+		Logger::fastLog(Logger::INFO, "./Log/" + Global::id ,  " Simple get function");
 	res.path = this->root + '/' + req.getPath();
 	size_t size;
 	int type = isFile(res.path, size);
@@ -230,12 +232,22 @@ void ResponseHandler::simpleGet(){
 		Upload up(ser, res);
 		return;
 	}
+
 	if (type == FILE)
+	{
+		Logger::fastLog(Logger::INFO, "./Log/" + Global::id ,  " Serve file");
 		serveFile(res.path, size);
+	}
 	else if (type == DIRECTORY) //TODO :  try index.html || check auto index
+	{
+		Logger::fastLog(Logger::INFO, "./Log/" + Global::id ,  " Serve directory");
 		serveDirectory();
+	}
 	else if (type == NOT_FOUND) //TODO : Generate 404
+	{
+		Logger::fastLog(Logger::WARNING, "./Log/" + Global::id ,  " Not found");
 		res.setCode(404);
+	}
 
 }
 
@@ -258,11 +270,15 @@ bool ResponseHandler::checkRedirection(){
 	return false;
 }
 
+
+
 void ResponseHandler::ResponseHandlere(Server &ser, Request &req, Response &res)
 {
 	LOCATION_ITT it;
 
 	if (isLocation(it)) {
+
+		Logger::fastLog(Logger::ERROR, "./Log/" + Global::id ,  "is location " + it->first);
 		isLoacation = true;
 		location = it->second;
 		res.location = location;
@@ -282,6 +298,7 @@ void ResponseHandler::ResponseHandlere(Server &ser, Request &req, Response &res)
 	}
 	else
 	{
+		Logger::fastLog(Logger::ERROR, "./Log/" + Global::id ,  "is not a location");
 		isLoacation = false;
 		autoindex = ser.getAutoIndex();
 		root = ser.getRoot();

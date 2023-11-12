@@ -5,6 +5,10 @@
 #include "../include/GenerateResponse.hpp"
 #include "../../include/includes.hpp"
 
+#include "../../Utils/include/Logger.hpp"
+#include "../../HttpElement/include/Global.hpp"
+#include <string>
+#include <sys/_types/_size_t.h>
 
 Response::Response(int fd){
 	this->_seek_pos = 0;
@@ -158,9 +162,9 @@ bool Response::sendResponse(){
 	}
 	return true;
 }
-
 bool Response::ReminderResponse(){
 	errorInSend = false;
+	Logger::fastLog(Logger::INFO, "./Log/" + Global::id,  "ReminderResponse function.");
 	std::ifstream file(path.c_str(), std::ios::in | std::ios::binary);
 	if (!file.is_open()){
 		setCode(500);
@@ -174,11 +178,13 @@ bool Response::ReminderResponse(){
 	stillSend = true;
 	if (file.eof())
 		stillSend = false;
+	size_t sizeoffile;
+	isFile(path.c_str(), sizeoffile);
 	file.close();
 	int ret = send(fd, buffer, bufferSize, 0);
+	Logger::fastLog(Logger::INFO, "./Log/" + Global::id,  "Sending " + std::to_string(ret) + " pos: " + std::to_string(pos) + " of: " + std::to_string(file.tellg() / (double) sizeoffile * 100.00) + " bytes to client.");
 	if (file.gcount() != ret)
 	{
-		std::cout << "ret: " << ret << " count: " << file.gcount() << std::endl;
 		pos -= file.gcount() - ret;
 	}
 	delete [] buffer;

@@ -74,16 +74,19 @@ void  Global::run()
 		checkTimeOut(servers);
 
 		int pollStatus = poll(this->gPollFds.data(), this->gPollFds.size(), -1);
+		std::cout << pollStatus << std::endl;
 		if (pollStatus == -1)
 		{
 			std::cerr << "POLL FAILED" << std::endl;
 			continue;
 		}
-		for( int i = gPollFds.size() - 1 ; i >= 0; i--){
-			if (pollStatus && ((gPollFds[i].revents & POLLIN) || (gPollFds[i].revents & POLLOUT))){
+		for( unsigned long i = 0; i < gPollFds.size() && pollStatus ; i++)
+		{
+			if (((gPollFds[i].revents & POLLIN) || (gPollFds[i].revents & POLLOUT))){
 				this->callHandelFds(gPollFds[i]);
 				pollStatus--;
 			}
+
 		}
 	}
 }

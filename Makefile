@@ -73,7 +73,8 @@ clean c:
 
 fclean f: clean
 			rm -rf $(NAME) ./tmp
-
+clear:
+			rm -rf ./Log/*
 re: fclean all
 
 .PHONY: all clean fclean re
