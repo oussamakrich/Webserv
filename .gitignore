@@ -11,4 +11,6 @@ todo
 MyLab
 .gitignore
 ./tmp/*
+*.sh
 config.conf
+.mp4
