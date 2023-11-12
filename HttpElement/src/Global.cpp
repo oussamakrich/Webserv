@@ -70,7 +70,7 @@ void  Global::run()
 	}
 	while(true){
 		checkTimeOut(servers);
-		//cout << "\r\t\t ================ Wait For new Evnet ================ SIZE " << gPollFds.size() << " \n ";
+		cout << "\r\t\t ================ Wait For new Evnet ================ SIZE " << gPollFds.size() << " \n ";
 		int pollStatus = poll(this->gPollFds.data(), this->gPollFds.size(), -1);
 		if (pollStatus == -1) 
 		{
@@ -84,6 +84,30 @@ void  Global::run()
 			}
 		}
 	}
+}
+
+Server &Global::FindServer(const MAP_STRING &headers, Server &ser){
+
+	std::string value;
+
+	value = headers.at("Host");
+	if (value.empty())
+		return ser;
+	stringstream ss(value);
+	std::getline(ss, value, ':');
+
+	std::vector<std::string>::iterator it;
+
+	it = std::find(serverNames.begin(), serverNames.end(), value);
+	if (it == serverNames.end() || value == ser.getServerName())
+		return ser;
+
+	size_t size = servers.size();
+	for (size_t i = 0;i < size; i++){
+		if (servers[i]->getServerName() == value && servers[i]->getPort() == ser.getPort() && servers[i]->getHost() == ser.getHost())
+			return *servers[i];
+	}
+	return ser;
 }
 
 void Global::switchEvent(int fd, int Flag){
