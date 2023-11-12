@@ -66,7 +66,7 @@ void Server::acceptClient(){
 		std::cerr << "ERROR : Connection failed" << std::endl;
 		return;
 	}
-	std::cout << serverName + " : new connection accepted" << std::endl;
+	// std::cout << serverName + " : new connection accepted" << std::endl;
 	newClient = new Client(this->clientMaxBodySize, clientFd);
 	newClient->setAddr(sockaddr);
 	this->clients.push_back(newClient);
@@ -93,19 +93,8 @@ bool Server::handelClient(ITT_CLIENT it){
 
 	Client *client = *it;
 	client->setLastTime(time(NULL));
-	if (client->IhaveUpload){
-		Upload reminder(*this, *client->response);
-		client->IhaveUpload = client->response->iHaveUpload;
-		if (!client->IhaveUpload)
-		{
-			client->response->setMsg(GenerateResponse::generateMsg(client->response->getCode()));;
-			client->response->setHeaderAndStart(GenerateResponse::generateHeaderAndSt(*client->response, client->keepAlive));
-			client->response->sendResponse();
-			client->IhaveResponse = false;
-			
-		}
-
-	}
+	if (client->IhaveUpload)
+		client->ClientUpload(*this);
 	else if (client->IhaveCGI && !client->CGIFinish)
 		client->CgiRequest(it, *this);
 	else if (client->IhaveResponse)
@@ -121,6 +110,7 @@ bool Server::handelClient(ITT_CLIENT it){
 	}
 	if (!client->keepAlive && !client->IhaveResponse)
 		closeConnection(it);
+	// client->setLastTime(time(NULL));
 	return true;
 }
 

@@ -2,6 +2,7 @@
 #include "../include/AllMethod.hpp"
 #include "../../Utils/include/DirListing.hpp"
 #include "../../Uploader/include/Upload.hpp"
+#include <cstdlib>
 
 ResponseHandler::ResponseHandler(Server &ser, Request &req, Response &res) : ser(ser), req(req), res(res)
 {
@@ -152,28 +153,37 @@ void ResponseHandler::serveFile(std::string path, size_t size){
 
 void ResponseHandler::_extract_resources_from_request()
 {
+	res._source_file = req.getBody();
+
 	std::string contentType = req.getHeader("Content-Type");
 	unsigned long pos = contentType.find("boundary=");
 	if (pos == std::string::npos)
-	{
-		std::cout << YELLOW"Warning:"<<  RESET" unable to upload the file (1)\n";
-		res.setCode(500);
-		res.stillSend = false;
 		return;
-	}
 	pos += 9;
 	unsigned long end = contentType.find(";", pos);
 	if (end == std::string::npos)
 		res._boundary = contentType.substr(pos);
 	else
 		res._boundary = contentType.substr(pos, end - pos);
-	// trim the boundary from the quotes
 	if (res._boundary[0] == '"')
 		res._boundary = res._boundary.substr(1, res._boundary.size() - 2);
 	if (res._boundary[res._boundary.size() - 1] == '"')
 		res._boundary = res._boundary.substr(0, res._boundary.size() - 1);
 	res._boundary = "--" + res._boundary;
-	res._source_file = req.getBody();
+}
+
+std::string ResponseHandler::GetFileExtension()
+{
+	TYPES_MAP types = ser.getMimeType();
+	TYPES_ITT it = types.begin();
+
+	std::string type = req.getHeader("Content-Type");
+	if (type.empty())
+		return ".bin";
+	for (; it != types.end(); it++)
+		if (it->second == type)
+			return it->first;
+	return ".bin";
 }
 
 std::string ResponseHandler::GetFileName()
@@ -181,11 +191,11 @@ std::string ResponseHandler::GetFileName()
 	unsigned long pos;
 	if ((req.getHeader("Content-Disposition")).empty())
 	{
-		std::string path = req.getPath();
+		std::string path = req.getBody();
 		pos = path.find_last_of('/');
 		if (pos == std::string::npos)
-			return path;
-		return path.substr(pos + 1);
+			return (path + "." + ResponseHandler::GetFileExtension());
+		return path.substr(pos + 1) + "." + ResponseHandler::GetFileExtension();
 	}
 	std::string disposition = req.getHeader("Content-Disposition");
 
@@ -252,7 +262,6 @@ void ResponseHandler::ResponseHandlere(Server &ser, Request &req, Response &res)
 {
 	LOCATION_ITT it;
 
-	std::cout <<"yes"  << std::endl;
 	if (isLocation(it)) {
 		isLoacation = true;
 		location = it->second;
@@ -264,6 +273,8 @@ void ResponseHandler::ResponseHandlere(Server &ser, Request &req, Response &res)
 			return ;
 		}
 		defaultType = location->getDefaultTypes();
+		if (defaultType.empty())
+			defaultType = ser.getDefaultType();
 		autoindex = location->isAutoIndex();
 		root = location->getRoot();
 		indexes = location->getIndexesList();

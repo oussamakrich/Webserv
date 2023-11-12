@@ -35,7 +35,7 @@ class ResponseHandler
 		void simpleGet();
 		std::string findMimeType(std::string path, Server &ser);
 		bool checkRedirection();
-
+		std::string GetFileExtension();
 		// int	isFile(std::string path, size_t &size);
 		void serveFile(std::string path, size_t size);
 		void serveDirectory();

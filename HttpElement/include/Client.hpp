@@ -41,6 +41,8 @@ class Client{
 		bool NewRequest(Server &ser);
 		bool OldRequest(ITT_CLIENT it, Server &ser);
 		bool CgiRequest(ITT_CLIENT it, Server &ser);
+
+		void ClientUpload(Server &ser);
 		void Error();
 
 	public: //Geters
