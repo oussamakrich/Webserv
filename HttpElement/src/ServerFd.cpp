@@ -3,6 +3,7 @@
 #include "../include/Global.hpp"
 #include "../../Response/include/GenerateResponse.hpp"
 #include "../../Uploader/include/Upload.hpp"
+#include <new>
 
 bool creatSocket(int *listen, addrinfo *MyAddr){
 	*listen = socket(MyAddr->ai_family , MyAddr->ai_socktype , 0);
@@ -67,7 +68,11 @@ void Server::acceptClient(){
 		return;
 	}
 	// std::cout << serverName + " : new connection accepted" << std::endl;
-	newClient = new Client(this->clientMaxBodySize, clientFd);
+	newClient = new(std::nothrow) Client(this->clientMaxBodySize, clientFd);
+	if (newClient == NULL){
+		std::cerr << "ERROR : new Client failed" << std::endl;
+		return;
+	}
 	newClient->setAddr(sockaddr);
 	this->clients.push_back(newClient);
 	Global::insertFd(clientFd);

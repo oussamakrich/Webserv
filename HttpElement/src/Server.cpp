@@ -65,6 +65,7 @@ TYPES_MAP generateMimeType(){
   mime["exe"]		= "application/octet-stream";
   mime["iso"]		= "application/octet-stream";
   mime["img"]		= "application/octet-stream";
+  mime["mp4"]		= "video/mp4";
 
 	return mime;
 }
