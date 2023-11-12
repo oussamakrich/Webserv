@@ -16,6 +16,7 @@ class Client{
 		Client(int bodySize, int fd);
 		~Client();
 		int					fd;
+		std::string			id;
 
 	private:
 		std::time_t			lastTime;

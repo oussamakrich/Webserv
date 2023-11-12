@@ -1,5 +1,5 @@
 #include "../../include/includes.hpp"
-#include <ios>
+#include <sys/time.h>
 
 std::string hexToChar(std::string hex){
     int i;
@@ -75,4 +75,14 @@ char *Responsejoin(const char *s1, char *s2, size_t size1, size_t size2)
 	if (size2 > 0)
 		delete[] s2;
 	return (tmp);
+}
+
+std::string generateId(){
+
+	timeval tm;
+    	gettimeofday(&tm, nullptr);
+
+	std::stringstream ss;
+	ss <<tm.tv_sec << "@" << tm.tv_usec;
+	return ss.str();
 }

@@ -12,6 +12,7 @@
 class Global {
 	private:
 		static	std::vector<struct pollfd> gPollFds;
+	
 
 
 	public:
@@ -26,6 +27,7 @@ class Global {
 	 static Server &FindServer( const MAP_STRING  &headers, Server &ser);
 		static std::vector<Server *> servers;
 
+	static std::string id; 
 
 
 		void  print();

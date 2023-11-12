@@ -68,13 +68,14 @@ void Server::acceptClient(){
 		return;
 	}
 	// std::cout << serverName + " : new connection accepted" << std::endl;
-	fcntl(clientFd, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
+	// fcntl(clientFd, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
 	newClient = new(std::nothrow) Client(this->clientMaxBodySize, clientFd);
 	if (newClient == NULL){
 		std::cerr << "ERROR : new Client failed" << std::endl;
 		return;
 	}
 	newClient->setAddr(sockaddr);
+	newClient->id = generateId();
 	this->clients.push_back(newClient);
 	Global::insertFd(clientFd);
 }
@@ -98,6 +99,7 @@ bool Server::handelClient(ITT_CLIENT it){
 	if (it == clients.end())	return false;
 
 	Client *client = *it;
+	Global::id = client->id;
 	client->setLastTime(time(NULL));
 	if (client->IhaveUpload)
 		client->ClientUpload(*this);
