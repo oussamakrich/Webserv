@@ -183,7 +183,7 @@ int	RequestBuffer::_get_body_level()
 		std::string _tmp = _headers.substr(_pos, _headers.find("\n", _pos) - _pos);
 		std::stringstream ss(_tmp);
 		ss >> _contentLength;
-		if (_contentLength > _maxBodySize) return 413;
+		if (_contentLength > _maxBodySize* 100) return 413;
 		return 1;
 	}
 	return (-1);

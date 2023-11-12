@@ -66,7 +66,7 @@ void Server::acceptClient(){
 		std::cerr << "ERROR : Connection failed" << std::endl;
 		return;
 	}
-	std::cout << serverName + " : new connection accepted" << std::endl;
+	// std::cout << serverName + " : new connection accepted" << std::endl;
 	newClient = new Client(this->clientMaxBodySize, clientFd);
 	newClient->setAddr(sockaddr);
 	this->clients.push_back(newClient);

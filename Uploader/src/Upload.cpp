@@ -1,10 +1,12 @@
 #include "../include/Upload.hpp"
 #include <fstream>
 #include <cstdio>
+#include <iostream>
 #include <netdb.h>
 #include <ostream>
 #include <string>
 #include <sys/_types/_size_t.h>
+#include <unistd.h>
 
 Upload::Upload(Server &ser, Response &res):ser(ser), res(res)
 {
@@ -19,7 +21,7 @@ bool Upload::_check_file_open_in(std::ifstream &file)
 {
 	if (!file.is_open())
 	{
-		std::cout << YELLOW"Warning:"<<  RESET" unable to upload the file (2)\n";
+		unlink(res._source_file.c_str());
 		res.setCode(500);
 		res.stillSend = false;
 		res.iHaveUpload = false;
@@ -31,7 +33,7 @@ bool Upload::_check_file_open_out(std::ofstream &file)
 {
 	if (!file.is_open())
 	{
-		std::cout << YELLOW"Warning:"<<  RESET" unable to upload the file (3)\n";
+		unlink(res._source_file.c_str());
 		res.setCode(507);
 		res.stillSend = false;
 		res.iHaveUpload = false;
@@ -60,8 +62,8 @@ void Upload::multipart()
 	_pos_of_end_boundary = res.byte.find((_end).c_str(), _end.size());
 	if (_pos_of_end_boundary == 0)
 	{
+		unlink(res._source_file.c_str());
 		res.setCode(201);
-				std::cout << GREEN"Succes:"<<  RESET" File Uploaded successfully " << res.getCode() << "\n";
 		file.close();
 		res.stillSend = false;
 		res.iHaveUpload = false;
@@ -77,8 +79,7 @@ void Upload::multipart()
 			if (_pos_of_end_boundary == 0)
 			{
 				res.setCode(201);
-				std::cout << GREEN"Succes:"<<  RESET" File Uploaded successfully " << res.getCode() << "\n";
-
+				unlink(res._source_file.c_str());
 				file.close();
 				res.stillSend = false;
 				res.iHaveUpload = false;
@@ -146,8 +147,8 @@ bool Upload::_extract_headers()
 	long long pos2 = res.byte.find("\n\n", 2);
 	if (pos == -1 && pos2 == -1)
 	{
-		std::cout << YELLOW"Warning:"<<  RESET" unable to upload the file (4)\n";
-		res.setCode(507);
+		unlink(res._source_file.c_str());
+		res.setCode(400);
 		res.stillSend = false;
 		res.iHaveUpload = false;
 		return false;
@@ -169,31 +170,43 @@ bool Upload::_extract_headers()
 
 void Upload::Uploader()
 {
-	std::string sourceFile = res._source_file;
-	std::string destinationFile = res.location->getUploadPath() + "/" + res._single_file_name;
 
-	if (res.getUploadStat() || res._is_multipart_form)
+	if (res.getUploadStat() && res._is_multipart_form)
 	{
 		multipart();
 	}
 	else
 	{
-		if (rename(sourceFile.c_str(), destinationFile.c_str()) == 0)
+
+		std::string destinationFile = res.location->getUploadPath() + "/" + res._single_file_name;
+		std::ifstream file(res._source_file.c_str(), std::ios::binary);
+		file.seekg(res._seek_pos);
+		if (!Upload::_check_file_open_in(file))						return;
+		std::ofstream _out_file(destinationFile.c_str(), std::ios::binary | std::ios::app);
+		if (!Upload::_check_file_open_out(_out_file))			return;
+		char *buffer = new char[R_READ];
+		file.read(buffer, R_READ);
+		_out_file.write(buffer, file.gcount());
+		delete [] buffer;
+		_out_file.close();
+		res._seek_pos += file.gcount();
+		if (file.eof())
 		{
-			std::cout<< YELLOW"File Uploaded successfully: " <<U_WHITE<< destinationFile << "\n";
+			unlink(res._source_file.c_str());
 			res.setCode(201);
 			res.stillSend = false;
 			res.iHaveUpload = false;
 		}
 		else
 		{
-			std::cout << YELLOW"Warning:"<<  RESET" unable to upload the file (1)\n";
-			res.setCode(500);
-			res.stillSend = false;
-			res.iHaveUpload = false;
+			res.stillSend = true;
+			res.iHaveUpload = true;
 		}
+		file.close();
 	}
 
 }
 
 Upload::~Upload(){}
+
+

@@ -70,11 +70,10 @@ void  Global::run()
 	}
 	while(true){
 		checkTimeOut(servers);
-		cout << "\r\t\t ================ Wait For new Evnet ================ SIZE " << gPollFds.size() << " \n ";
 		int pollStatus = poll(this->gPollFds.data(), this->gPollFds.size(), -1);
-		if (pollStatus == -1) 
+		if (pollStatus == -1)
 		{
-			std::cout << "POLL : FILA\n";
+			std::cerr << "POLL FAILED" << std::endl;
 			continue;
 		}
 		for(unsigned int i =0; i < gPollFds.size(); i++){
