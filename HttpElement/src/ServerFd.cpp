@@ -74,7 +74,6 @@ void Server::acceptClient(){
 		std::cerr << "ERROR : new Client failed" << std::endl;
 		return;
 	}
-	newClient = new Client(this->clientMaxBodySize, clientFd);
 	newClient->setAddr(sockaddr);
 	this->clients.push_back(newClient);
 	Global::insertFd(clientFd);
