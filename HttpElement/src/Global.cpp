@@ -72,7 +72,7 @@ void  Global::run()
 		checkTimeOut(servers);
 		std::cout << "try pool\n";
 
-		int pollStatus = poll(this->gPollFds.data(), this->gPollFds.size(), -1);
+		int pollStatus = poll(this->gPollFds.data(), this->gPollFds.size(), 1);
 		std::cout << "after try pool\n";
 		if (pollStatus == -1)
 		{
