@@ -71,7 +71,7 @@ void Client::switchEvent(int fd, int Flag){
 bool Client::OldRequest(ITT_CLIENT it, Server &ser){
 
 	if (!response->ReminderResponse() && !response->errorInSend){
-		response->sendErrorResponse(getFd());
+		response->sendErrorResponse(getFd()); //TODO: ?
 		ser.closeConnection(it);
 		return true;
 	}

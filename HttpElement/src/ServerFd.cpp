@@ -68,11 +68,13 @@ void Server::acceptClient(){
 		return;
 	}
 	// std::cout << serverName + " : new connection accepted" << std::endl;
+	fcntl(clientFd, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
 	newClient = new(std::nothrow) Client(this->clientMaxBodySize, clientFd);
 	if (newClient == NULL){
 		std::cerr << "ERROR : new Client failed" << std::endl;
 		return;
 	}
+	newClient = new Client(this->clientMaxBodySize, clientFd);
 	newClient->setAddr(sockaddr);
 	this->clients.push_back(newClient);
 	Global::insertFd(clientFd);
@@ -141,7 +143,6 @@ void Server::checkTimeOut(){
 		std::time_t now = std::time(NULL);
 		if(now - tm >= TIME_OUT){
 	 		std::cout << "Client fd: " << client->getFd()  << "TIME : " << now - tm<< "\n";
-			exit(0);
 			closeConnection(it);
 			continue;
 		}

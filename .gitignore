@@ -12,3 +12,4 @@ MyLab
 .gitignore
 ./tmp/*
 config.conf
+./hustler/test2.mp4
