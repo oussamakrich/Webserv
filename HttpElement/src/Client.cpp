@@ -27,8 +27,10 @@ bool Client::ReadRequest(){ //TODO : send 500 if read fail
 
 	char *buffer;
 	buffer = new (std::nothrow) char[N_READ];
-	if (!buffer)
+	if (!buffer){
+		std::cerr << "Fail to allocate for read" << std::endl;
 		return false;
+	}
 	memset(buffer, 0, N_READ);
 	status = recv(this->fd, buffer, N_READ, 0);
 	if (status == -1 || status == 0)
@@ -71,7 +73,6 @@ void Client::switchEvent(int fd, int Flag){
 bool Client::OldRequest(ITT_CLIENT it, Server &ser){
 
 	if (!response->ReminderResponse() && !response->errorInSend){
-		response->sendErrorResponse(getFd());
 		ser.closeConnection(it);
 		return true;
 	}
@@ -128,7 +129,7 @@ bool Client::NewRequest(Server &ser){
 	Request *req;
 
 	this->keepAlive = true;
-	if (!ReadRequest()){
+	if (!ReadRequest()){ //TODO : send 500 if read fail
 		this->keepAlive = false;
 		this->IhaveResponse = false;
 		return true;
@@ -149,16 +150,14 @@ bool Client::NewRequest(Server &ser){
 	Server &server = Global::FindServer(req->getHeaders(),  ser);
 	response = GenerateResponse::generateResponse(server, *req, this->fd);
 	this->keepAlive = req->getConnection();
-	this->IhaveResponse = response->stillSend;
-	this->IhaveUpload = response->iHaveUpload;
 	delete req;
 	IhaveCGI = response->isCGI;
 	IhaveUpload = response->iHaveUpload;
-	IhaveResponse = response->stillSend;
 	if (response->isCGI || response->iHaveUpload)
 		return true;
 	if (!response->sendResponse())
 		return false;
+	IhaveResponse = response->stillSend;
 	if (!IhaveResponse){
 		delete  response;
 		response = NULL;

@@ -20,7 +20,10 @@ Response::Response(int fd){
 	this->errrCgi = false;
 }
 
-Response::~Response(){}
+Response::~Response(){
+	if (this->buffer != NULL)
+		delete [] this->buffer;
+}
 
 int Response::getCode(){ return this->code;}
 
@@ -130,7 +133,7 @@ bool Response::CgiResponse(bool keepAlive){
 	if (Cgi::isTimeOut(cgiInfo)){
 		setCode(504);
 		Cgi::CgiUnlink(cgiInfo);
-		Cgi::KillCgi(cgiInfo);	
+		Cgi::KillCgi(cgiInfo);
 		stillSend = false;
 		errrCgi	= true;
 		return false;
@@ -146,8 +149,9 @@ bool Response::sendResponse(){
 	const char *resp = Responsejoin(HeaderAndStart.c_str(), buffer, HeaderAndStart.size(), bufferSize);
 	buffer = NULL;
 	int ret = send(fd, resp, HeaderAndStart.size() + bufferSize, 0);
-	delete  resp;
-	if (ret == -1 || ret == 0){
+	delete []  resp;
+	if (ret == -1 || ret == 0)
+	{
 	 std::cout << "Error send" << std::endl;
 		errorInSend = true;
 		return false;
@@ -157,22 +161,28 @@ bool Response::sendResponse(){
 
 bool Response::ReminderResponse(){
 	errorInSend = false;
-	std::ifstream file(path.c_str());
+	std::ifstream file(path.c_str(), std::ios::in | std::ios::binary);
 	if (!file.is_open()){
 		setCode(500);
 		return false;
 	}
-	char *buffer = new char[R_READ];
+	buffer = new char[R_READ];
 	file.seekg(pos);
 	file.read(buffer, R_READ);
-	setBuffer(buffer, file.gcount());
+	bufferSize =  file.gcount();
 	pos += file.gcount();
 	stillSend = true;
 	if (file.eof())
 		stillSend = false;
 	file.close();
 	int ret = send(fd, buffer, bufferSize, 0);
+	if (file.gcount() != ret)
+	{
+		std::cout << "ret: " << ret << " count: " << file.gcount() << std::endl;
+		pos -= file.gcount() - ret;
+	}
 	delete [] buffer;
+	buffer = NULL;
 	if (ret == -1 || ret == 0)
 	{
 		std::cout << "Error send reminder : " << ret << std::endl;
