@@ -133,7 +133,7 @@ void Client::ClientUpload(Server &ser){
 			response->setHeaderAndStart(GenerateResponse::generateHeaderAndSt(*response, keepAlive));
 			response->sendResponse();
 			IhaveResponse = false;
-			switchEvent(this->fd, POLLIN);
+			// switchEvent(this->fd, POLLIN);
 		}
 }
 
@@ -185,6 +185,7 @@ bool Client::NewRequest(Server &ser){
 		return true;
 	if (!response->sendResponse())
 		return false;
+	IhaveUpload = response->iHaveUpload;
 	IhaveResponse = response->stillSend;
 	if (!IhaveResponse){
 		delete  response;
@@ -194,3 +195,50 @@ bool Client::NewRequest(Server &ser){
 	}
 	return true;
 }
+
+
+
+
+
+
+
+
+
+
+
+/*
+buffer address: 0x7ffee7d9ea48
+tmp._data address: 0x7ffee7d9ea30
+res.byte._data address: 0x7f878b6062b0
+buffer address: 0x7ffee7d9ef38
+tmp._data address: 0x7ffee7d9ef20
+res.byte._data address: 0x7f878b6062b0
+buffer address: 0x7ffee7d9ef38
+tmp._data address: 0x7ffee7d9ef20
+res.byte._data address: 0x7f878b6062b0
+buffer address: 0x7ffee7d9ef38
+tmp._data address: 0x7ffee7d9ef20
+res.byte._data address: 0x7f878b6062b0
+buffer address: 0x7ffee7d9ef38
+tmp._data address: 0x7ffee7d9ef20
+res.byte._data address: 0x7f878b6062b0
+buffer address: 0x7ffee7d9ef38
+tmp._data address: 0x7ffee7d9ef20
+res.byte._data address: 0x7f878b6062b0
+buffer address: 0x7ffee7d9ef38
+tmp._data address: 0x7ffee7d9ef20
+res.byte._data address: 0x7f878b6062b0
+buffer address: 0x7ffee7d9ef38
+tmp._data address: 0x7ffee7d9ef20
+res.byte._data address: 0x7f878b6062b0
+buffer address: 0x7ffee7d9ef38
+tmp._data address: 0x7ffee7d9ef20
+res.byte._data address: 0x7f878b6062b0
+buffer address: 0x7ffee7d9ef38
+tmp._data address: 0x7ffee7d9ef20
+res.byte._data address: 0x7f878b6062b0
+buffer address: 0x7ffee7d9ef38
+tmp._data address: 0x7ffee7d9ef20
+res.byte._data address: 0x7f878b6062b0
+
+*/

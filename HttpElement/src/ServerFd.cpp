@@ -109,7 +109,9 @@ bool Server::handelClient(ITT_CLIENT it){
 	client->setLastTime(time(NULL));
 	Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "set last time: " + convertCode((client->getLastTime())));
 	if (client->IhaveUpload)
+	{
 		client->ClientUpload(*this);
+	}
 	else if (client->IhaveCGI && !client->CGIFinish)
 		client->CgiRequest(it, *this);
 	else if (client->IhaveResponse)

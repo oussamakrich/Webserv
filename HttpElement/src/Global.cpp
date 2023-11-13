@@ -85,7 +85,6 @@ void  Global::run()
 		{
 			if (gPollFds[i].revents & POLLHUP){
 				std::cout << "polhub" << std::endl;
-				Global::removeFd(gPollFds[i].fd);
 				continue;
 			}
 			if (((gPollFds[i].revents & POLLIN) || (gPollFds[i].revents & POLLOUT))){
