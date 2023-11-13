@@ -13,3 +13,4 @@ MyLab
 ./tmp/*
 config.conf
 ./hustler/test2.mp4
+*.mp4
