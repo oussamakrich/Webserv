@@ -1,4 +1,5 @@
 #include  "../include/Logger.hpp"
+#include "../../HttpElement/include/Global.hpp"
 
 Logger::Logger(const std::string logfile): _log(logfile, std::ios::app){}
 
@@ -7,6 +8,7 @@ Logger::~Logger(){_log.close();}
 bool Logger::logFormat(const std::string &logtype, std::string &msg)
 {
     if (_log.good() == false) return false;
+	_log << timeToString(getTime() - Global::time) << "    ";
     _log << logtype;
 	_log << " : ";
 	_log << msg;

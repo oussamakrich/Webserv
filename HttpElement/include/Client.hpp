@@ -17,6 +17,7 @@ class Client{
 		~Client();
 		int					fd;
 		std::string			id;
+		long long				time;
 
 	private:
 		std::time_t			lastTime;

@@ -68,8 +68,7 @@ void Server::acceptClient(){
 		std::cerr << "ERROR : Connection failed" << std::endl;
 		return;
 	}
-	// std::cout << serverName + " : new connection accepted" << std::endl;
-	// fcntl(clientFd, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
+	fcntl(clientFd, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
 	newClient = new(std::nothrow) Client(this->clientMaxBodySize, clientFd);
 	if (newClient == NULL){
 		std::cerr << "ERROR : new Client failed" << std::endl;
@@ -77,6 +76,7 @@ void Server::acceptClient(){
 	}
 	newClient->setAddr(sockaddr);
 	newClient->id = generateId();
+	newClient->time = getTime();
 	Logger::fastLog(Logger::INFO, "./Log/" + (newClient->id),  "Accept new client");
 	std::cout << "Accept new client with the id: " << newClient->id << std::endl;
 	this->clients.push_back(newClient);
@@ -103,7 +103,8 @@ bool Server::handelClient(ITT_CLIENT it){
 	if (it == clients.end())	return false;
 
 	Client *client = *it;
-	Global::id = client->id;
+	Global::id = client->id;//Debug
+	Global::time = client->time;//Debug
 	client->setLastTime(time(NULL));
 	Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "set last time: " + convertCode((client->getLastTime())));
 	if (client->IhaveUpload)
@@ -118,13 +119,14 @@ bool Server::handelClient(ITT_CLIENT it){
 		closeConnection(it);
 		return true;
 	}
+	client->setLastTime(time(NULL));
+	Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "set second last time: " + convertCode((client->getLastTime())));
 	if (client->response && client->response->errorInSend){
 		closeConnection(it);
 		return true;
 	}
 	if (!client->keepAlive && !client->IhaveResponse)
 		closeConnection(it);
-	// client->setLastTime(time(NULL));
 	return true;
 }
 
@@ -149,7 +151,9 @@ void Server::checkTimeOut(){
 		std::time_t tm = client->getLastTime();
 		std::time_t now = std::time(NULL);
 		if(now - tm >= TIME_OUT){
-	 		std::cout << "Client fd: " << client->getFd()  << "TIME : " << now - tm<< "\n";
+			Global::id = client->id;
+			Global::time = client->time;
+	 		std::cout << "Client fd: " << client->getFd()  << " TIME : " << now - tm<< "\n";
 			Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "client timeout");
 
 			closeConnection(it);

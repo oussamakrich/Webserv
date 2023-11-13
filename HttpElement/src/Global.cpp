@@ -6,6 +6,7 @@ std::vector<std::string> Global::serverNames =  std::vector<std::string>();
 std::vector<Server *> Global::servers =  std::vector<Server *>();
 
 std::string Global::id = "0"; //DEBUG
+long long Global::time = 0; //DEBUG
 
 Global::Global(){}
 
@@ -74,7 +75,6 @@ void  Global::run()
 		checkTimeOut(servers);
 
 		int pollStatus = poll(this->gPollFds.data(), this->gPollFds.size(), -1);
-		std::cout << pollStatus << std::endl;
 		if (pollStatus == -1)
 		{
 			std::cerr << "POLL FAILED" << std::endl;

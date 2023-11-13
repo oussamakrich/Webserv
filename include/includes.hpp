@@ -120,3 +120,5 @@ void removeSlash(std::string &path);
 char *Responsejoin(const char *s1, char *s2, size_t size1, size_t size2);
 std::string generateId();
 
+std::string timeToString(long long time);
+long long getTime();

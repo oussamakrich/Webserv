@@ -28,6 +28,7 @@ class Global {
 		static std::vector<Server *> servers;
 
 	static std::string id; 
+	static long long time;
 
 
 		void  print();
