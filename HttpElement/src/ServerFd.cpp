@@ -3,13 +3,13 @@
 #include "../include/Global.hpp"
 #include "../../Response/include/GenerateResponse.hpp"
 #include "../../Uploader/include/Upload.hpp"
-#include <new>
 #include "../../Utils/include/Logger.hpp"
+#include <cstdio>
 
 bool creatSocket(int *listen, addrinfo *MyAddr){
 	*listen = socket(MyAddr->ai_family , MyAddr->ai_socktype , 0);
 	if (*listen == -1){
-		std::cerr << "Socket : failed " << std::endl;
+		perror("socket");
 		freeaddrinfo(MyAddr);
 		return false;
 	}
@@ -36,7 +36,7 @@ bool Server::start(){
 	struct addrinfo *MyAddr;
 	int	ret = getaddrinfo(this->getHost().c_str(), PortString.str().c_str(), &hints, &MyAddr);
 	if(ret){
-		gai_strerror(ret);
+		std::cerr << gai_strerror(ret) << std::endl;
 		freeaddrinfo(MyAddr);
 		return false;
 	}
@@ -44,13 +44,13 @@ bool Server::start(){
 		return false;
 
 	if (bind(_listen, MyAddr->ai_addr,MyAddr->ai_addrlen) != 0){
-		std::cerr << "bind : failed " << std::endl;
+		perror("bind");
 		freeaddrinfo(MyAddr);
 		return false;
 	}
 	freeaddrinfo(MyAddr);
 	if (listen(_listen, SOMAXCONN) == -1){
-		std::cerr << "listen : failed " << std::endl;
+		perror("listen");
 		return false;
 	}
 	fcntl(_listen, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
@@ -75,13 +75,14 @@ void Server::acceptClient(){
 		return;
 	}
 	newClient->setAddr(sockaddr);
-	newClient->id = generateId();
-	newClient->time = getTime();
+	newClient->id = generateId();//Debug
+	newClient->time = getTime();//Debug
 	Logger::fastLog(Logger::INFO, "./Log/" + (newClient->id),  "Accept new client");
 	std::cout << "Accept new client with the id: " << newClient->id << std::endl;
 	this->clients.push_back(newClient);
 	Global::insertFd(clientFd);
 }
+
 ITT_CLIENT Server::findClient(pollfd pfd){
 	ITT_CLIENT it = clients.begin();
 
@@ -122,11 +123,14 @@ bool Server::handelClient(ITT_CLIENT it){
 	client->setLastTime(time(NULL));
 	Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "set second last time: " + convertCode((client->getLastTime())));
 	if (client->response && client->response->errorInSend){
+		std::cout <<"ERROR : error in send" << std::endl;
 		closeConnection(it);
 		return true;
 	}
-	if (!client->keepAlive && !client->IhaveResponse)
+	if (!client->keepAlive && !client->IhaveResponse){
+		std::cout <<"2 ERROR : error in send" << std::endl;
 		closeConnection(it);
+	}
 	return true;
 }
 

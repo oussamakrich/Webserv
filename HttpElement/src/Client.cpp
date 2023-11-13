@@ -14,6 +14,7 @@ Client::Client(int bodySize, int fd) : reqBuff(bodySize){
 	IhaveResponse = false;
 	IhaveUpload = false;
 	IhaveCGI = false;
+	keepAlive = true;
 	this->response = NULL;
 	this->fd = fd;
 }
@@ -94,24 +95,31 @@ bool Client::OldRequest(ITT_CLIENT it, Server &ser){
 
 bool Client::CgiRequest(ITT_CLIENT it, Server &ser){
 	switchEvent(this->fd, POLLOUT);
+		Logger::fastLog(Logger::INFO, "./Log/" + id,  "client switch event to POLLOUT");
 	if (response->CgiResponse(this->keepAlive)){
+		Logger::fastLog(Logger::INFO, "./Log/" + id,  "Cgi Finished");
 		CGIFinish = true;
 		IhaveResponse = response->stillSend;
 		if (!IhaveResponse){
+			Logger::fastLog(Logger::INFO, "./Log/" + id,  "Cgi response Send finish");
 			switchEvent(this->fd, POLLIN);
+			Logger::fastLog(Logger::INFO, "./Log/" + id,  "client switch event to POLLIN");
 			response->isCGI = false;
 			Cgi::CgiUnlink(response->cgiInfo);
+		Logger::fastLog(Logger::INFO, "./Log/" + id,  "client unlink cgi files");
 			delete response;
 			response = NULL;
 		}
 		return true;
 	}
 	if (response->errrCgi){
+			Logger::fastLog(Logger::INFO, "./Log/" + id,  "Cgi Error");
 		IhaveResponse = false;
 		response->sendErrorResponse(getFd());
 		ser.closeConnection(it);
 		return true;
 	}
+	Logger::fastLog(Logger::INFO, "./Log/" + id,  "Cgi still waiting");
 	return false;
 }
 
@@ -137,6 +145,7 @@ bool Client::NewRequest(Server &ser){
 	this->keepAlive = true;
 	if (!ReadRequest())
 	{ //TODO : send 500 if read fail
+		std::cout << "Read Fail" << std::endl;
 		this->keepAlive = false;
 		this->IhaveResponse = false;
 		return true;
@@ -162,9 +171,8 @@ bool Client::NewRequest(Server &ser){
 		delete req;
 		return false;
 	}
-	// Server &server = Global::FindServer(req->getHeaders(),  ser);
-
-	response = GenerateResponse::generateResponse(ser, *req, this->fd);
+	Server &server = Global::FindServer(req->getHeaders(),  ser);
+	response = GenerateResponse::generateResponse(server, *req, this->fd);
 
 	Logger::fastLog(Logger::INFO, "./Log/" + id,  "response generated");
 
@@ -172,6 +180,7 @@ bool Client::NewRequest(Server &ser){
 	delete req;
 	IhaveCGI = response->isCGI;
 	IhaveUpload = response->iHaveUpload;
+	IhaveResponse = response->stillSend;
 	if (response->isCGI || response->iHaveUpload)
 		return true;
 	if (!response->sendResponse())
@@ -181,6 +190,7 @@ bool Client::NewRequest(Server &ser){
 		delete  response;
 		response = NULL;
 		switchEvent(this->fd, POLLIN);
+		Logger::fastLog(Logger::INFO, "./Log/" + id,  "client switch event to POLLIN");
 	}
 	return true;
 }

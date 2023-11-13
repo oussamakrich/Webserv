@@ -138,12 +138,11 @@ void ResponseHandler::serveFile(std::string path, size_t size){
 		return;
 	}
 	char *buffer = new char[R_READ];
+	std::memset(buffer, 0, R_READ);
 	file.read(buffer, R_READ);
 	res.setBuffer(buffer, file.gcount());
 	res.pos = file.gcount();
-	res.stillSend = true;
-	if (file.eof())
-		res.stillSend = false;
+	res.stillSend = !file.eof();
 	file.close();
 	res.setHeadr("Content-Length: " + convertCode(size));
 	res.setHeadr("Content-Type: " + findMimeType(path, ser));
@@ -218,7 +217,7 @@ std::string ResponseHandler::GetFileName()
 
 
 void ResponseHandler::simpleGet(){
-		Logger::fastLog(Logger::INFO, "./Log/" + Global::id ,  " Simple get function");
+		Logger::fastLog(Logger::INFO, "./Log/" + Global::id ,  " Simple get function");//DEBUG
 	res.path = this->root + '/' + req.getPath();
 	size_t size;
 	int type = isFile(res.path, size);
@@ -235,17 +234,17 @@ void ResponseHandler::simpleGet(){
 
 	if (type == FILE)
 	{
-		Logger::fastLog(Logger::INFO, "./Log/" + Global::id ,  " Serve file");
+		Logger::fastLog(Logger::INFO, "./Log/" + Global::id ,  " Serve file");//DEBUG
 		serveFile(res.path, size);
 	}
 	else if (type == DIRECTORY) //TODO :  try index.html || check auto index
 	{
-		Logger::fastLog(Logger::INFO, "./Log/" + Global::id ,  " Serve directory");
+		Logger::fastLog(Logger::INFO, "./Log/" + Global::id ,  " Serve directory");//DEBUG
 		serveDirectory();
 	}
 	else if (type == NOT_FOUND) //TODO : Generate 404
 	{
-		Logger::fastLog(Logger::WARNING, "./Log/" + Global::id ,  " Not found");
+		Logger::fastLog(Logger::WARNING, "./Log/" + Global::id ,  " Not found");//DEBUG
 		res.setCode(404);
 	}
 
@@ -275,10 +274,8 @@ bool ResponseHandler::checkRedirection(){
 void ResponseHandler::ResponseHandlere(Server &ser, Request &req, Response &res)
 {
 	LOCATION_ITT it;
-
 	if (isLocation(it)) {
-
-		Logger::fastLog(Logger::ERROR, "./Log/" + Global::id ,  "is location " + it->first);
+		Logger::fastLog(Logger::ERROR, "./Log/" + Global::id ,  "is location " + it->first);//DEBUG
 		isLoacation = true;
 		location = it->second;
 		res.location = location;
@@ -298,7 +295,7 @@ void ResponseHandler::ResponseHandlere(Server &ser, Request &req, Response &res)
 	}
 	else
 	{
-		Logger::fastLog(Logger::ERROR, "./Log/" + Global::id ,  "is not a location");
+		Logger::fastLog(Logger::ERROR, "./Log/" + Global::id ,  "is not a location");//DEBUG
 		isLoacation = false;
 		autoindex = ser.getAutoIndex();
 		root = ser.getRoot();

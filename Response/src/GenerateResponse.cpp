@@ -32,7 +32,7 @@ std::string GenerateResponse::generateHeaderAndSt(Response &res, bool keepAlive)
 	str = res.getVersion() + " " + convertCode(res.getCode()) + " " + res.getMsg() + "\r\n";
 	std::vector<std::string> headers = res.getHeaders();
 	if (keepAlive)
-		connection = "Connection: keep-alive\r\nKeep-Alive: timeout=" + convertCode(TIME_OUT) + "\r\n";
+		connection = "Connection: keep-alive\r\nKeep-Alive: timeout=" + convertCode(TIME_OUT);
 	headers.push_back(connection);
 	for (unsigned int i = 0;i < headers.size();i++){
 		headersTmp += headers[i] + "\r\n";

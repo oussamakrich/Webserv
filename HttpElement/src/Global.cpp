@@ -1,5 +1,6 @@
 
 #include "../include/Global.hpp"
+#include <cstdio>
 #include <sys/poll.h>
 std::vector<struct pollfd> Global::gPollFds =  std::vector<struct pollfd>();
 std::vector<std::string> Global::serverNames =  std::vector<std::string>();
@@ -77,16 +78,20 @@ void  Global::run()
 		int pollStatus = poll(this->gPollFds.data(), this->gPollFds.size(), -1);
 		if (pollStatus == -1)
 		{
-			std::cerr << "POLL FAILED" << std::endl;
+			perror("poll");
 			continue;
 		}
-		for( unsigned long i = 0; i < gPollFds.size() && pollStatus ; i++)
+		for(size_t i = 0; i < gPollFds.size() && pollStatus ; i++)
 		{
+			if (gPollFds[i].revents & POLLHUP){
+				std::cout << "polhub" << std::endl;
+				Global::removeFd(gPollFds[i].fd);
+				continue;
+			}
 			if (((gPollFds[i].revents & POLLIN) || (gPollFds[i].revents & POLLOUT))){
 				this->callHandelFds(gPollFds[i]);
 				pollStatus--;
 			}
-
 		}
 	}
 }

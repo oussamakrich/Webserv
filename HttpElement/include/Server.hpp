@@ -21,7 +21,7 @@
 #define VECT_CLIENT std::vector<Client*>
 #define ITT_CLIENT	std::vector<Client*>::iterator
 
-#define TIME_OUT 4
+#define TIME_OUT 60
 
 class Server {
 

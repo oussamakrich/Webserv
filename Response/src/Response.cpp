@@ -109,12 +109,11 @@ bool Response::CgiRead(bool keepAlive){
 		return true;
 	}
 	buffer = new char[R_READ];
+	std::memset(buffer, 0, R_READ);
 	file.read(buffer, R_READ);
 	bufferSize = file.gcount();
 	this->pos += bufferSize;
-	stillSend = true;
-	if (file.eof())
-		stillSend = false;
+	stillSend = !file.eof();
 	file.close();
 	return true;
 }
@@ -154,14 +153,20 @@ bool Response::sendResponse(){
 	buffer = NULL;
 	int ret = send(fd, resp, HeaderAndStart.size() + bufferSize, 0);
 	delete []  resp;
-	if (ret == -1 || ret == 0)
+	if (ret - HeaderAndStart.size() != bufferSize)
+		pos -= ret - HeaderAndStart.size();
+	if (ret == 0)
 	{
 	 std::cout << "Error send" << std::endl;
 		errorInSend = true;
 		return false;
 	}
+	if (ret == -1){
+		std::cerr << "first send return -1" << std::endl;
+	}
 	return true;
 }
+
 bool Response::ReminderResponse(){
 	errorInSend = false;
 	Logger::fastLog(Logger::INFO, "./Log/" + Global::id,  "ReminderResponse function.");
@@ -173,26 +178,26 @@ bool Response::ReminderResponse(){
 	buffer = new char[R_READ];
 	file.seekg(pos);
 	file.read(buffer, R_READ);
-	bufferSize =  file.gcount();
+	bufferSize = file.gcount();
 	pos += file.gcount();
-	stillSend = true;
-	if (file.eof())
-		stillSend = false;
+	stillSend = !file.eof();
+	file.close();
 	size_t sizeoffile;
 	isFile(path.c_str(), sizeoffile);
-	file.close();
 	int ret = send(fd, buffer, bufferSize, 0);
 	Logger::fastLog(Logger::INFO, "./Log/" + Global::id,  "Sending " + std::to_string(ret) + " pos: " + std::to_string(pos) + " of: " + std::to_string(file.tellg() / (double) sizeoffile * 100.00) + " bytes to client.");
 	if (file.gcount() != ret)
-	{
 		pos -= file.gcount() - ret;
-	}
 	delete [] buffer;
 	buffer = NULL;
-	if (ret == -1 || ret == 0)
+	if (ret == 0)
 	{
 		std::cout << "Error send reminder : " << ret << std::endl;
 		errorInSend = true;
+		return false;
+	}
+	if (ret == -1){
+		std::cerr << "send return -1" << std::endl;
 		return false;
 	}
 	return true;
