@@ -113,6 +113,7 @@ void Upload::multipart()
 			break;
 		case -1:
 			{
+
 				std::ofstream _out_file(res.location->getUploadPath() + "/" + res._file_uploading, std::ios::binary | std::ios::app);
 				if (!Upload::_check_file_open_out(_out_file))			return(res.byte.clear());
 				_out_file.write(res.byte.getData(), res.byte.size());
@@ -121,6 +122,7 @@ void Upload::multipart()
 				res.byte.clear();
 				res.stillSend = true;
 				res.iHaveUpload = true;
+				std::cout << "Here: " << res.iHaveUpload << std::endl;
 			}
 			break;
 		default :
@@ -177,7 +179,8 @@ void Upload::Uploader()
 	}
 	else
 	{
-
+		std::cout << "Destination file: " << res.location->getUploadPath() << "/" << res._single_file_name << std::endl;
+		std::cout << "Source file: " << res._source_file << std::endl;
 		std::string destinationFile = res.location->getUploadPath() + "/" + res._single_file_name;
 		std::ifstream file(res._source_file.c_str(), std::ios::binary);
 		file.seekg(res._seek_pos);
@@ -192,6 +195,7 @@ void Upload::Uploader()
 		res._seek_pos += file.gcount();
 		if (file.eof())
 		{
+			std::cout << "File uploaded" << std::endl;
 			unlink(res._source_file.c_str());
 			res.setCode(201);
 			res.stillSend = false;
@@ -199,6 +203,7 @@ void Upload::Uploader()
 		}
 		else
 		{
+			std::cout << "File not uploaded" << std::endl;
 			res.stillSend = true;
 			res.iHaveUpload = true;
 		}

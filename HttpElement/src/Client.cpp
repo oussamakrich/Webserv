@@ -116,11 +116,12 @@ void Client::ClientUpload(Server &ser){
 		IhaveUpload = response->iHaveUpload;
 		if (!IhaveUpload)
 		{
+			std::cout << "Reminder upload" << std::endl;
 			response->setMsg(GenerateResponse::generateMsg(response->getCode()));;
 			response->setHeaderAndStart(GenerateResponse::generateHeaderAndSt(*response, keepAlive));
 			response->sendResponse();
 			IhaveResponse = false;
-			switchEvent(this->fd, POLLIN);
+			// switchEvent(this->fd, POLLIN);
 		}
 }
 
@@ -153,6 +154,7 @@ bool Client::NewRequest(Server &ser){
 	delete req;
 	IhaveCGI = response->isCGI;
 	IhaveUpload = response->iHaveUpload;
+	IhaveResponse = response->stillSend;
 	if (response->isCGI || response->iHaveUpload)
 		return true;
 	if (!response->sendResponse())

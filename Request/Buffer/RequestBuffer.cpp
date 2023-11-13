@@ -357,12 +357,15 @@ int RequestBuffer::_body_handler()
 	switch (_body_level)
 	{
 		case 1:
+			std::cout << "content-length"<< std::endl;
 			_status = _content_length_handler();
 			break;
 		case 2:
+			std::cout << "chunked"<< std::endl;
 			_status = _chunked_handler();
 			break;
 		case 3:
+			std::cout << "boundary"<< std::endl;
 			_status = _multipart_handler();
 			break;
 		default:
