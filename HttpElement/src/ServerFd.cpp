@@ -101,7 +101,6 @@ bool Server::handelClient(ITT_CLIENT it){
 	client->setLastTime(time(NULL));
 	if (client->IhaveUpload)
 	{
-		std::cout << "IhaveUpload" << std::endl;
 		client->ClientUpload(*this);
 	}
 	else if (client->IhaveCGI && !client->CGIFinish)

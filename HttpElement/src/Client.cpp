@@ -116,7 +116,6 @@ void Client::ClientUpload(Server &ser){
 		IhaveUpload = response->iHaveUpload;
 		if (!IhaveUpload)
 		{
-			std::cout << "Reminder upload" << std::endl;
 			response->setMsg(GenerateResponse::generateMsg(response->getCode()));;
 			response->setHeaderAndStart(GenerateResponse::generateHeaderAndSt(*response, keepAlive));
 			response->sendResponse();
@@ -159,6 +158,7 @@ bool Client::NewRequest(Server &ser){
 		return true;
 	if (!response->sendResponse())
 		return false;
+	IhaveUpload = response->iHaveUpload;
 	IhaveResponse = response->stillSend;
 	if (!IhaveResponse){
 		delete  response;
@@ -167,3 +167,50 @@ bool Client::NewRequest(Server &ser){
 	}
 	return true;
 }
+
+
+
+
+
+
+
+
+
+
+
+/*
+buffer address: 0x7ffee7d9ea48
+tmp._data address: 0x7ffee7d9ea30
+res.byte._data address: 0x7f878b6062b0
+buffer address: 0x7ffee7d9ef38
+tmp._data address: 0x7ffee7d9ef20
+res.byte._data address: 0x7f878b6062b0
+buffer address: 0x7ffee7d9ef38
+tmp._data address: 0x7ffee7d9ef20
+res.byte._data address: 0x7f878b6062b0
+buffer address: 0x7ffee7d9ef38
+tmp._data address: 0x7ffee7d9ef20
+res.byte._data address: 0x7f878b6062b0
+buffer address: 0x7ffee7d9ef38
+tmp._data address: 0x7ffee7d9ef20
+res.byte._data address: 0x7f878b6062b0
+buffer address: 0x7ffee7d9ef38
+tmp._data address: 0x7ffee7d9ef20
+res.byte._data address: 0x7f878b6062b0
+buffer address: 0x7ffee7d9ef38
+tmp._data address: 0x7ffee7d9ef20
+res.byte._data address: 0x7f878b6062b0
+buffer address: 0x7ffee7d9ef38
+tmp._data address: 0x7ffee7d9ef20
+res.byte._data address: 0x7f878b6062b0
+buffer address: 0x7ffee7d9ef38
+tmp._data address: 0x7ffee7d9ef20
+res.byte._data address: 0x7f878b6062b0
+buffer address: 0x7ffee7d9ef38
+tmp._data address: 0x7ffee7d9ef20
+res.byte._data address: 0x7f878b6062b0
+buffer address: 0x7ffee7d9ef38
+tmp._data address: 0x7ffee7d9ef20
+res.byte._data address: 0x7f878b6062b0
+
+*/
