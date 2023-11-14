@@ -6,7 +6,7 @@ using namespace std;
 
 #define STATIC_VAR_NUM 7
 
-#define CGITIME_OUT 60; // TODO: 
+#define CGITIME_OUT 200; // TODO: 
 struct s_cgiInfo
 {
 	int code;

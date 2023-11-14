@@ -108,7 +108,8 @@ bool Server::handelClient(ITT_CLIENT it, pollfd pfd){
 	Global::id = client->id;//Debug
 	Global::time = client->time;//Debug
 	if (pfd.revents & POLLHUP){
-		Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "revents is POLLHUP: " + convertCode((client->getLastTime())));
+		Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "revents is POLLHUP: ");
+		client->clearClient();	
 		closeConnection(it);
 		return true;
 	}
@@ -117,13 +118,14 @@ bool Server::handelClient(ITT_CLIENT it, pollfd pfd){
 	if (client->IhaveUpload)
 		client->ClientUpload(*this);
 	else if (client->IhaveCGI && !client->CGIFinish){
-		Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "Ihave cgi and cgiFinish false" + convertCode((client->getLastTime())));
+		Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "Ihave cgi and cgiFinish false");
 		client->CgiRequest(it, *this);
 	}
 	else if (client->IhaveResponse){
-		if (!client->OldRequest())
+		if (!client->OldRequest()){
 			this->closeConnection(it);
 			return true;
+		}
 	}
 	else if (!client->NewRequest(*this) && !client->response->errorInSend){
 		Logger::fastLog(Logger::ERROR, "./Log/" + client->id,  " Send Error Response $" + convertCode(client->response->getCode()));

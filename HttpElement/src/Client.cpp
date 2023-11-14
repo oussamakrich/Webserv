@@ -21,6 +21,7 @@ Client::Client(int bodySize, int fd) : reqBuff(bodySize){
 }
 
 Client::~Client(){
+	clearClient();
 	delete this->response;
 }
 
@@ -74,6 +75,28 @@ void Client::setLastTime(std::time_t tm){ this->lastTime = tm;}
 
 void Client::switchEvent(int fd, int Flag){
 	Global::switchEvent(fd, Flag);
+}
+
+void Client::clearClient(){
+
+	if (!response){
+		Logger::fastLog(Logger::ERROR, "./Log/" + id,  " try to clear but i dont have response");
+		return;
+	}
+	if (this->IhaveCGI && this->CGIFinish){
+		Logger::fastLog(Logger::ERROR, "./Log/" + id,  " connection reset and cgi finish -> unlink files");
+		Cgi::CgiUnlink(response->cgiInfo);
+	}
+	else if (this->IhaveCGI && !this->CGIFinish){
+		Logger::fastLog(Logger::ERROR, "./Log/" + id,  " connection reset and cgi still wait -> KillCgi unlink files");
+		Cgi::KillCgi(response->cgiInfo);		
+		Cgi::CgiUnlink(response->cgiInfo);		
+	}
+	if (this->IhaveUpload) {
+		Logger::fastLog(Logger::ERROR, "./Log/" + id,  " connection reset and I have upload -> unlink files");
+		unlink(response->_source_file.c_str());
+	}
+	
 }
 
 bool Client::OldRequest(){
@@ -204,50 +227,3 @@ bool Client::NewRequest(Server &ser){
 	}
 	return true;
 }
-
-
-
-
-
-
-
-
-
-
-
-/*
-buffer address: 0x7ffee7d9ea48
-tmp._data address: 0x7ffee7d9ea30
-res.byte._data address: 0x7f878b6062b0
-buffer address: 0x7ffee7d9ef38
-tmp._data address: 0x7ffee7d9ef20
-res.byte._data address: 0x7f878b6062b0
-buffer address: 0x7ffee7d9ef38
-tmp._data address: 0x7ffee7d9ef20
-res.byte._data address: 0x7f878b6062b0
-buffer address: 0x7ffee7d9ef38
-tmp._data address: 0x7ffee7d9ef20
-res.byte._data address: 0x7f878b6062b0
-buffer address: 0x7ffee7d9ef38
-tmp._data address: 0x7ffee7d9ef20
-res.byte._data address: 0x7f878b6062b0
-buffer address: 0x7ffee7d9ef38
-tmp._data address: 0x7ffee7d9ef20
-res.byte._data address: 0x7f878b6062b0
-buffer address: 0x7ffee7d9ef38
-tmp._data address: 0x7ffee7d9ef20
-res.byte._data address: 0x7f878b6062b0
-buffer address: 0x7ffee7d9ef38
-tmp._data address: 0x7ffee7d9ef20
-res.byte._data address: 0x7f878b6062b0
-buffer address: 0x7ffee7d9ef38
-tmp._data address: 0x7ffee7d9ef20
-res.byte._data address: 0x7f878b6062b0
-buffer address: 0x7ffee7d9ef38
-tmp._data address: 0x7ffee7d9ef20
-res.byte._data address: 0x7f878b6062b0
-buffer address: 0x7ffee7d9ef38
-tmp._data address: 0x7ffee7d9ef20
-res.byte._data address: 0x7f878b6062b0
-
-*/

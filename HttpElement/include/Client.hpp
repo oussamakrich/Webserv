@@ -54,7 +54,6 @@ class Client{
 		void setLastTime(std::time_t tm);
 		void switchEvent(int fd, int Flag);
 		void resetClient();
-
-
+		void clearClient();
 
 };

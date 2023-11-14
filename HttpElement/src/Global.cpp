@@ -85,6 +85,7 @@ void  Global::run()
 		{
 			if (gPollFds[i].revents & POLLHUP){
 				this->callHandelFds(gPollFds[i]);
+				std::cout <<"pilhup " << Global::id << std::endl;
 				pollStatus--;
 				continue;
 			}
