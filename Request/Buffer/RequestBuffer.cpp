@@ -302,14 +302,14 @@ int RequestBuffer::_multipart_handler()
 	int _pos;
 	if (_body_path.size() == 0)
 	{
-		_body_path = Cgi::getRandomName("/tmp/", "omm");
+		_body_path = Cgi::getRandomName("/tmp/", "_file");
 	}
 	std::ofstream _file(_body_path, std::ios::out | std::ios::binary |
 	std::ios::app);
 	if (_file.is_open() == false)
 	{
 		std::cout << RED"Inernal server error: " << "failed to create a tmp file." <<
-	_body_path << std::endl;
+		_body_path << std::endl;
 		return (_status = 507, _status);
 	}
 	std::string _line;
@@ -321,7 +321,9 @@ int RequestBuffer::_multipart_handler()
 		{
 			_file.close();
 			_file2.close();
-			_buffer.resize(_buffer.size());
+			// _buffer.resize(_buffer.size());
+			delete [] _buffer._data;
+			_buffer._size = 0;
 			return (_status = 1, _status);
 		}
 	}
@@ -338,7 +340,8 @@ int RequestBuffer::_multipart_handler()
 	{
 		_file.write(_buffer.getData(), _pos + (_boundary.size() + 2));
 		_file.close();
-		_buffer.resize(_pos + (_boundary.size() + 2));
+		delete []_buffer._data;
+		_buffer._size = 0;
 		return (_status = 1, _status);
 	}
 	return (0);

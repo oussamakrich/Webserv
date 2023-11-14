@@ -17,7 +17,7 @@ class Response{
 		std::string msg;
 		std::vector<std::string> headers;
 		char *buffer;
-		int bufferSize;
+		size_t bufferSize;
 
 
 	public:

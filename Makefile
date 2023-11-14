@@ -58,7 +58,7 @@ HEADER =	./HttpElement/include/Client.hpp \
 
 OBJ = $(SRC:.cpp=.o)
 
-FLAGS = -g -fsanitize=address  -Wall -Wextra -Werror -std=c++98
+FLAGS =   -Wall -Wextra -Werror -std=c++98 -g #-fsanitize=address
 
 all:  $(NAME)
 
