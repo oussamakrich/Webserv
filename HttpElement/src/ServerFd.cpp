@@ -5,6 +5,7 @@
 #include "../../Uploader/include/Upload.hpp"
 #include "../../Utils/include/Logger.hpp"
 #include <cstdio>
+#include <sys/poll.h>
 
 bool creatSocket(int *listen, addrinfo *MyAddr){
 	*listen = socket(MyAddr->ai_family , MyAddr->ai_socktype , 0);
@@ -100,37 +101,43 @@ void Server::closeConnection(ITT_CLIENT it){
 	delete client;
 }
 
-bool Server::handelClient(ITT_CLIENT it){
+bool Server::handelClient(ITT_CLIENT it, pollfd pfd){
 	if (it == clients.end())	return false;
 
 	Client *client = *it;
+	if (pfd.revents & POLLHUP){
+		Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "revents is POLLHUP: " + convertCode((client->getLastTime())));
+		closeConnection(it);
+		return true;
+	}
 	Global::id = client->id;//Debug
 	Global::time = client->time;//Debug
 	client->setLastTime(time(NULL));
 	Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "set last time: " + convertCode((client->getLastTime())));
 	if (client->IhaveUpload)
-	{
 		client->ClientUpload(*this);
-	}
 	else if (client->IhaveCGI && !client->CGIFinish)
 		client->CgiRequest(it, *this);
 	else if (client->IhaveResponse)
 		client->OldRequest(it, *this);
 	else if (!client->NewRequest(*this) && !client->response->errorInSend){
-		Logger::fastLog(Logger::ERROR, "./Log/" + client->id,  " error while handling new requeset");
-		client->response->sendErrorResponse(client->getFd());
-		closeConnection(it);
+		Logger::fastLog(Logger::ERROR, "./Log/" + client->id,  " Send Error Response " + convertCode(client->response->getCode()));
+		client->response->sendErrorResponse(client->getFd(), client->keepAlive);
+		delete client->response;
+		client->resetClient();
+		client->response = NULL;
+		client->switchEvent(pfd.fd, POLLIN);
 		return true;
 	}
 	client->setLastTime(time(NULL));
 	Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "set second last time: " + convertCode((client->getLastTime())));
 	if (client->response && client->response->errorInSend){
-		std::cout <<"ERROR : error in send" << std::endl;
+		std::cout <<"response error in send" << std::endl;
 		closeConnection(it);
 		return true;
 	}
 	if (!client->keepAlive && !client->IhaveResponse){
-		std::cout <<"2 ERROR : error in send" << std::endl;
+		std::cout <<"KeepAlive is false && Idont have resp" << std::endl;
 		closeConnection(it);
 	}
 	return true;
@@ -145,7 +152,7 @@ bool Server::handelFd(struct pollfd pfd){
 		return true;
 	}
 	else
-		 return this->handelClient(findClient(pfd));
+		 return this->handelClient(findClient(pfd), pfd);
 }
 
 void Server::checkTimeOut(){

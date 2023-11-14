@@ -77,11 +77,12 @@ class Server {
 		bool	 start();
 		bool	 handelFd(struct pollfd fd);
 		void	 acceptClient();
-		bool	 handelClient(ITT_CLIENT it);
+		bool	 handelClient(ITT_CLIENT it, pollfd pfd);
 		ITT_CLIENT	findClient(pollfd pfd);
 		void	 checkTimeOut();
 
 		void closeConnection(ITT_CLIENT it);
+
 
 
 	public:

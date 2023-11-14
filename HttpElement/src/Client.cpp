@@ -115,7 +115,7 @@ bool Client::CgiRequest(ITT_CLIENT it, Server &ser){
 	if (response->errrCgi){
 			Logger::fastLog(Logger::INFO, "./Log/" + id,  "Cgi Error");
 		IhaveResponse = false;
-		response->sendErrorResponse(getFd());
+		response->sendErrorResponse(getFd(), this->keepAlive);
 		ser.closeConnection(it);
 		return true;
 	}
@@ -133,22 +133,28 @@ void Client::ClientUpload(Server &ser){
 			response->setHeaderAndStart(GenerateResponse::generateHeaderAndSt(*response, keepAlive));
 			response->sendResponse();
 			IhaveResponse = false;
-			// switchEvent(this->fd, POLLIN);
+			switchEvent(this->fd, POLLIN);
 		}
 }
 
 #include "../../Utils/include/Logger.hpp"
+
+void Client::resetClient(){
+	IhaveResponse = false;
+	IhaveUpload = false;
+	IhaveCGI = false;
+}
 
 bool Client::NewRequest(Server &ser){
 	Request *req;
 
 	this->keepAlive = true;
 	if (!ReadRequest())
-	{ //TODO : send 500 if read fail
-		std::cout << "Read Fail" << std::endl;
-		this->keepAlive = false;
-		this->IhaveResponse = false;
-		return true;
+	{ 
+		this->response = new Response(this->fd);
+		response->errorPage = ser.getErrorPages();
+		response->setCode(500);
+		return false;
 	}
 	if (!isRequestAvailable())
 	{
