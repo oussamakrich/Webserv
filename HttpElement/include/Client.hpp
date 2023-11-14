@@ -1,15 +1,56 @@
 #pragma once
 
 #include "../../include/includes.hpp"
+#include "../../Parsing/include/ParsRequest.hpp"
+#include "../../Response/include/Response.hpp"
+
+
+#define ITT_CLIENT	std::vector<Client*>::iterator
+
+class Server;
+
 
 class Client{
 
-	public:
-		int getFd();
-
-	public:
-		void setFd(int fd);
+	public :
+		Client(int bodySize, int fd);
+		~Client();
+		pollfd					pfd;
 
 	private:
-		struct pollfd pfd;
+		std::time_t			lastTime;
+		int							status;
+		std::string			address;
+		sockaddr			sockaddr;
+
+	public:
+		RequestBuffer reqBuff;
+		Response *response;
+		Request		*req;
+		bool			IhaveResponse;
+		bool			IhaveCGI;
+		bool			keepAlive;
+		bool			CGIFinish;
+		bool		IhaveUpload;
+
+	public: //Utils
+		bool		ReadRequest();
+		bool		isRequestAvailable();
+		Request *getRequest();
+		std::time_t	getLastTime();
+
+		bool NewRequest(ITT_CLIENT	it, Server &ser);
+		bool OldRequest(ITT_CLIENT it, Server &ser);
+		bool CgiRequest();
+		void Error();
+
+	public: //Geters
+		int getFd();
+		struct sockaddr &getAddr();
+		void setAddr(struct sockaddr &addr);
+		void setLastTime(std::time_t tm);
+		void switchEvent(int fd, int Flag);
+
+
+
 };

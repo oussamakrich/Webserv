@@ -9,11 +9,12 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 # include <sys/types.h>
-# include <sys/socket.h>
 # include <netinet/in.h>
 # include <netdb.h>
 # include <unistd.h>
 #include <sys/poll.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 
 #define RED "\033[0;31m"
@@ -26,7 +27,8 @@
 #define U_YELLOW "\033[4;33m"
 #define BLUE "\033[0;34m"
 
-
+#define IS_METHOD_SUPORTED(method)((method == "GET" || method == "DELETE" || method == "POST" ))
+#define xout std::cout << __FILE__ << ":" << __LINE__ << ":> "
 typedef enum {
 	DIRECTIVE_SYNTAX_ERROR,
 	UNKNOWN_DIRECTIVE,
@@ -54,10 +56,6 @@ typedef enum {
 	MAX_BODY_SIZE,
 	ERROR_PAGES,
 	DEFAULT_TYPE,
-	ERROR_LOG,
-	ACCESS_LOG,
-	TRY_FILES,
-	REWRITE,
 	AUTO_INDEX,
 	ALLOWED_METHOD,
 	OPEN_S_BRACKET,
@@ -68,7 +66,11 @@ typedef enum {
 	COLON,
 	SPACE,
 	WORD,
-	QUOTES
+	QUOTES,
+	UPLOAD,
+	CGI,
+	UPLOAD_PATH,
+	DOWNLOAD
 }Token;
 
 typedef struct {
@@ -91,7 +93,8 @@ typedef struct {
 
 std::string trim(const std::string &s);
 
-
+std::string UrlDecode(std::string codedStr);
+std::string UrlEncode(std::string simpleStr);
 
 void Otrim(std::string &line);
 void error(std::string error);
@@ -99,3 +102,19 @@ void error(std::string error);
 // Printers: this section will be removed its for debugging purposes only.
 void printTokens(std::vector<TOKEN> tokens);
 void printEnam(Token t);
+
+
+std::string convertCode(int code);
+// int isClientValid(int fd);
+
+int isFile(std::string path, size_t &size);
+
+void sigChange();
+void sigRestDefault();
+void sigHandler(int sig);
+
+std::vector<std::string> splitStream(const std::string& str, char delimiter);
+
+void removeSlash(std::string &path);
+
+
