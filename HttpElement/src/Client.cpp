@@ -117,7 +117,7 @@ bool Client::OldRequest(){
 	return true;
 }
 
-bool Client::CgiRequest(ITT_CLIENT it, Server &ser){
+bool Client::CgiRequest(){
 	switchEvent(this->fd, POLLOUT);
 		Logger::fastLog(Logger::INFO, "./Log/" + id,  "client switch event to POLLOUT");
 	if (response->CgiResponse(this->keepAlive)){
@@ -137,10 +137,9 @@ bool Client::CgiRequest(ITT_CLIENT it, Server &ser){
 		return true;
 	}
 	if (response->errrCgi){
-			Logger::fastLog(Logger::INFO, "./Log/" + id,  "Cgi Error");
+		Logger::fastLog(Logger::INFO, "./Log/" + id,  "Cgi Error");
 		IhaveResponse = false;
 		response->sendErrorResponse(getFd(), this->keepAlive);
-		ser.closeConnection(it);
 		return true;
 	}
 	Logger::fastLog(Logger::INFO, "./Log/" + id,  "Cgi still waiting");

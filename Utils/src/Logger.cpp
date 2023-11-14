@@ -47,7 +47,7 @@ bool Logger::isGood()
 } // return status of open log file;
 bool Logger::fastLog(int type, std::string file, std::string msg)
 {
-	Logger lg(file + ".log");
+	Logger lg(file);
 	bool res ;
 	switch (type)
 	{

@@ -119,7 +119,7 @@ bool Server::handelClient(ITT_CLIENT it, pollfd pfd){
 		client->ClientUpload(*this);
 	else if (client->IhaveCGI && !client->CGIFinish){
 		Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "Ihave cgi and cgiFinish false");
-		client->CgiRequest(it, *this);
+		client->CgiRequest();
 	}
 	else if (client->IhaveResponse){
 		if (!client->OldRequest()){
