@@ -120,8 +120,11 @@ bool Server::handelClient(ITT_CLIENT it, pollfd pfd){
 		Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "Ihave cgi and cgiFinish false" + convertCode((client->getLastTime())));
 		client->CgiRequest(it, *this);
 	}
-	else if (client->IhaveResponse)
-		client->OldRequest(it, *this);
+	else if (client->IhaveResponse){
+		if (!client->OldRequest())
+			this->closeConnection(it);
+			return true;
+	}
 	else if (!client->NewRequest(*this) && !client->response->errorInSend){
 		Logger::fastLog(Logger::ERROR, "./Log/" + client->id,  " Send Error Response $" + convertCode(client->response->getCode()));
 		client->response->sendErrorResponse(client->getFd(), client->keepAlive);

@@ -76,12 +76,11 @@ void Client::switchEvent(int fd, int Flag){
 	Global::switchEvent(fd, Flag);
 }
 
-bool Client::OldRequest(ITT_CLIENT it, Server &ser){
+bool Client::OldRequest(){
 
 	if (!response->ReminderResponse() && !response->errorInSend){
 		Logger::fastLog(Logger::ERROR, "./Log/" + id,  " error while handling old requeset");
-		ser.closeConnection(it); // DELETE client in client
-		return true;
+		return false;
 	}
 	IhaveResponse = response->stillSend;
 	if (!IhaveResponse){
