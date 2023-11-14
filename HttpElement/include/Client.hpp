@@ -15,7 +15,7 @@ class Client{
 	public :
 		Client(int bodySize, int fd);
 		~Client();
-		pollfd					pfd;
+		int					fd;
 
 	private:
 		std::time_t			lastTime;
@@ -26,7 +26,6 @@ class Client{
 	public:
 		RequestBuffer reqBuff;
 		Response *response;
-		Request		*req;
 		bool			IhaveResponse;
 		bool			IhaveCGI;
 		bool			keepAlive;
@@ -39,9 +38,11 @@ class Client{
 		Request *getRequest();
 		std::time_t	getLastTime();
 
-		bool NewRequest(ITT_CLIENT	it, Server &ser);
+		bool NewRequest(Server &ser);
 		bool OldRequest(ITT_CLIENT it, Server &ser);
-		bool CgiRequest();
+		bool CgiRequest(ITT_CLIENT it, Server &ser);
+
+		void ClientUpload(Server &ser);
 		void Error();
 
 	public: //Geters

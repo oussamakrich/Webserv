@@ -11,27 +11,27 @@ Response *GenerateResponse::generateResponse(Server &ser, Request &req, int fd){
 	res->errorPage = ser.getErrorPages();
 	ResponseHandler Handler(ser, req, *res);
 
-
+	
 	res->setMsg(generateMsg(res->getCode()));
-	res->setHeaderAndStart(generateHeaderAndSt(*res, req));
+	res->setHeaderAndStart(generateHeaderAndSt(*res, req.getConnection()));
 
 	return res;
 }
 
 void extractStatus(Response &res, std::string header){
-	std::vector<std::string> cc = splitStream(header, ' ');
+	std::vector<std::string> cc = splitStream(header);
 	res.setCode(std::atoi(cc[1].c_str()));
 	res.setMsg(cc[2]);
 }
 
-std::string GenerateResponse::generateHeaderAndSt(Response &res, Request &req){
+std::string GenerateResponse::generateHeaderAndSt(Response &res, bool keepAlive){
 	std::string str;
 	std::string headersTmp = "";
 	std::string connection = "Connection: close";
 
 	str = res.getVersion() + " " + convertCode(res.getCode()) + " " + res.getMsg() + "\r\n";
 	std::vector<std::string> headers = res.getHeaders();
-	if (req.getConnection() == 1)
+	if (keepAlive)
 		connection = "Connection: keep-alive";
 	headers.push_back(connection);
 	for (unsigned int i = 0;i < headers.size();i++){

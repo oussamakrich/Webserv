@@ -113,8 +113,9 @@ void sigChange();
 void sigRestDefault();
 void sigHandler(int sig);
 
-std::vector<std::string> splitStream(const std::string& str, char delimiter);
+std::vector<std::string> splitStream(const std::string& str);
 
 void removeSlash(std::string &path);
 
+char *Responsejoin(const char *s1, char *s2, size_t size1, size_t size2);
 

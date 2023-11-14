@@ -21,7 +21,7 @@ std::string convertCode(int code){
 	return codeStr;
 }
 
-std::string ErrorResponse::getErrorPage(Server &serv){
+std::string ErrorResponse::getErrorPage(){
 	errorCodeStr = convertCode(errorCode);	
 
 	errorPage = "HTTP/1.1 " + errorCodeStr + " " + errorMsg + "\r\n";

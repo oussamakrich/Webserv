@@ -3,6 +3,7 @@
 #include "../include/Global.hpp"
 #include "../../Response/include/GenerateResponse.hpp"
 #include "../../Uploader/include/Upload.hpp"
+#include <new>
 
 bool creatSocket(int *listen, addrinfo *MyAddr){
 	*listen = socket(MyAddr->ai_family , MyAddr->ai_socktype , 0);
@@ -67,13 +68,17 @@ void Server::acceptClient(){
 		std::cerr << "ERROR : Connection failed" << std::endl;
 		return;
 	}
-	std::cout << serverName + " : new connection accepted" << std::endl;
-	newClient = new Client(this->clientMaxBodySize, clientFd);
+	// std::cout << serverName + " : new connection accepted" << std::endl;
+	fcntl(clientFd, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
+	newClient = new(std::nothrow) Client(this->clientMaxBodySize, clientFd);
+	if (newClient == NULL){
+		std::cerr << "ERROR : new Client failed" << std::endl;
+		return;
+	}
 	newClient->setAddr(sockaddr);
 	this->clients.push_back(newClient);
 	Global::insertFd(clientFd);
 }
-
 ITT_CLIENT Server::findClient(pollfd pfd){
 	ITT_CLIENT it = clients.begin();
 
@@ -85,7 +90,6 @@ ITT_CLIENT Server::findClient(pollfd pfd){
 
 void Server::closeConnection(ITT_CLIENT it){
 	Client *client = *it;
-	std::cout << "connection closed : " << client->getFd() << std::endl;
 	clients.erase(it);
 	Global::removeFd(client->getFd());
 	delete client;
@@ -96,16 +100,14 @@ bool Server::handelClient(ITT_CLIENT it){
 
 	Client *client = *it;
 	client->setLastTime(time(NULL));
-	if (client->IhaveUpload){
-		Upload reminder(*this, *client->response);
-		client->IhaveUpload = client->response->iHaveUpload;
-	}
+	if (client->IhaveUpload)
+		client->ClientUpload(*this);
 	else if (client->IhaveCGI && !client->CGIFinish)
-		client->CgiRequest();
+		client->CgiRequest(it, *this);
 	else if (client->IhaveResponse)
 		client->OldRequest(it, *this);
-	else if (!client->NewRequest(it, *this) && !client->response->errorInSend){
-		client->response->sendErrorResponse(*this, client->getFd());
+	else if (!client->NewRequest(*this) && !client->response->errorInSend){
+		client->response->sendErrorResponse(client->getFd());
 		closeConnection(it);
 		return true;
 	}
@@ -115,6 +117,7 @@ bool Server::handelClient(ITT_CLIENT it){
 	}
 	if (!client->keepAlive && !client->IhaveResponse)
 		closeConnection(it);
+	// client->setLastTime(time(NULL));
 	return true;
 }
 
@@ -133,12 +136,13 @@ bool Server::handelFd(struct pollfd pfd){
 void Server::checkTimeOut(){
 	ITT_CLIENT it = clients.begin();
 	Client *client;
+
 	while (it != clients.end()){
 		client = *it;
 		std::time_t tm = client->getLastTime();
 		std::time_t now = std::time(NULL);
 		if(now - tm >= TIME_OUT){
-			std::cout << "client deleted" << std::endl;
+	 		std::cout << "Client fd: " << client->getFd()  << "TIME : " << now - tm<< "\n";
 			closeConnection(it);
 			continue;
 		}

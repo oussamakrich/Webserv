@@ -5,6 +5,7 @@
 #include "Client.hpp"
 #include <functional>
 #include <string>
+#include <sys/_types/_size_t.h>
 
 
 #define str_it std::vector<std::string>::iterator
@@ -32,7 +33,7 @@ class Server {
 
 	private:
 		int									port; // done.
-		int    							clientMaxBodySize; // done.
+		size_t    							clientMaxBodySize; // done.
 		bool								autoIndex; // done.
 		std::string					host; // done.
 		std::string					root; // done.
@@ -68,7 +69,7 @@ class Server {
 		std::vector<int>		CheckRepeatErrorPages;
 		bool	listenRepeat;
 		bool	ServerOff;
-		
+
 
 
 		void final();
@@ -81,7 +82,7 @@ class Server {
 		void	 checkTimeOut();
 
 		void closeConnection(ITT_CLIENT it);
-		
+
 
 	public:
 		int	getPort() const;

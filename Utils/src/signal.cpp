@@ -1,11 +1,13 @@
 
 #include <signal.h>
 #include <iostream>
+#include "../../include/includes.hpp"
 
 void sigHandler(int sig)
 {
-	std::cout << "server receive a Signal" << sig<<std::endl;
+	errno = 0;
 	signal(sig, sigHandler);
+
 }
 
 void sigChange()
@@ -17,6 +19,7 @@ void sigChange()
 		signal(i, sigHandler);
 	}
 }
+
 void sigRestDefault()
 {
 	for (size_t i = 0; i <= 22; i++)

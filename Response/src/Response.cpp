@@ -4,8 +4,6 @@
 #include "../../HttpElement/include/Server.hpp"
 #include "../include/GenerateResponse.hpp"
 #include "../../include/includes.hpp"
-#include <fstream>
-#include <sys/_types/_size_t.h>
 
 
 Response::Response(int fd){
@@ -19,9 +17,13 @@ Response::Response(int fd){
 	this->headers = std::vector<std::string>();
 	this->buffer = NULL;
 	this->bufferSize = 0;
+	this->errrCgi = false;
 }
 
-Response::~Response(){}
+Response::~Response(){
+	if (this->buffer != NULL)
+		delete [] this->buffer;
+}
 
 int Response::getCode(){ return this->code;}
 
@@ -51,13 +53,16 @@ void Response::setHeadr(std::string header){ this->headers.push_back(header);}
 
 void Response::setHeaderAndStart(std::string header){this->HeaderAndStart = header;}
 
-void Response::sendErrorResponse(Server &ser ,int fd){
+void Response::sendErrorResponse(int fd){
 		stillSend = false;
 		ErrorResponse err = GenerateError::generateError(this->code, this->errorPage);
-		std::string error =  err.getErrorPage(ser);
+		std::string error =  err.getErrorPage();
 		send(fd, error.c_str(), error.size(), 0);
 }
-void Response::CgiHeaders(Request &req, std::ifstream &file, size_t sizeOfFile){
+
+
+
+void Response::CgiHeaders(bool keepAlive, std::ifstream &file, size_t sizeOfFile){
 	std::string header;
 	size_t pos;
 	size_t headerPos = 0;
@@ -75,12 +80,15 @@ void Response::CgiHeaders(Request &req, std::ifstream &file, size_t sizeOfFile){
 	headerPos = file.tellg();
 	this->msg = "OK";
 	this->code = 200;
-	setHeadr("Content-Length: " + convertCode(sizeOfFile - headerPos));
-	this->HeaderAndStart = GenerateResponse::generateHeaderAndSt(*this, req);
+	if (file.eof())
+		setHeadr("Content-Length: 0");
+	else
+		setHeadr("Content-Length: " + convertCode(sizeOfFile - headerPos));
+	this->HeaderAndStart = GenerateResponse::generateHeaderAndSt(*this, keepAlive);
 	this->pos = headerPos;
 }
 
-bool Response::CgiRead(Request &req){
+bool Response::CgiRead(bool keepAlive){
 	path = cgiInfo.output;
 	size_t sizeOfFile;
 	isFile(path, sizeOfFile);
@@ -90,7 +98,12 @@ bool Response::CgiRead(Request &req){
 		setCode(500);
 		return false;
 	}
-	CgiHeaders(req, file, sizeOfFile);
+	CgiHeaders(keepAlive, file, sizeOfFile);
+	if (file.eof()){
+		file.close();
+		stillSend = false;
+		return true;
+	}
 	buffer = new char[R_READ];
 	file.read(buffer, R_READ);
 	bufferSize = file.gcount();
@@ -102,13 +115,28 @@ bool Response::CgiRead(Request &req){
 	return true;
 }
 
-bool Response::CgiResponse(Request &req){
+bool Response::CgiResponse(bool keepAlive){
 
 	int status;
 	if (Cgi::isFinished(cgiInfo, status)){
-		CgiRead(req);
+		if (status != 0){
+			setCode(500);
+			stillSend = false;
+			errrCgi	= true;
+			Cgi::CgiUnlink(cgiInfo);
+			return false;
+		}
+		CgiRead(keepAlive);
 		sendResponse();
 		return true;
+	}
+	if (Cgi::isTimeOut(cgiInfo)){
+		setCode(504);
+		Cgi::CgiUnlink(cgiInfo);
+		Cgi::KillCgi(cgiInfo);
+		stillSend = false;
+		errrCgi	= true;
+		return false;
 	}
 	return false;
 }
@@ -118,11 +146,12 @@ bool Response::sendResponse(){
 	errorInSend = false;
 	if (this->code >= 400)
 		return false;
-	const char *resp = this->strjoin(HeaderAndStart.c_str(), buffer, HeaderAndStart.size(), bufferSize);
+	const char *resp = Responsejoin(HeaderAndStart.c_str(), buffer, HeaderAndStart.size(), bufferSize);
 	buffer = NULL;
 	int ret = send(fd, resp, HeaderAndStart.size() + bufferSize, 0);
-	delete  resp;
-	if (ret == -1 || ret == 0){
+	delete []  resp;
+	if (ret == -1 || ret == 0)
+	{
 	 std::cout << "Error send" << std::endl;
 		errorInSend = true;
 		return false;
@@ -132,22 +161,28 @@ bool Response::sendResponse(){
 
 bool Response::ReminderResponse(){
 	errorInSend = false;
-	std::ifstream file(path.c_str());
+	std::ifstream file(path.c_str(), std::ios::in | std::ios::binary);
 	if (!file.is_open()){
 		setCode(500);
 		return false;
 	}
-	char *buffer = new char[R_READ];
+	buffer = new char[R_READ];
 	file.seekg(pos);
 	file.read(buffer, R_READ);
-	setBuffer(buffer, file.gcount());
+	bufferSize =  file.gcount();
 	pos += file.gcount();
 	stillSend = true;
 	if (file.eof())
 		stillSend = false;
 	file.close();
 	int ret = send(fd, buffer, bufferSize, 0);
+	if (file.gcount() != ret)
+	{
+		std::cout << "ret: " << ret << " count: " << file.gcount() << std::endl;
+		pos -= file.gcount() - ret;
+	}
 	delete [] buffer;
+	buffer = NULL;
 	if (ret == -1 || ret == 0)
 	{
 		std::cout << "Error send reminder : " << ret << std::endl;

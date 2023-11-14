@@ -14,7 +14,6 @@ Server::Server(){
 
 Server::~Server()
 {
-
 	for (std::map<std::string, Location*>::iterator it = locations.begin(); it != locations.end(); it++)
 		delete it->second;
 	locations.clear();
@@ -45,27 +44,28 @@ Server &Server::operator=(const Server &copy)
 TYPES_MAP generateMimeType(){
 	TYPES_MAP mime;
 
-	mime[".html"]		= "text/html";
-  mime[".htm"]		= "text/html";
-  mime[".shtml"]	= "text/html";
-  mime[".css"]		= "text/css";
-  mime[".xml"]		= "text/xml";
-  mime[".gif"]		= "image/gif";
-  mime[".jpeg"]		= "image/jpeg";
-  mime[".jpg"]		= "image/jpeg";
-  mime[".js"]			= "application/javascript";
-  mime[".txt"]		= "text/plain";
-  mime[".avif"]		= "image/avif";
-  mime[".png"]		= "image/png";
-  mime[".svg"]		= "image/svg+xml";
-  mime[".json"]		= "application/json";
-  mime[".pdf"]		= "application/pdf";
-  mime[".rar"]		= "application/x-rar-compressed";
-  mime[".zip"]		= "application/zip";
-  mime[".bin"]		= "application/octet-stream";
-  mime[".exe"]		= "application/octet-stream";
-  mime[".iso"]		= "application/octet-stream";
-  mime[".img"]		= "application/octet-stream";
+	mime["html"]		= "text/html";
+  mime["htm"]		= "text/html";
+  mime["shtml"]	= "text/html";
+  mime["css"]		= "text/css";
+  mime["xml"]		= "text/xml";
+  mime["gif"]		= "image/gif";
+  mime["jpeg"]		= "image/jpeg";
+  mime["jpg"]		= "image/jpeg";
+  mime["js"]			= "application/javascript";
+  mime["txt"]		= "text/plain";
+  mime["avif"]		= "image/avif";
+  mime["png"]		= "image/png";
+  mime["svg"]		= "image/svg+xml";
+  mime["json"]		= "application/json";
+  mime["pdf"]		= "application/pdf";
+  mime["rar"]		= "application/x-rar-compressed";
+  mime["zip"]		= "application/zip";
+  mime["bin"]		= "application/octet-stream";
+  mime["exe"]		= "application/octet-stream";
+  mime["iso"]		= "application/octet-stream";
+  mime["img"]		= "application/octet-stream";
+  mime["mp4"]		= "video/mp4";
 
 	return mime;
 }
@@ -174,5 +174,3 @@ std::ostream &operator<<(std::ostream &out, Server &server){
 	}
 	return out;
 }
-
-

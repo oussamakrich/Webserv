@@ -3,11 +3,7 @@
 #include "../include/Global.hpp"
 #include "../include/Server.hpp"
 #include "../../Response/include/GenerateResponse.hpp"
-#include <fstream>
-#include <sstream>
-#include <string>
-#include <sys/_types/_size_t.h>
-#include <vector>
+#include "../../Uploader/include/Upload.hpp"
 
 #define N_READ 50000
 
@@ -18,30 +14,32 @@ Client::Client(int bodySize, int fd) : reqBuff(bodySize){
 	IhaveUpload = false;
 	IhaveCGI = false;
 	this->response = NULL;
-	pfd.fd = fd;
-	pfd.events = POLLIN | POLLOUT;
-	pfd.revents = 0;
+	this->fd = fd;
 }
 
 Client::~Client(){
 	delete this->response;
 }
 
-int Client::getFd(){return pfd.fd; }
+int Client::getFd(){return fd; }
 
-bool Client::ReadRequest(){
+bool Client::ReadRequest(){ //TODO : send 500 if read fail
 
 	char *buffer;
-	buffer = new char[N_READ];
-	memset(buffer, 0, N_READ);
-	status = recv(pfd.fd, buffer, N_READ, 0);
-	if (status == -1 || status == 0)
-	{
-		delete  buffer;
+	buffer = new (std::nothrow) char[N_READ];
+	if (!buffer){
+		std::cerr << "Fail to allocate for read" << std::endl;
 		return false;
 	}
-	int level = reqBuff.insertBuffer(buffer, status);
-	delete buffer;
+	memset(buffer, 0, N_READ);
+	status = recv(this->fd, buffer, N_READ, 0);
+	if (status == -1 || status == 0)
+	{
+		delete  [] buffer;
+		return false;
+	}
+	reqBuff.insertBuffer(buffer, status);
+	delete [] buffer;
 	return true;
 }
 
@@ -69,14 +67,12 @@ std::time_t Client::getLastTime(){ return lastTime;}
 void Client::setLastTime(std::time_t tm){ this->lastTime = tm;}
 
 void Client::switchEvent(int fd, int Flag){
-	pfd.events = Flag;
 	Global::switchEvent(fd, Flag);
 }
 
 bool Client::OldRequest(ITT_CLIENT it, Server &ser){
 
 	if (!response->ReminderResponse() && !response->errorInSend){
-		response->sendErrorResponse(ser, getFd());
 		ser.closeConnection(it);
 		return true;
 	}
@@ -91,14 +87,13 @@ bool Client::OldRequest(ITT_CLIENT it, Server &ser){
 	return true;
 }
 
-bool Client::CgiRequest(){
-	switchEvent(this->pfd.fd, POLLOUT);
-	if (response->CgiResponse(*req)){
+bool Client::CgiRequest(ITT_CLIENT it, Server &ser){
+	switchEvent(this->fd, POLLOUT);
+	if (response->CgiResponse(this->keepAlive)){
 		CGIFinish = true;
-		delete req;
 		IhaveResponse = response->stillSend;
 		if (!IhaveResponse){
-			switchEvent(this->pfd.fd, POLLIN);
+			switchEvent(this->fd, POLLIN);
 			response->isCGI = false;
 			Cgi::CgiUnlink(response->cgiInfo);
 			delete response;
@@ -106,76 +101,67 @@ bool Client::CgiRequest(){
 		}
 		return true;
 	}
+	if (response->errrCgi){
+		IhaveResponse = false;
+		response->sendErrorResponse(getFd());
+		ser.closeConnection(it);
+		return true;
+	}
 	return false;
 }
 
-Server &Global::FindServer(const MAP_STRING &headers, Server &ser){
+void Client::ClientUpload(Server &ser){
 
-	std::string value;
-	//TODO : first check if host is only alpha
-
-	value = headers.at("Host");
-	if (value.empty())
-		return ser;
-	stringstream ss(value);
-	std::getline(ss, value, ':');
-
-	std::vector<std::string>::iterator it;
-
-	it = std::find(serverNames.begin(), serverNames.end(), value);
-	if (it == serverNames.end() || value == ser.getServerName())
-		return ser;
-
-	size_t size = servers.size();
-	for (size_t i = 0;i < size; i++){
-		if (servers[i]->getServerName() == value && servers[i]->getPort() == ser.getPort() && servers[i]->getHost() == ser.getHost())
-			return *servers[i];
-	}
-	return ser;
+		Upload reminder(ser, *response);
+		IhaveUpload = response->iHaveUpload;
+		if (!IhaveUpload)
+		{
+			response->setMsg(GenerateResponse::generateMsg(response->getCode()));;
+			response->setHeaderAndStart(GenerateResponse::generateHeaderAndSt(*response, keepAlive));
+			response->sendResponse();
+			IhaveResponse = false;
+			switchEvent(this->fd, POLLIN);
+		}
 }
 
 
-bool Client::NewRequest(ITT_CLIENT it, Server &ser){
+bool Client::NewRequest(Server &ser){
 	Request *req;
 
 	this->keepAlive = true;
-	if (!ReadRequest()){
+	if (!ReadRequest()){ //TODO : send 500 if read fail
 		this->keepAlive = false;
 		this->IhaveResponse = false;
 		return true;
 	}
 	if (!isRequestAvailable())
 		return true;
-	switchEvent(this->pfd.fd, POLLOUT);
+	switchEvent(this->fd, POLLOUT);
 	req = getRequest();
 	reqBuff.clear();
 	if (req->getType() < 0)
 	{
-		this->response = new Response(this->pfd.fd);
+		this->response = new Response(this->fd);
 		response->errorPage = ser.getErrorPages();
 		response->setCode(req->getErrorCode());
 		delete req;
 		return false;
 	}
 	Server &server = Global::FindServer(req->getHeaders(),  ser);
-	response = GenerateResponse::generateResponse(server, *req, this->pfd.fd);
+	response = GenerateResponse::generateResponse(server, *req, this->fd);
+	this->keepAlive = req->getConnection();
+	delete req;
 	IhaveCGI = response->isCGI;
-	if (response->isCGI){
-		this->req = req;
-		return true;
-	}
-	if (!response->sendResponse()){
-		delete req;
-		return false;
-	}
 	IhaveUpload = response->iHaveUpload;
+	if (response->isCGI || response->iHaveUpload)
+		return true;
+	if (!response->sendResponse())
+		return false;
 	IhaveResponse = response->stillSend;
 	if (!IhaveResponse){
 		delete  response;
 		response = NULL;
-		switchEvent(this->pfd.fd, POLLIN);
+		switchEvent(this->fd, POLLIN);
 	}
-	this->keepAlive = req->getConnection();
-	delete req;
 	return true;
 }
