@@ -61,7 +61,7 @@ void Response::sendErrorResponse(int fd, bool keepAlive){
 		stillSend = false;
 		ErrorResponse err = GenerateError::generateError(this->code, this->errorPage);
 		std::string error =  err.getErrorPage(keepAlive);
-		send(fd, error.c_str(), error.size(), 0);
+		send(fd, error.c_str(), error.size(), 0); // WARNING : check
 }
 
 

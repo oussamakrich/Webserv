@@ -85,8 +85,9 @@ void  Global::run()
 		{
 			if (gPollFds[i].revents & POLLHUP){
 				this->callHandelFds(gPollFds[i]);
+					pollStatus--;
 			}
-			if (((gPollFds[i].revents & POLLIN) || (gPollFds[i].revents & POLLOUT))){
+			else if (((gPollFds[i].revents & POLLIN) || (gPollFds[i].revents & POLLOUT))){
 				this->callHandelFds(gPollFds[i]);
 				pollStatus--;
 			}

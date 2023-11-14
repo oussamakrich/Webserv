@@ -79,7 +79,7 @@ bool Client::OldRequest(ITT_CLIENT it, Server &ser){
 
 	if (!response->ReminderResponse() && !response->errorInSend){
 		Logger::fastLog(Logger::ERROR, "./Log/" + id,  " error while handling old requeset");
-		ser.closeConnection(it);
+		ser.closeConnection(it); // DELETE client in client
 		return true;
 	}
 	IhaveResponse = response->stillSend;
@@ -89,6 +89,7 @@ bool Client::OldRequest(ITT_CLIENT it, Server &ser){
 		delete  response;
 		response = NULL;
 		switchEvent(getFd(), POLLIN);
+		resetClient();
 	}
 	return true;
 }
