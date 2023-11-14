@@ -105,13 +105,13 @@ bool Server::handelClient(ITT_CLIENT it, pollfd pfd){
 	if (it == clients.end())	return false;
 
 	Client *client = *it;
+	Global::id = client->id;//Debug
+	Global::time = client->time;//Debug
 	if (pfd.revents & POLLHUP){
 		Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "revents is POLLHUP: " + convertCode((client->getLastTime())));
 		closeConnection(it);
 		return true;
 	}
-	Global::id = client->id;//Debug
-	Global::time = client->time;//Debug
 	client->setLastTime(time(NULL));
 	Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "set last time: " + convertCode((client->getLastTime())));
 	if (client->IhaveUpload)
