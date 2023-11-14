@@ -79,7 +79,8 @@ void Upload::multipart()
 	if (_pos_of_end_boundary == 0)
 	{
 		// print the address of buffer
-		unlink(res._source_file.c_str());
+		std::cout << "File uploaded" << std::endl;
+		// unlink(res._source_file.c_str());
 		res.setCode(201);
 		res.byte.clear();
 		file.close();
@@ -96,8 +97,9 @@ void Upload::multipart()
 			_pos_of_end_boundary = res.byte.find((res._boundary + "--").c_str(), res._boundary.size() + 2);
 			if (_pos_of_end_boundary == 0)
 			{
+				std::cout << "File uploaded" << std::endl;
 				res.setCode(201);
-				unlink(res._source_file.c_str());
+				// unlink(res._source_file.c_str());
 				file.close();
 				res.stillSend = false;
 				res.iHaveUpload = false;

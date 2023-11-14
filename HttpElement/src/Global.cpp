@@ -81,10 +81,12 @@ void  Global::run()
 			perror("poll");
 			continue;
 		}
-		for(size_t i = 0; i < gPollFds.size() || pollStatus ; i++)
+		for(size_t i = 0; i < gPollFds.size() && pollStatus ; i++)
 		{
 			if (gPollFds[i].revents & POLLHUP){
 				this->callHandelFds(gPollFds[i]);
+				pollStatus--;
+				continue;
 			}
 			if (((gPollFds[i].revents & POLLIN) || (gPollFds[i].revents & POLLOUT))){
 				this->callHandelFds(gPollFds[i]);
