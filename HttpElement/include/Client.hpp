@@ -53,6 +53,7 @@ class Client{
 		void setAddr(struct sockaddr &addr);
 		void setLastTime(std::time_t tm);
 		void switchEvent(int fd, int Flag);
+		void resetClient();
 
 
 

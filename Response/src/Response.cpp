@@ -57,10 +57,10 @@ void Response::setHeadr(std::string header){ this->headers.push_back(header);}
 
 void Response::setHeaderAndStart(std::string header){this->HeaderAndStart = header;}
 
-void Response::sendErrorResponse(int fd){
+void Response::sendErrorResponse(int fd, bool keepAlive){
 		stillSend = false;
 		ErrorResponse err = GenerateError::generateError(this->code, this->errorPage);
-		std::string error =  err.getErrorPage();
+		std::string error =  err.getErrorPage(keepAlive);
 		send(fd, error.c_str(), error.size(), 0);
 }
 

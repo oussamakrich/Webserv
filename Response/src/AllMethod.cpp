@@ -217,7 +217,7 @@ std::string ResponseHandler::GetFileName()
 
 
 void ResponseHandler::simpleGet(){
-		Logger::fastLog(Logger::INFO, "./Log/" + Global::id ,  " Simple get function");//DEBUG
+	Logger::fastLog(Logger::INFO, "./Log/" + Global::id ,  " Simple get function");//DEBUG
 	res.path = this->root + '/' + req.getPath();
 	size_t size;
 	int type = isFile(res.path, size);

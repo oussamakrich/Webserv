@@ -80,7 +80,7 @@ class Response{
 		bool CgiRead(bool keepAlive);
 		void CgiHeaders(bool keepAlive, std::ifstream &file, size_t sizeOfFile);
 
-		void sendErrorResponse(int fd);
+		void sendErrorResponse(int fd, bool keepAlive);
 		void HandelLocation();
 
 
