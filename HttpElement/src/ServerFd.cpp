@@ -116,12 +116,14 @@ bool Server::handelClient(ITT_CLIENT it, pollfd pfd){
 	Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "set last time: " + convertCode((client->getLastTime())));
 	if (client->IhaveUpload)
 		client->ClientUpload(*this);
-	else if (client->IhaveCGI && !client->CGIFinish)
+	else if (client->IhaveCGI && !client->CGIFinish){
+		Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "Ihave cgi and cgiFinish false" + convertCode((client->getLastTime())));
 		client->CgiRequest(it, *this);
+	}
 	else if (client->IhaveResponse)
 		client->OldRequest(it, *this);
 	else if (!client->NewRequest(*this) && !client->response->errorInSend){
-		Logger::fastLog(Logger::ERROR, "./Log/" + client->id,  " Send Error Response " + convertCode(client->response->getCode()));
+		Logger::fastLog(Logger::ERROR, "./Log/" + client->id,  " Send Error Response $" + convertCode(client->response->getCode()));
 		client->response->sendErrorResponse(client->getFd(), client->keepAlive);
 		delete client->response;
 		client->resetClient();

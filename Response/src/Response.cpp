@@ -123,6 +123,7 @@ bool Response::CgiResponse(bool keepAlive){
 	int status;
 	if (Cgi::isFinished(cgiInfo, status)){
 		if (status != 0){
+			Logger::fastLog(Logger::INFO, "./Log/" + Global::id,  "CGI status != 0");
 			setCode(500);
 			stillSend = false;
 			errrCgi	= true;

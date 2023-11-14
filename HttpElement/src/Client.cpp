@@ -14,6 +14,7 @@ Client::Client(int bodySize, int fd) : reqBuff(bodySize){
 	IhaveResponse = false;
 	IhaveUpload = false;
 	IhaveCGI = false;
+	CGIFinish = false;
 	keepAlive = true;
 	this->response = NULL;
 	this->fd = fd;
@@ -143,6 +144,7 @@ void Client::resetClient(){
 	IhaveResponse = false;
 	IhaveUpload = false;
 	IhaveCGI = false;
+	CGIFinish = false;
 }
 
 bool Client::NewRequest(Server &ser){
@@ -187,6 +189,7 @@ bool Client::NewRequest(Server &ser){
 	IhaveCGI = response->isCGI;
 	IhaveUpload = response->iHaveUpload;
 	IhaveResponse = response->stillSend;
+	CGIFinish = false;
 	if (response->isCGI || response->iHaveUpload)
 		return true;
 	if (!response->sendResponse())
