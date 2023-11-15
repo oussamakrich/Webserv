@@ -109,7 +109,7 @@ bool Server::handelClient(ITT_CLIENT it, pollfd pfd){
 	Global::time = client->time;//Debug
 	if (pfd.revents & POLLHUP){
 		Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "revents is POLLHUP: ");
-		client->clearClient();	
+		client->clearClient();
 		closeConnection(it);
 		return true;
 	}
@@ -159,7 +159,7 @@ bool Server::handelFd(struct pollfd pfd){
 		return true;
 	}
 	else
-		 return this->handelClient(findClient(pfd), pfd);
+		return this->handelClient(findClient(pfd), pfd);
 }
 
 void Server::checkTimeOut(){

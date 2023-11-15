@@ -173,7 +173,9 @@ bool Response::ReminderResponse(){
 	errorInSend = false;
 	Logger::fastLog(Logger::INFO, "./Log/" + Global::id,  "ReminderResponse function.");
 	std::ifstream file(path.c_str());
-	if (!file.is_open()){
+	if (!file.is_open())
+	{
+		// TODO: switch the event.
 		setCode(500);
 		std::cerr << "Error open file" << std::endl;
 		return false;

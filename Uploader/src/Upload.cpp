@@ -196,11 +196,8 @@ bool Upload::_extract_headers()
 
 void Upload::Uploader()
 {
-	std::cout << "here\n";
 	if (res._is_multipart_form)
-	{
 		multipart();
-	}
 	else
 	{
 		std::string destinationFile = res.location->getUploadPath() + "/" + res._single_file_name;
