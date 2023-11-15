@@ -72,8 +72,7 @@ char *Responsejoin(const char *s1, char *s2, size_t size1, size_t size2)
 		tmp[i + j] = s2[j];
 		j++;
 	}
-	if (size2 > 0)
-		delete[] s2;
+	delete[] s2;
 	return (tmp);
 }
 

@@ -30,7 +30,7 @@ int Client::getFd(){return fd; }
 bool Client::ReadRequest(){ //TODO : send 500 if read fail
 
 	char *buffer;
-	buffer = new (std::nothrow) char[N_READ];
+	buffer = new char[N_READ];
 	if (!buffer){
 		std::cerr << "Fail to allocate for read" << std::endl;
 		return false;
@@ -40,7 +40,6 @@ bool Client::ReadRequest(){ //TODO : send 500 if read fail
 	if (status == 0)
 	{
 		delete  [] buffer;
-
 		return false;
 	}
 	reqBuff.insertBuffer(buffer, status);
