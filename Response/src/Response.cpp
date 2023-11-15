@@ -23,6 +23,9 @@ Response::Response(int fd){
 	this->buffer = NULL;
 	this->bufferSize = 0;
 	this->errrCgi = false;
+	this->iHaveUpload = false;// false
+	this->stillSend = false;// sttll send the reminder
+	this->isCGI = false;
 }
 
 Response::~Response(){
@@ -147,30 +150,19 @@ bool Response::CgiResponse(bool keepAlive){
 }
 
 bool Response::sendResponse(){
-
-	errorInSend = false;
 	if (this->code >= 400)
 		return false;
 	const char *resp = Responsejoin(HeaderAndStart.c_str(), buffer, HeaderAndStart.size(), bufferSize);
+	Logger::fastLog(Logger::INFO, "./Log/" + Global::id,  "/n--------------------Reponse headers-------------------\n" + HeaderAndStart + "\n--------------------Reponse headers-------------------\n");
 	buffer = NULL;
 	int ret = send(fd, resp, HeaderAndStart.size() + bufferSize, 0);
 	delete []  resp;
 	if (ret - HeaderAndStart.size() != bufferSize)
 		pos -= ret - HeaderAndStart.size();
-	if (ret == 0)
-	{
-	 std::cout << "Error send" << std::endl;
-		errorInSend = true;
-		return false;
-	}
-	if (ret == -1){
-		std::cerr << "first send return -1" << std::endl;
-	}
 	return true;
 }
 
 bool Response::ReminderResponse(){
-	errorInSend = false;
 	Logger::fastLog(Logger::INFO, "./Log/" + Global::id,  "ReminderResponse function.");
 	std::ifstream file(path.c_str());
 	if (!file.is_open())
@@ -196,15 +188,5 @@ bool Response::ReminderResponse(){
 		pos -= file.gcount() - ret;
 	delete [] buffer;
 	buffer = NULL;
-	// if (ret == 0)
-	// {
-	// 	std::cout << "Error send reminder : " << ret << std::endl;
-	// 	errorInSend = true;
-	// 	return false;
-	// }
-	// if (ret == -1){
-	// 	std::cerr << "send return -1" << std::endl;
-	// 	return false;
-	// }
 	return true;
 }

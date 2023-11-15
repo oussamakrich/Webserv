@@ -43,7 +43,6 @@ class Response{
 		bool isCGI;
 		bool errrCgi;
 		t_cgiInfo cgiInfo;
-		bool		errorInSend;
 		std::string		multiDataFormPath;
 
 

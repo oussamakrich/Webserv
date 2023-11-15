@@ -66,6 +66,7 @@ Location *GenerateLocation::generateLocation(std::vector<TOKEN>::iterator &token
 		if (tokens->first != SEMICOLON)   throw std::runtime_error(ERR_MESS_SEMICOLON);
 		tokens++;
 	}// end while
+		lc->final();
 		return lc;
 } // end GenerateLocation
 

@@ -37,9 +37,10 @@ bool Client::ReadRequest(){ //TODO : send 500 if read fail
 	}
 	memset(buffer, 0, N_READ);
 	status = recv(this->fd, buffer, N_READ, 0);
-	if (status == -1 || status == 0)
+	if (status == 0)
 	{
 		delete  [] buffer;
+
 		return false;
 	}
 	reqBuff.insertBuffer(buffer, status);
@@ -209,6 +210,7 @@ bool Client::NewRequest(Server &ser){
 	this->keepAlive = req->getConnection();
 	delete req;
 	IhaveCGI = response->isCGI;
+	std::cerr <<std::boolalpha << response->isCGI << std::endl;
 	IhaveUpload = response->iHaveUpload;
 	IhaveResponse = response->stillSend;
 	CGIFinish = false;
