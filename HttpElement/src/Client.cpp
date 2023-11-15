@@ -154,6 +154,7 @@ void Client::ClientUpload(Server &ser){
 
 		Upload reminder(ser, *response);
 		IhaveUpload = response->iHaveUpload;
+		std::cout << "i have upload: " << IhaveUpload << std::endl;
 		if (!IhaveUpload)
 		{
 			response->setMsg(GenerateResponse::generateMsg(response->getCode()));;

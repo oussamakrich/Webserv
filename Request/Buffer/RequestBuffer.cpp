@@ -249,7 +249,7 @@ std::string RequestBuffer::_generate_tmp_file_path()
 
 int	RequestBuffer::_chunked_handler()
 {
-	int increment;
+	int increment = 0;
 	if (_buffer.size() == 0)				return 0; // This mean that the buffer is empty.
 	if (_chunkSize == -1)
 	{
@@ -283,6 +283,7 @@ int	RequestBuffer::_chunked_handler()
 			_file.close();
 			_buffer.resize(_chunkSize + increment);
 			_chunkSize = -1;
+			std::cout << increment << std::endl;
 		}
 		else
 		{
@@ -290,6 +291,7 @@ int	RequestBuffer::_chunked_handler()
 			_chunkSize -= _buffer.size();
 			_buffer.resize(_buffer.size());
 			_file.close();
+			std::cout << increment << std::endl;
 		}
 		return (_chunked_handler());
 	}
