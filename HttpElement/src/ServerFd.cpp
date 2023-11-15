@@ -122,12 +122,10 @@ bool Server::handelClient(ITT_CLIENT it, pollfd pfd){
 		client->CgiRequest();
 	}
 	else if (client->IhaveResponse){
-		if (!client->OldRequest()){
-			// this->closeConnection(it);
-			// return true;
-		}
+		if (client->OldRequest() == false)
+			closeConnection(it);
 	}
-	else if (!client->NewRequest(*this) && !client->response->errorInSend){
+	else if (!client->NewRequest(*this)){
 		Logger::fastLog(Logger::ERROR, "./Log/" + client->id,  " Send Error Response $" + convertCode(client->response->getCode()));
 		client->response->sendErrorResponse(client->getFd(), client->keepAlive);
 		delete client->response;
@@ -138,11 +136,6 @@ bool Server::handelClient(ITT_CLIENT it, pollfd pfd){
 	}
 	client->setLastTime(time(NULL));
 	Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "set second last time: " + convertCode((client->getLastTime())));
-	// if (client->response && client->response->errorInSend){
-	// 	std::cout <<"response error in send" << std::endl;
-	// 	closeConnection(it);
-	// 	return true;
-	// }
 	if (!client->keepAlive && !client->IhaveResponse){
 		std::cout <<"KeepAlive is false && Idont have resp" << std::endl;
 		closeConnection(it);
