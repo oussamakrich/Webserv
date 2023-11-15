@@ -4,6 +4,7 @@
 #include "../include/Server.hpp"
 #include "../../Response/include/GenerateResponse.hpp"
 #include "../../Uploader/include/Upload.hpp"
+#include <istream>
 
 #define N_READ 50000
 
@@ -30,6 +31,7 @@ int Client::getFd(){return fd; }
 bool Client::ReadRequest(){ //TODO : send 500 if read fail
 
 	char *buffer;
+	std::ofstream file("debug.txt", std::ios::app | std::ios::binary);
 	buffer = new (std::nothrow) char[N_READ];
 	if (!buffer){
 		std::cerr << "Fail to allocate for read" << std::endl;
@@ -43,6 +45,7 @@ bool Client::ReadRequest(){ //TODO : send 500 if read fail
 
 		return false;
 	}
+	file.write(buffer, status);
 	reqBuff.insertBuffer(buffer, status);
 	Logger::fastLog(Logger::INFO, "./Log/" + id,  "------------------- Start buffer request -------------------");
 	Logger::fastLog(Logger::INFO, "./Log/" + id,  buffer);
@@ -90,14 +93,14 @@ void Client::clearClient(){
 	}
 	else if (this->IhaveCGI && !this->CGIFinish){
 		Logger::fastLog(Logger::ERROR, "./Log/" + id,  " connection reset and cgi still wait -> KillCgi unlink files");
-		Cgi::KillCgi(response->cgiInfo);		
-		Cgi::CgiUnlink(response->cgiInfo);		
+		Cgi::KillCgi(response->cgiInfo);
+		Cgi::CgiUnlink(response->cgiInfo);
 	}
 	if (this->IhaveUpload) {
 		Logger::fastLog(Logger::ERROR, "./Log/" + id,  " connection reset and I have upload -> unlink files");
 		unlink(response->_source_file.c_str());
 	}
-	
+
 }
 
 bool Client::OldRequest(){
@@ -175,7 +178,7 @@ bool Client::NewRequest(Server &ser){
 
 	this->keepAlive = true;
 	if (!ReadRequest())
-	{ 
+	{
 		this->response = new Response(this->fd);
 		response->errorPage = ser.getErrorPages();
 		response->setCode(500);

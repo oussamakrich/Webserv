@@ -36,14 +36,14 @@ bool Server::start(){
 
 	struct addrinfo *MyAddr;
 	int	ret = getaddrinfo(this->getHost().c_str(), PortString.str().c_str(), &hints, &MyAddr);
-	if(ret){
+	if(ret)
+	{
 		std::cerr << gai_strerror(ret) << std::endl;
 		freeaddrinfo(MyAddr);
 		return false;
 	}
 	if (!creatSocket(&_listen, MyAddr))
 		return false;
-
 	if (bind(_listen, MyAddr->ai_addr,MyAddr->ai_addrlen) != 0){
 		perror("bind");
 		freeaddrinfo(MyAddr);

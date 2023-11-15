@@ -136,6 +136,7 @@ bool Response::CgiResponse(bool keepAlive){
 		}
 		CgiRead(keepAlive);
 		sendResponse();
+		std::cout << "hello\n";
 		return true;
 	}
 	if (Cgi::isTimeOut(cgiInfo)){
@@ -149,12 +150,14 @@ bool Response::CgiResponse(bool keepAlive){
 	return false;
 }
 
-bool Response::sendResponse(){
+bool Response::sendResponse()
+{
 	if (this->code >= 400)
 		return false;
 	const char *resp = Responsejoin(HeaderAndStart.c_str(), buffer, HeaderAndStart.size(), bufferSize);
 	Logger::fastLog(Logger::INFO, "./Log/" + Global::id,  "/n--------------------Reponse headers-------------------\n" + HeaderAndStart + "\n--------------------Reponse headers-------------------\n");
 	buffer = NULL;
+
 	int ret = send(fd, resp, HeaderAndStart.size() + bufferSize, 0);
 	delete []  resp;
 	if (ret - HeaderAndStart.size() != bufferSize)

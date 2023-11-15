@@ -376,7 +376,6 @@ int RequestBuffer::_body_handler()
 
 int	RequestBuffer::insertBuffer(const char *buffer, int size)
 {
-	// std::cout << buffer << " " << size<< std::endl;
 	_buffer = _buffer + Byte(buffer, size);
 
 	switch (_level)

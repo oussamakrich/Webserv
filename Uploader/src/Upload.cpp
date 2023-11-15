@@ -215,7 +215,7 @@ void Upload::Uploader()
 		if (file.eof())
 		{
 			std::cout << "File uploaded" << std::endl;
-			unlink(res._source_file.c_str());
+			// unlink(res._source_file.c_str());
 			res.setCode(201);
 			res.stillSend = false;
 			res.iHaveUpload = false;
