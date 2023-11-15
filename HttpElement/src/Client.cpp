@@ -101,7 +101,7 @@ void Client::clearClient(){
 
 bool Client::OldRequest(){
 
-	if (!response->ReminderResponse() && !response->errorInSend){
+	if (!response->ReminderResponse() /*&& !response->errorInSend*/){
 		Logger::fastLog(Logger::ERROR, "./Log/" + id,  " error while handling old requeset");
 		return false;
 	}

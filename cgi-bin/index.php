@@ -1,7 +1,7 @@
 
 <?php
-// phpinfo();
-echo "Hello World!";
+phpinfo();
+// echo "Hello World!";
 ?>
 
 
