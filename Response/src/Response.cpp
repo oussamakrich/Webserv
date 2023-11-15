@@ -23,6 +23,9 @@ Response::Response(int fd){
 	this->buffer = NULL;
 	this->bufferSize = 0;
 	this->errrCgi = false;
+	this->iHaveUpload = false;// false
+	this->stillSend = false;// sttll send the reminder
+	this->isCGI = false;
 }
 
 Response::~Response(){
