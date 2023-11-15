@@ -16,6 +16,7 @@ Location::Location(string path): path(path)
 	this->redirection_text = "ok";
 	this->AutoIndex = false;
 	this->upload = false;
+	this->_isRedirection = false; // add 
 	this->isDown = false;
 	this->upload_path = "";
 	this->_isRedirection = false;

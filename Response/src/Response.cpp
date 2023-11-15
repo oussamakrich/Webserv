@@ -7,6 +7,7 @@
 
 #include "../../Utils/include/Logger.hpp"
 #include "../../HttpElement/include/Global.hpp"
+#include <cstring>
 #include <string>
 #include <sys/_types/_size_t.h>
 
@@ -171,12 +172,14 @@ bool Response::sendResponse(){
 bool Response::ReminderResponse(){
 	errorInSend = false;
 	Logger::fastLog(Logger::INFO, "./Log/" + Global::id,  "ReminderResponse function.");
-	std::ifstream file(path.c_str(), std::ios::in | std::ios::binary);
+	std::ifstream file(path.c_str());
 	if (!file.is_open()){
 		setCode(500);
+		std::cerr << "Error open file" << std::endl;
 		return false;
 	}
 	buffer = new char[R_READ];
+	memset(buffer, 0, R_READ);
 	file.seekg(pos);
 	file.read(buffer, R_READ);
 	bufferSize = file.gcount();
@@ -191,15 +194,15 @@ bool Response::ReminderResponse(){
 		pos -= file.gcount() - ret;
 	delete [] buffer;
 	buffer = NULL;
-	if (ret == 0)
-	{
-		std::cout << "Error send reminder : " << ret << std::endl;
-		errorInSend = true;
-		return false;
-	}
-	if (ret == -1){
-		std::cerr << "send return -1" << std::endl;
-		return false;
-	}
+	// if (ret == 0)
+	// {
+	// 	std::cout << "Error send reminder : " << ret << std::endl;
+	// 	errorInSend = true;
+	// 	return false;
+	// }
+	// if (ret == -1){
+	// 	std::cerr << "send return -1" << std::endl;
+	// 	return false;
+	// }
 	return true;
 }
