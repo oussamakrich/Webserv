@@ -105,23 +105,30 @@ bool Server::handelClient(ITT_CLIENT it, pollfd pfd){
 	if (it == clients.end())	return false;
 
 	Client *client = *it;
+	Global::id = client->id;//Debug
+	Global::time = client->time;//Debug
 	if (pfd.revents & POLLHUP){
-		Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "revents is POLLHUP: " + convertCode((client->getLastTime())));
+		Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "revents is POLLHUP: ");
+		client->clearClient();	
 		closeConnection(it);
 		return true;
 	}
-	Global::id = client->id;//Debug
-	Global::time = client->time;//Debug
 	client->setLastTime(time(NULL));
 	Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "set last time: " + convertCode((client->getLastTime())));
 	if (client->IhaveUpload)
 		client->ClientUpload(*this);
-	else if (client->IhaveCGI && !client->CGIFinish)
-		client->CgiRequest(it, *this);
-	else if (client->IhaveResponse)
-		client->OldRequest(it, *this);
+	else if (client->IhaveCGI && !client->CGIFinish){
+		Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "Ihave cgi and cgiFinish false");
+		client->CgiRequest();
+	}
+	else if (client->IhaveResponse){
+		if (!client->OldRequest()){
+			this->closeConnection(it);
+			return true;
+		}
+	}
 	else if (!client->NewRequest(*this) && !client->response->errorInSend){
-		Logger::fastLog(Logger::ERROR, "./Log/" + client->id,  " Send Error Response " + convertCode(client->response->getCode()));
+		Logger::fastLog(Logger::ERROR, "./Log/" + client->id,  " Send Error Response $" + convertCode(client->response->getCode()));
 		client->response->sendErrorResponse(client->getFd(), client->keepAlive);
 		delete client->response;
 		client->resetClient();

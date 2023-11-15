@@ -61,7 +61,7 @@ void Response::sendErrorResponse(int fd, bool keepAlive){
 		stillSend = false;
 		ErrorResponse err = GenerateError::generateError(this->code, this->errorPage);
 		std::string error =  err.getErrorPage(keepAlive);
-		send(fd, error.c_str(), error.size(), 0);
+		send(fd, error.c_str(), error.size(), 0); // WARNING : check
 }
 
 
@@ -123,6 +123,7 @@ bool Response::CgiResponse(bool keepAlive){
 	int status;
 	if (Cgi::isFinished(cgiInfo, status)){
 		if (status != 0){
+			Logger::fastLog(Logger::INFO, "./Log/" + Global::id,  "CGI status != 0");
 			setCode(500);
 			stillSend = false;
 			errrCgi	= true;

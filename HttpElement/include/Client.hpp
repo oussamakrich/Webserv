@@ -41,8 +41,8 @@ class Client{
 		std::time_t	getLastTime();
 
 		bool NewRequest(Server &ser);
-		bool OldRequest(ITT_CLIENT it, Server &ser);
-		bool CgiRequest(ITT_CLIENT it, Server &ser);
+		bool OldRequest();
+		bool CgiRequest();
 
 		void ClientUpload(Server &ser);
 		void Error();
@@ -54,7 +54,6 @@ class Client{
 		void setLastTime(std::time_t tm);
 		void switchEvent(int fd, int Flag);
 		void resetClient();
-
-
+		void clearClient();
 
 };

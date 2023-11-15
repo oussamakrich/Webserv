@@ -109,10 +109,13 @@ void ResponseHandler::handelCGI(){
 	}
 	std::string bin = location->getCgiBinFor(res.path);
 	res.cgiInfo =  Cgi::Run(req, bin, res.path);
+	Logger::fastLog(Logger::INFO, "./Log/" + Global::id ,  "Cgi info : code : " + convertCode(res.cgiInfo.code) + " input : " + res.cgiInfo.input);//DEBUG
 	if (res.cgiInfo.code == 500){
+		Logger::fastLog(Logger::INFO, "./Log/" + Global::id ,  "Cgi Failed");//DEBUG
 		res.setCode(500);
 		return;
 	}
+	Logger::fastLog(Logger::INFO, "./Log/" + Global::id ,  "Cgi run : seccusse");//DEBUG
 	res.isCGI = true;
 }
 
@@ -121,6 +124,7 @@ void ResponseHandler::serveFile(std::string path, size_t size){
 	res.isCGI = false;
 	if (checkCGI(path)){
 		res.path = path;
+		Logger::fastLog(Logger::INFO, "./Log/" + Global::id ,  path + " is match as cgi");//DEBUG
 		handelCGI();
 		return;
 	}

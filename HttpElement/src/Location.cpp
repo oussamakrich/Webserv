@@ -18,6 +18,7 @@ Location::Location(string path): path(path)
 	this->upload = false;
 	this->isDown = false;
 	this->upload_path = "";
+	this->_isRedirection = false;
 }
 Location::~Location(){}
 void Location::final()
@@ -54,7 +55,7 @@ void	Location::setPath(string &path)                        {   this->path = pat
 void	Location::setUploadOn(bool b)						   {   this->upload = b;                                      	}
 void	Location::setUploadPath(const string	&upload_path)	{	this->upload_path = upload_path;						}
 void 	Location::setDownload(bool b) 							{	 this->isDown = b;										}
-	
+
 
 /*********************************< getter >*******************/
 
@@ -105,7 +106,7 @@ bool  Location::isMatch(string uri)    const
 	return uri.at(this->path.size()) == '/' ;
 }
 bool Location::isUploadOn()					const          { return upload; }
-bool Location::isDownloadEnable()			const			{ return  isDown; }  
+bool Location::isDownloadEnable()			const			{ return  isDown; }
 bool Location::isCgiExtention(string file)	const
 {
 	size_t pos = file.find(".");

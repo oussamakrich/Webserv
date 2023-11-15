@@ -110,7 +110,7 @@ void Cgi::cgiProcess(t_cgiInfo &info, Request &req, char **env,  char **args)
 	catch(const std::exception& e)
 	{
 		std::cerr << e.what() << '\n';
-			perror("erro : ");
+			perror("CgiProcess");
 		exit(-1);
 	}
 	exit(-1);

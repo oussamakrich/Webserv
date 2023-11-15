@@ -18,13 +18,13 @@ if (!(isset($_SESSION['user']) && isset($_SESSION['pass'])))
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            /* background-color: #f4f4f4; */
             margin: 20px;
             text-align: center;
         }
 
         h2 {
-            color: #333;
+            color: #fff;
         }
 
         input[type="file"] {

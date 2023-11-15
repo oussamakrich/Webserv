@@ -14,12 +14,14 @@ Client::Client(int bodySize, int fd) : reqBuff(bodySize){
 	IhaveResponse = false;
 	IhaveUpload = false;
 	IhaveCGI = false;
+	CGIFinish = false;
 	keepAlive = true;
 	this->response = NULL;
 	this->fd = fd;
 }
 
 Client::~Client(){
+	clearClient();
 	delete this->response;
 }
 
@@ -75,12 +77,33 @@ void Client::switchEvent(int fd, int Flag){
 	Global::switchEvent(fd, Flag);
 }
 
-bool Client::OldRequest(ITT_CLIENT it, Server &ser){
+void Client::clearClient(){
+
+	if (!response){
+		Logger::fastLog(Logger::ERROR, "./Log/" + id,  " try to clear but i dont have response");
+		return;
+	}
+	if (this->IhaveCGI && this->CGIFinish){
+		Logger::fastLog(Logger::ERROR, "./Log/" + id,  " connection reset and cgi finish -> unlink files");
+		Cgi::CgiUnlink(response->cgiInfo);
+	}
+	else if (this->IhaveCGI && !this->CGIFinish){
+		Logger::fastLog(Logger::ERROR, "./Log/" + id,  " connection reset and cgi still wait -> KillCgi unlink files");
+		Cgi::KillCgi(response->cgiInfo);		
+		Cgi::CgiUnlink(response->cgiInfo);		
+	}
+	if (this->IhaveUpload) {
+		Logger::fastLog(Logger::ERROR, "./Log/" + id,  " connection reset and I have upload -> unlink files");
+		unlink(response->_source_file.c_str());
+	}
+	
+}
+
+bool Client::OldRequest(){
 
 	if (!response->ReminderResponse() && !response->errorInSend){
 		Logger::fastLog(Logger::ERROR, "./Log/" + id,  " error while handling old requeset");
-		ser.closeConnection(it);
-		return true;
+		return false;
 	}
 	IhaveResponse = response->stillSend;
 	if (!IhaveResponse){
@@ -89,11 +112,12 @@ bool Client::OldRequest(ITT_CLIENT it, Server &ser){
 		delete  response;
 		response = NULL;
 		switchEvent(getFd(), POLLIN);
+		resetClient();
 	}
 	return true;
 }
 
-bool Client::CgiRequest(ITT_CLIENT it, Server &ser){
+bool Client::CgiRequest(){
 	switchEvent(this->fd, POLLOUT);
 		Logger::fastLog(Logger::INFO, "./Log/" + id,  "client switch event to POLLOUT");
 	if (response->CgiResponse(this->keepAlive)){
@@ -113,10 +137,9 @@ bool Client::CgiRequest(ITT_CLIENT it, Server &ser){
 		return true;
 	}
 	if (response->errrCgi){
-			Logger::fastLog(Logger::INFO, "./Log/" + id,  "Cgi Error");
+		Logger::fastLog(Logger::INFO, "./Log/" + id,  "Cgi Error");
 		IhaveResponse = false;
 		response->sendErrorResponse(getFd(), this->keepAlive);
-		ser.closeConnection(it);
 		return true;
 	}
 	Logger::fastLog(Logger::INFO, "./Log/" + id,  "Cgi still waiting");
@@ -143,6 +166,7 @@ void Client::resetClient(){
 	IhaveResponse = false;
 	IhaveUpload = false;
 	IhaveCGI = false;
+	CGIFinish = false;
 }
 
 bool Client::NewRequest(Server &ser){
@@ -187,6 +211,7 @@ bool Client::NewRequest(Server &ser){
 	IhaveCGI = response->isCGI;
 	IhaveUpload = response->iHaveUpload;
 	IhaveResponse = response->stillSend;
+	CGIFinish = false;
 	if (response->isCGI || response->iHaveUpload)
 		return true;
 	if (!response->sendResponse())
@@ -201,50 +226,3 @@ bool Client::NewRequest(Server &ser){
 	}
 	return true;
 }
-
-
-
-
-
-
-
-
-
-
-
-/*
-buffer address: 0x7ffee7d9ea48
-tmp._data address: 0x7ffee7d9ea30
-res.byte._data address: 0x7f878b6062b0
-buffer address: 0x7ffee7d9ef38
-tmp._data address: 0x7ffee7d9ef20
-res.byte._data address: 0x7f878b6062b0
-buffer address: 0x7ffee7d9ef38
-tmp._data address: 0x7ffee7d9ef20
-res.byte._data address: 0x7f878b6062b0
-buffer address: 0x7ffee7d9ef38
-tmp._data address: 0x7ffee7d9ef20
-res.byte._data address: 0x7f878b6062b0
-buffer address: 0x7ffee7d9ef38
-tmp._data address: 0x7ffee7d9ef20
-res.byte._data address: 0x7f878b6062b0
-buffer address: 0x7ffee7d9ef38
-tmp._data address: 0x7ffee7d9ef20
-res.byte._data address: 0x7f878b6062b0
-buffer address: 0x7ffee7d9ef38
-tmp._data address: 0x7ffee7d9ef20
-res.byte._data address: 0x7f878b6062b0
-buffer address: 0x7ffee7d9ef38
-tmp._data address: 0x7ffee7d9ef20
-res.byte._data address: 0x7f878b6062b0
-buffer address: 0x7ffee7d9ef38
-tmp._data address: 0x7ffee7d9ef20
-res.byte._data address: 0x7f878b6062b0
-buffer address: 0x7ffee7d9ef38
-tmp._data address: 0x7ffee7d9ef20
-res.byte._data address: 0x7f878b6062b0
-buffer address: 0x7ffee7d9ef38
-tmp._data address: 0x7ffee7d9ef20
-res.byte._data address: 0x7f878b6062b0
-
-*/
