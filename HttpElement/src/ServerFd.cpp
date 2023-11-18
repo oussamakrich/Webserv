@@ -4,8 +4,6 @@
 #include "../../Response/include/GenerateResponse.hpp"
 #include "../../Uploader/include/Upload.hpp"
 #include "../../Utils/include/Logger.hpp"
-#include <cstdio>
-#include <sys/poll.h>
 
 bool creatSocket(int *listen, addrinfo *MyAddr){
 	*listen = socket(MyAddr->ai_family , MyAddr->ai_socktype , 0);
