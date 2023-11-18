@@ -17,10 +17,10 @@ int main (int argc, char **argv)
 
 		std::vector<TOKEN> tokens = Tokenizer::tokenGenerator(file);//
 		Global *WebServer = GenerateGlobalClass::generateGlobalClass(tokens);
-		WebServer->print();
+		// WebServer->print();
 
-		// sigChange();
-		// WebServer->run();
+		sigChange();
+		WebServer->run();
 	}
 	catch (std::exception &e)
 	{

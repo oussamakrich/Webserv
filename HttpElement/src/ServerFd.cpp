@@ -5,6 +5,26 @@
 #include "../../Uploader/include/Upload.hpp"
 #include "../../Utils/include/Logger.hpp"
 
+addrinfo *addrInfo(std::string host, int port){
+
+	addrinfo *MyAddr;
+	stringstream PortString;
+	PortString << port;
+	struct addrinfo hints;
+	bzero(&hints, sizeof(hints));
+	hints.ai_flags = AI_PASSIVE;
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+
+	int	ret = getaddrinfo(host.c_str(), PortString.str().c_str(), &hints, &MyAddr);
+	if(ret){
+		std::cerr << gai_strerror(ret) << std::endl;
+		freeaddrinfo(MyAddr);
+		return NULL;
+	}
+	return MyAddr;
+}
+
 bool creatSocket(int *listen, addrinfo *MyAddr){
 	*listen = socket(MyAddr->ai_family , MyAddr->ai_socktype , 0);
 	if (*listen == -1){
@@ -21,28 +41,17 @@ bool creatSocket(int *listen, addrinfo *MyAddr){
 }
 
 bool Server::start(){
+	return false;
+
 	if (listenRepeat == true) // NOTE : if the server is repeated dont start it
 		return true;
-
-	stringstream PortString;
-	PortString << this->port;
-	struct addrinfo hints;
-	bzero(&hints, sizeof(hints));
-	hints.ai_flags = AI_PASSIVE;
-	hints.ai_family = AF_UNSPEC;
-	hints.ai_socktype = SOCK_STREAM;
-
-	struct addrinfo *MyAddr;
-	int	ret = getaddrinfo(this->getHost().c_str(), PortString.str().c_str(), &hints, &MyAddr);
-	if(ret){
-		std::cerr << gai_strerror(ret) << std::endl;
-		freeaddrinfo(MyAddr);
+	addrinfo *MyAddr = addrInfo(this->getHost(), this->getPort());
+	if (!MyAddr)
 		return false;
-	}
 	if (!creatSocket(&_listen, MyAddr))
 		return false;
 
-	if (bind(_listen, MyAddr->ai_addr,MyAddr->ai_addrlen) != 0){
+	if (bind(_listen, MyAddr->ai_addr, MyAddr->ai_addrlen) != 0){
 		perror("bind");
 		freeaddrinfo(MyAddr);
 		return false;
@@ -58,6 +67,7 @@ bool Server::start(){
 }
 
 void Server::acceptClient(){
+
 	Client	*newClient = NULL;
 	struct sockaddr sockaddr;
 	bzero(&sockaddr, sizeof(sockaddr));

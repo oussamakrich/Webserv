@@ -173,7 +173,7 @@ void	GenerateServer::handelOne(Server &ser,std::string line){
 	size_t pos= line.find_first_not_of("0123456789");
 	if (pos == line.npos){
 		if (line.size() > 5)
-			error("Port is grather tha max");
+			error("Port is grather than max");
 		ser.setPort(atoi(line.c_str()));
 	}
 	else
@@ -188,7 +188,7 @@ void GenerateServer::hostV6(Server &ser, std::string line)
 	if (pos == line.npos)
 			error("Listen '[' Should be closed");
 	ser.setHost(line.substr(1, pos - 1));
-	if (ser.getHost().find_first_not_of("ABCDEFabcdef0123456789:[]") != ser.getHost().npos)
+	if (ser.getHost().find_first_not_of("ABCDEFabcdef0123456789:") != ser.getHost().npos)
 		error("Unexpected Charachter in host");
 	line.erase(0, pos + 1);
 	if (!line.empty()){
@@ -213,7 +213,7 @@ void GenerateServer::parseListen(Server &ser, std::string line){
 			handelOne(ser, line);
 		else
 		{
-			if (pos !=line.rfind(':'))
+			if (pos != line.rfind(':'))
 				error("Identifier repeated twice ':' ");
 			ser.setHost(line.substr(0, pos));
 			portStr = line.substr(pos + 1);

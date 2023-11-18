@@ -2,7 +2,6 @@
 #include "../include/Server.hpp"
 #include "../../Parsing/include/GenerateLocation.hpp"
 #include "../include/Global.hpp"
-#include <ios>
 
 Server::Server(){
 	this->host = "0.0.0.0";
@@ -36,8 +35,6 @@ Server &Server::operator=(const Server &copy)
 		locations = copy.locations;
 		_listen = copy._listen;
 		clients	= copy.clients;
-
-
 	return *this;
 }
 
