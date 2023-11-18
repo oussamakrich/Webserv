@@ -31,8 +31,7 @@ int Client::getFd(){return fd; }
 bool Client::ReadRequest(){ //TODO : send 500 if read fail
 
 	char *buffer;
-	std::ofstream file("debug.txt", std::ios::app | std::ios::binary);
-	buffer = new (std::nothrow) char[N_READ];
+	buffer = new char[N_READ];
 	if (!buffer){
 		std::cerr << "Fail to allocate for read" << std::endl;
 		return false;
@@ -42,10 +41,8 @@ bool Client::ReadRequest(){ //TODO : send 500 if read fail
 	if (status == 0)
 	{
 		delete  [] buffer;
-
 		return false;
 	}
-	file.write(buffer, status);
 	reqBuff.insertBuffer(buffer, status);
 	Logger::fastLog(Logger::INFO, "./Log/" + id,  "------------------- Start buffer request -------------------");
 	Logger::fastLog(Logger::INFO, "./Log/" + id,  buffer);
@@ -154,10 +151,9 @@ void Client::ClientUpload(Server &ser){
 
 		Upload reminder(ser, *response);
 		IhaveUpload = response->iHaveUpload;
-		std::cout << "i have upload: " << IhaveUpload << std::endl;
 		if (!IhaveUpload)
 		{
-			response->setMsg(GenerateResponse::generateMsg(response->getCode()));;
+			response->setMsg(GenerateResponse::generateMsg(response->getCode()));
 			response->setHeaderAndStart(GenerateResponse::generateHeaderAndSt(*response, keepAlive));
 			response->sendResponse();
 			IhaveResponse = false;

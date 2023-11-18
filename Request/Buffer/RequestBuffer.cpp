@@ -33,10 +33,12 @@ void RequestBuffer::clear()
 	_boundary = "";
 	_body_level = -1;
 	_seek_pos = 0;
+	_increment = 0;
 }
 
 RequestBuffer::RequestBuffer(int MaxBodySize)
 {
+	_increment = 0;
 	_maxBodySize = MaxBodySize;
 	_level = 0;
 	_contentLength = -1;
@@ -249,23 +251,22 @@ std::string RequestBuffer::_generate_tmp_file_path()
 
 int	RequestBuffer::_chunked_handler()
 {
-	int increment = 0;
 	if (_buffer.size() == 0)				return 0; // This mean that the buffer is empty.
 	if (_chunkSize == -1)
 	{
 		int _pos = _buffer.find("\r\n", 2);
-		increment = 2;
+		_increment = 2;
 		if (_pos == -1)
 		{
 			_pos = _buffer.find("\n", 1);
-			increment = 1;
+			_increment = 1;
 			if (_pos == -1)						return 0; // This mean that the buffer does not contain a full line. so we return.
 		}
 		char *_tmp = nullTerminate(_buffer.substr(0, _pos), _pos);
 		std::stringstream ss(_tmp);
 		ss >> std::hex >> _chunkSize;
 		if (_tmp != NULL) delete [] _tmp;
-		_buffer.resize(_pos + increment);
+		_buffer.resize(_pos + _increment);
 	}
 	if (_chunkSize == 0)	return (_status = 1, _status);
 	else
@@ -281,9 +282,9 @@ int	RequestBuffer::_chunked_handler()
 		{
 			_file.write(_buffer.getData(), _chunkSize);
 			_file.close();
-			_buffer.resize(_chunkSize + increment);
+			_buffer.resize(_chunkSize + _increment);
 			_chunkSize = -1;
-			std::cout << increment << std::endl;
+			
 		}
 		else
 		{
@@ -291,7 +292,6 @@ int	RequestBuffer::_chunked_handler()
 			_chunkSize -= _buffer.size();
 			_buffer.resize(_buffer.size());
 			_file.close();
-			std::cout << increment << std::endl;
 		}
 		return (_chunked_handler());
 	}

@@ -25,7 +25,7 @@ class RequestBuffer
 		std::string									_headers;
 		std::string									_body_path;
 		int											_status;
-
+		int											_increment;
 	private:
 
 		Byte										_buffer;

@@ -84,79 +84,12 @@ if (!(isset($_SESSION['user']) && isset($_SESSION['pass'])))
 </ul>
 </nav>
 <body>
-	<h2>Upload Image</h2>
-
+	  <h2>Upload Image</h2>
     <label for="imageInput">Select Image</label>
     <input type="file" id="imageInput" accept="image/*" />
     <button onclick="uploadImage()">Upload</button>
     <div id="result"></div>
-
-    <h2>Upload PDF</h2>
-    <label for="pdfInput">Select PDF</label>
-    <input type="file" id="pdfInput" accept=".pdf" />
-    <button onclick="uploadPDF()">Upload</button>
-    <div id="result"></div>
-
-    <h2>Upload Video</h2>
-    <label for="videoInput">Select Video</label>
-    <input type="file" id="videoInput" accept="video/*" />
-    <button onclick="uploadVideo()">Upload</button>
-    <div id="result"></div>
-
-	<h2>Upload Multiple Images</h2>
-<div id="dropArea" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)">
-    <p>Drag and drop images here</p>
-</div>
-<button onclick="uploadImages()">Upload</button>
-<div id="result"></div>
-
 <script>
-const uploadImages = async () => {
-    const input = document.getElementById("imageInput");
-    const files = input.files;
-
-    if (files.length > 0) {
-        const formData = new FormData();
-        for (let i = 0; i < files.length; i++) {
-            formData.append("images[]", files[i]);
-        }
-
-        try {
-            const response = await fetch("/upload", {
-                method: "POST",
-                body: formData
-            });
-
-            const result = await response.text();
-            document.getElementById("result").innerHTML = result;
-        } catch (error) {
-            console.error("Error:", error);
-        }
-    } else {
-        alert("Please select one or more image files.");
-    }
-};
-
-const handleDrop = (event) => {
-    event.preventDefault();
-    document.getElementById("dropArea").classList.remove("dragover");
-    const files = event.dataTransfer.files;
-    document.getElementById("imageInput").files = files;
-};
-
-const handleDragOver = (event) => {
-    event.preventDefault();
-};
-
-const handleDragEnter = (event) => {
-    event.preventDefault();
-    document.getElementById("dropArea").classList.add("dragover");
-};
-
-const handleDragLeave = (event) => {
-    event.preventDefault();
-    document.getElementById("dropArea").classList.remove("dragover");
-};
 function uploadImage() {
         var input = document.getElementById("imageInput");
         var file = input.files[0];
@@ -180,77 +113,6 @@ function uploadImage() {
           alert("Please select an image file.");
         }
       }
-      function uploadPDF() {
-        var input = document.getElementById("pdfInput");
-        var file = input.files[0];
-
-        if (file) {
-          var formData = new FormData();
-          formData.append("pdf", file);
-
-          fetch("/upload", {
-            method: "POST",
-            body: formData,
-          })
-            .then((response) => response.text())
-            .then((result) => {
-              document.getElementById("result").innerHTML = result;
-            })
-            .catch((error) => {
-              console.error("Error:", error);
-            });
-        } else {
-          alert("Please select a PDF file.");
-        }
-      }
-      function uploadVideo() {
-        var input = document.getElementById("videoInput");
-        var file = input.files[0];
-
-        if (file) {
-          var formData = new FormData();
-          formData.append("video", file);
-
-          fetch("/upload", {
-            method: "POST",
-            body: formData,
-          })
-            .then((response) => response.text())
-            .then((result) => {
-              document.getElementById("result").innerHTML = result;
-            })
-            .catch((error) => {
-              console.error("Error:", error);
-            });
-        } else {
-          alert("Please select a video file.");
-        }
-      }
-	  function uploadImages() {
-    var input = document.getElementById("imageInput");
-    var files = input.files;
-
-    if (files.length > 0) {
-        var formData = new FormData();
-        for (var i = 0; i < files.length; i++) {
-            formData.append("images[]", files[i]);
-        }
-
-        fetch("/upload", {
-            method: "POST",
-            body: formData
-        })
-        .then(response => response.text())
-        .then(result => {
-            document.getElementById("result").innerHTML = result;
-        })
-        .catch(error => {
-            console.error("Error:", error);
-        });
-    } else {
-        alert("Please select one or more image files.");
-    }
-}
 </script>
 
 </body>

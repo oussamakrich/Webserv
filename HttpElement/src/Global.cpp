@@ -24,10 +24,9 @@ void Global::addServer(Server *server){
 	this->servers.push_back(server);
 }
 
-void  Global::print(){
+void  Global::print() {
 		std::vector<Server *>::iterator it = servers.begin();
-
-		for(;it != servers.end(); it++){
+		for(;it != servers.end(); it++) {
 			std::cout << *(*it) << std::endl;
 		}
 };
@@ -63,18 +62,15 @@ void  Global::run()
 	std::vector<Server *>::iterator it = servers.begin();
 
 	for(;it != servers.end(); it++) {
-		if (!(*it)->start()){
+		if (!(*it)->start()) {
 			delete *it;
 			servers.erase(it);
 		}
-		if (servers.size() == 0)
-			exit(1);
-		if (!(*it)->getServerName().empty())
-			serverNames.push_back((*it)->getServerName());
+		if (servers.size() == 0)				exit(1);
+		if (!(*it)->getServerName().empty())	serverNames.push_back((*it)->getServerName());
 	}
-	while(true){
+	while(true) {
 		checkTimeOut(servers);
-
 		int pollStatus = poll(this->gPollFds.data(), this->gPollFds.size(), -1);
 		if (pollStatus == -1)
 		{
@@ -130,10 +126,8 @@ void Global::switchEvent(int fd, int Flag){
 	}
 }
 
-void Global::insertFd(int fd){
-
+void Global::insertFd(int fd) {
 	struct pollfd pfd;
-
 	pfd.fd = fd;
 	pfd.events = POLLIN;
 	pfd.revents = 0;

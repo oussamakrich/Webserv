@@ -31,7 +31,7 @@ bool Server::start(){
 	struct addrinfo hints;
 	bzero(&hints, sizeof(hints));
 	hints.ai_flags = AI_PASSIVE;
-	hints.ai_family = AF_UNSPEC;
+	hints.ai_family = AF_UNSPEC;// AF_UNSPEC :
 	hints.ai_socktype = SOCK_STREAM;
 
 	struct addrinfo *MyAddr;
@@ -79,7 +79,6 @@ void Server::acceptClient(){
 	newClient->id = generateId();//Debug
 	newClient->time = getTime();//Debug
 	Logger::fastLog(Logger::INFO, "./Log/" + (newClient->id),  "Accept new client");
-	std::cout << "Accept new client with the id: " << newClient->id << std::endl;
 	this->clients.push_back(newClient);
 	Global::insertFd(clientFd);
 }
@@ -125,7 +124,7 @@ bool Server::handelClient(ITT_CLIENT it, pollfd pfd){
 		if (client->OldRequest() == false)
 			closeConnection(it);
 	}
-	else if (!client->NewRequest(*this)){
+	else if (!client->NewRequest(*this)) {
 		Logger::fastLog(Logger::ERROR, "./Log/" + client->id,  " Send Error Response $" + convertCode(client->response->getCode()));
 		client->response->sendErrorResponse(client->getFd(), client->keepAlive);
 		delete client->response;
@@ -137,7 +136,6 @@ bool Server::handelClient(ITT_CLIENT it, pollfd pfd){
 	client->setLastTime(time(NULL));
 	Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "set second last time: " + convertCode((client->getLastTime())));
 	if (!client->keepAlive && !client->IhaveResponse){
-		std::cout <<"KeepAlive is false && Idont have resp" << std::endl;
 		closeConnection(it);
 	}
 	return true;
@@ -145,7 +143,8 @@ bool Server::handelClient(ITT_CLIENT it, pollfd pfd){
 
 bool Server::handelFd(struct pollfd pfd){
 
-	if (pfd.fd == _listen){
+	if (pfd.fd == _listen)
+	{
 		if (pfd.revents & POLLOUT)
 			return false;
 		this->acceptClient();
@@ -175,3 +174,4 @@ void Server::checkTimeOut(){
 		it++;
 	}
 }
+

@@ -136,7 +136,6 @@ bool Response::CgiResponse(bool keepAlive){
 		}
 		CgiRead(keepAlive);
 		sendResponse();
-		std::cout << "hello\n";
 		return true;
 	}
 	if (Cgi::isTimeOut(cgiInfo)){
