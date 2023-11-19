@@ -30,7 +30,7 @@ class RequestBuffer
 	private:
 
 		Byte										_buffer;
-		long long									_maxBodySize;
+		size_t									_maxBodySize;
 		int											_level;
 		long long									_contentLength;
 		bool										_found;
@@ -43,7 +43,7 @@ class RequestBuffer
 
 	public:
 
-		RequestBuffer(int MaxBodySize);
+		RequestBuffer(size_t MaxBodySize);
 
 
 	public: //Getters:
@@ -60,7 +60,7 @@ class RequestBuffer
 		void										setProtocol(std::string const &Protocol);
 		void										setHeaders(std::string const &Headers);
 		void										setMethod(std::string const &Method);
-		void										setMaxBodySize(int MaxBodySize);
+		void										setMaxBodySize(size_t MaxBodySize);
 		void										setURI(std::string const &URI);
 		void										setBody(char *body, int size);
 

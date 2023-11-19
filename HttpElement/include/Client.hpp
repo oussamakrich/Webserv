@@ -3,6 +3,7 @@
 #include "../../include/includes.hpp"
 #include "../../Parsing/include/ParsRequest.hpp"
 #include "../../Response/include/Response.hpp"
+#include <iterator>
 
 
 #define ITT_CLIENT	std::vector<Client*>::iterator

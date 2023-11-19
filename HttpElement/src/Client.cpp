@@ -190,6 +190,6 @@ bool Client::NewRequest(Server &ser){
 	IhaveResponse = response->stillSend;
 	if (!IhaveResponse)
 		this->resetClient();
-	
+
 	return true;
 }
