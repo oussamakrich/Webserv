@@ -4,6 +4,7 @@
 #include "../../Response/include/GenerateResponse.hpp"
 #include "../../Uploader/include/Upload.hpp"
 #include "../../Utils/include/Logger.hpp"
+#include <cstdio>
 
 addrinfo *addrInfo(std::string host, int port){
 
@@ -41,7 +42,6 @@ bool creatSocket(int *listen, addrinfo *MyAddr){
 }
 
 bool Server::start(){
-	return false;
 
 	if (listenRepeat == true) // NOTE : if the server is repeated dont start it
 		return true;
@@ -69,12 +69,9 @@ bool Server::start(){
 void Server::acceptClient(){
 
 	Client	*newClient = NULL;
-	struct sockaddr sockaddr;
-	bzero(&sockaddr, sizeof(sockaddr));
-	socklen_t len = sizeof(sockaddr);
-	int clientFd = accept(_listen, &sockaddr, &len);
+	int clientFd = accept(_listen, NULL, NULL);
 	if (clientFd  == -1){
-		std::cerr << "ERROR : Connection failed" << std::endl;
+		perror("accept");
 		return;
 	}
 	fcntl(clientFd, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
@@ -83,7 +80,6 @@ void Server::acceptClient(){
 		std::cerr << "ERROR : new Client failed" << std::endl;
 		return;
 	}
-	newClient->setAddr(sockaddr);
 	newClient->id = generateId();//Debug
 	newClient->time = getTime();//Debug
 	Logger::fastLog(Logger::INFO, "./Log/" + (newClient->id),  "Accept new client");
@@ -93,12 +89,24 @@ void Server::acceptClient(){
 }
 
 ITT_CLIENT Server::findClient(pollfd pfd){
-	ITT_CLIENT it = clients.begin();
 
+	ITT_CLIENT it = clients.begin();
 	for(; it != clients.end(); it++)
 		if (pfd.fd == (*it)->getFd())
 				break ;
 	return it;
+}
+
+bool Server::handelFd(struct pollfd pfd){
+
+	if (pfd.fd == _listen){
+		if (pfd.revents & POLLOUT)
+			return false;
+		this->acceptClient();
+		return true;
+	}
+	else
+		 return this->handelClient(findClient(pfd), pfd);
 }
 
 void Server::closeConnection(ITT_CLIENT it){
@@ -118,7 +126,7 @@ bool Server::handelClient(ITT_CLIENT it, pollfd pfd){
 	if (pfd.revents & POLLHUP){
 		Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "revents is POLLHUP: ");
 		client->clearClient();	
-		closeConnection(it);
+		this->closeConnection(it);
 		return true;
 	}
 	client->setLastTime(time(NULL));
@@ -134,7 +142,7 @@ bool Server::handelClient(ITT_CLIENT it, pollfd pfd){
 			closeConnection(it);
 	}
 	else if (!client->NewRequest(*this)){
-		Logger::fastLog(Logger::ERROR, "./Log/" + client->id,  " Send Error Response $" + convertCode(client->response->getCode()));
+		// Logger::fastLog(Logger::ERROR, "./Log/" + client->id,  " Send Error Response $" + convertCode(client->response->getCode()));
 		client->response->sendErrorResponse(client->getFd(), client->keepAlive);
 		delete client->response;
 		client->resetClient();
@@ -149,18 +157,6 @@ bool Server::handelClient(ITT_CLIENT it, pollfd pfd){
 		closeConnection(it);
 	}
 	return true;
-}
-
-bool Server::handelFd(struct pollfd pfd){
-
-	if (pfd.fd == _listen){
-		if (pfd.revents & POLLOUT)
-			return false;
-		this->acceptClient();
-		return true;
-	}
-	else
-		 return this->handelClient(findClient(pfd), pfd);
 }
 
 void Server::checkTimeOut(){
