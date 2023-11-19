@@ -80,7 +80,7 @@ void Server::final()
 
 void Server::setPort(int port) { this->port = port; }
 
-void Server::setClientMaxBodySize(int size) { this->clientMaxBodySize = size; }
+void Server::setClientMaxBodySize(size_t size) { this->clientMaxBodySize = size; }
 
 void Server::setAutoIndex(bool autoIndex) { this->autoIndex = autoIndex; }
 
@@ -116,7 +116,7 @@ int		Server::getListen() const	{return _listen;}
 
 bool Server::getAutoIndex() const{return autoIndex;}
 
-int		Server::getClientMaxBodySize() const{return clientMaxBodySize;}
+size_t		Server::getClientMaxBodySize() const{return clientMaxBodySize;}
 
 std::string	Server::getHost() const{return host;}
 
@@ -136,6 +136,66 @@ LOCATION_MAP &Server::getAllLocation() { return locations; }
 
 std::map<std::string, std::string>	Server::getMimeType() const{return mimeType;}
 
+
+addrinfo *addrInfo(std::string host, int port){
+
+	addrinfo *MyAddr;
+	stringstream PortString;
+	PortString << port;
+	struct addrinfo hints;
+	bzero(&hints, sizeof(hints));
+	hints.ai_flags = AI_PASSIVE;
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+
+	int	ret = getaddrinfo(host.c_str(), PortString.str().c_str(), &hints, &MyAddr);
+	if(ret){
+		std::cerr << gai_strerror(ret) << std::endl;
+		freeaddrinfo(MyAddr);
+		return NULL;
+	}
+	return MyAddr;
+}
+
+bool creatSocket(int *listen, addrinfo *MyAddr){
+	*listen = socket(MyAddr->ai_family , MyAddr->ai_socktype , 0);
+	if (*listen == -1){
+		perror("socket");
+		freeaddrinfo(MyAddr);
+		return false;
+	}
+	int opt = 1;
+	if (setsockopt(*listen, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
+		perror("setsockopt");
+		return false;
+	}
+	return true;
+}
+
+bool Server::start(){
+
+	if (listenRepeat == true) // NOTE : if the server is repeated dont start it
+		return true;
+	addrinfo *MyAddr = addrInfo(this->getHost(), this->getPort());
+	if (!MyAddr)
+		return false;
+	if (!creatSocket(&_listen, MyAddr))
+		return false;
+
+	if (bind(_listen, MyAddr->ai_addr, MyAddr->ai_addrlen) != 0){
+		perror("bind");
+		freeaddrinfo(MyAddr);
+		return false;
+	}
+	freeaddrinfo(MyAddr);
+	if (listen(_listen, SOMAXCONN) == -1){
+		perror("listen");
+		return false;
+	}
+	fcntl(_listen, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
+	Global::insertFd(_listen);
+	return true;
+}
 
 //INFO : ++++++++++++++++++++++++++for Print++++++++++++++++++++++++++++++++++++
 

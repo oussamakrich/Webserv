@@ -1,5 +1,11 @@
-print("Content-Type: text/html\n");
-print('''
+#!/usr/bin/env python3
+import cgi
+
+print("Content-type: text/html\n")
+
+form = cgi.FieldStorage()
+
+html = """
 <!DOCTYPE html>
 
 <html>
@@ -21,10 +27,30 @@ print('''
             <li><a href="phpCgi.php"> php Cgi  </a> </li> 
     </ul>
 </nav>
-<h1>this page run with python cgi  </h1>
-<footer>  
-    Http Hustler Web Server &copy 2023 - 1337 
- </footer>  
- 
- ''')
+<body>
+    <h1>Personalized Greeting</h1>
+    <form method="post" action="">
+        <label for="name">Enter your name:</label>
+        <input type="text" name="name" required><br>
+
+        <label for="age">Enter your age:</label>
+        <input type="text" name="age" required><br>
+
+        <input type="submit" value="Generate Greeting">
+    </form>
+"""
+
+if "name" in form and "age" in form:
+    name = form["name"].value
+    age = form["age"].value
+
+    # Print personalized greeting
+    html += f"<p>Hello, {name}! You are {age} years old.</p>"
+
+html += """
+</body>
+</html>
+"""
+
+print(html)
 
