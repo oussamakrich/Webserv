@@ -1,5 +1,15 @@
 print("Content-Type: text/html\n");
-print('''
+
+import platform
+
+os_name = platform.system();
+os_version = platform.version();
+machine_type = platform.machine();
+processor = platform.processor();
+
+
+
+print(f'''
 <!DOCTYPE html>
 
 <html>
@@ -22,9 +32,19 @@ print('''
     </ul>
 </nav>
 <h1>this page run with python cgi  </h1>
+
+
+<h1>Machine Type: {machine_type}<h1>
+<h1>Operating System Version: {os_version}<h1>
+<h1>Operating System: {os_name}<h1>
+<h1>Processor: {processor}<h1>
 <footer>  
     Http Hustler Web Server &copy 2023 - 1337 
  </footer>  
  
  ''')
+
+
+
+
 
