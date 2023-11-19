@@ -26,6 +26,7 @@ Response::Response(int fd){
 	this->iHaveUpload = false;// false
 	this->stillSend = false;// sttll send the reminder
 	this->isCGI = false;
+	this->redirection = false;
 }
 
 Response::~Response(){
@@ -150,7 +151,7 @@ bool Response::CgiResponse(bool keepAlive){
 }
 
 bool Response::sendResponse(){
-	if (this->code >= 400)
+	if (this->code >= 400 && this->redirection == false)
 		return false;
 	const char *resp = Responsejoin(HeaderAndStart.c_str(), buffer, HeaderAndStart.size(), bufferSize);
 	Logger::fastLog(Logger::INFO, "./Log/" + Global::id,  "/n--------------------Reponse headers-------------------\n" + HeaderAndStart + "\n--------------------Reponse headers-------------------\n");
@@ -160,6 +161,7 @@ bool Response::sendResponse(){
 	if (ret - HeaderAndStart.size() != bufferSize)
 		pos -= ret - HeaderAndStart.size();
 	return true;
+	
 }
 
 bool Response::ReminderResponse(){

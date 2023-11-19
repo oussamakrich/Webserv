@@ -258,9 +258,11 @@ void ResponseHandler::simpleGet(){
 bool ResponseHandler::checkRedirection(){
 	char *buffer;
 	if (location->isRedirection()){
+		res.redirection = true;
 		res.setCode(location->getRedirectionCode());
 		if (res.getCode() >= 300 && res.getCode() < 400){
 			res.setHeadr("Location: " + location->getRedirectionText());
+			res.setHeadr("Content-Length: 0");
 		}
 		else {
 			res.setHeadr("Content-Length: " + convertCode(location->getRedirectionText().size()));
@@ -279,6 +281,7 @@ bool ResponseHandler::checkRedirection(){
 void ResponseHandler::ResponseHandlere(Server &ser, Request &req, Response &res)
 {
 	LOCATION_ITT it;
+	res.redirection = false;
 	if (isLocation(it)) {
 		Logger::fastLog(Logger::ERROR, "./Log/" + Global::id ,  "is location " + it->first);//DEBUG
 		isLoacation = true;
