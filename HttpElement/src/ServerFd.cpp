@@ -4,67 +4,6 @@
 #include "../../Response/include/GenerateResponse.hpp"
 #include "../../Uploader/include/Upload.hpp"
 #include "../../Utils/include/Logger.hpp"
-#include <cstdio>
-
-addrinfo *addrInfo(std::string host, int port){
-
-	addrinfo *MyAddr;
-	stringstream PortString;
-	PortString << port;
-	struct addrinfo hints;
-	bzero(&hints, sizeof(hints));
-	hints.ai_flags = AI_PASSIVE;
-	hints.ai_family = AF_UNSPEC;
-	hints.ai_socktype = SOCK_STREAM;
-
-	int	ret = getaddrinfo(host.c_str(), PortString.str().c_str(), &hints, &MyAddr);
-	if(ret){
-		std::cerr << gai_strerror(ret) << std::endl;
-		freeaddrinfo(MyAddr);
-		return NULL;
-	}
-	return MyAddr;
-}
-
-bool creatSocket(int *listen, addrinfo *MyAddr){
-	*listen = socket(MyAddr->ai_family , MyAddr->ai_socktype , 0);
-	if (*listen == -1){
-		perror("socket");
-		freeaddrinfo(MyAddr);
-		return false;
-	}
-	int opt = 1;
-	if (setsockopt(*listen, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
-		perror("setsockopt");
-		return false;
-	}
-	return true;
-}
-
-bool Server::start(){
-
-	if (listenRepeat == true) // NOTE : if the server is repeated dont start it
-		return true;
-	addrinfo *MyAddr = addrInfo(this->getHost(), this->getPort());
-	if (!MyAddr)
-		return false;
-	if (!creatSocket(&_listen, MyAddr))
-		return false;
-
-	if (bind(_listen, MyAddr->ai_addr, MyAddr->ai_addrlen) != 0){
-		perror("bind");
-		freeaddrinfo(MyAddr);
-		return false;
-	}
-	freeaddrinfo(MyAddr);
-	if (listen(_listen, SOMAXCONN) == -1){
-		perror("listen");
-		return false;
-	}
-	fcntl(_listen, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
-	Global::insertFd(_listen);
-	return true;
-}
 
 void Server::acceptClient(){
 

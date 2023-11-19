@@ -50,7 +50,7 @@ class Server {
 
 		public:
 			void setPort(int port);
-		  void setClientMaxBodySize(int size);
+		  void setClientMaxBodySize(size_t size);
 			void setAutoIndex(bool autoIndex);
 		  void setHost(const std::string& host);
 		  void setRoot(const std::string& root);
@@ -86,7 +86,7 @@ class Server {
 
 	public:
 		int	getPort() const;
-		int	getClientMaxBodySize() const;
+		size_t	getClientMaxBodySize() const;
 		int	getListen() const;
 
 		bool	getAutoIndex() const;

@@ -1,6 +1,8 @@
 #include "../include/GenerateServer.hpp"
 #include "../include/GenerateLocation.hpp"
 
+#define MEGABYTE 1000000
+
 void error(std::string error){
 	std::cerr << RED"Syntax Error : "<< RESET << error  << std::endl;
 	exit(1);
@@ -13,7 +15,7 @@ Server *GenerateServer::NewServer(TOKEN_IT &it){
 		switch (it->first) {
 			case LOCATION				: fillLocation(*server, ++it);		break;
 			case TYPES					:	SetTypes(*server, ++it);				break;
-			case MAX_BODY_SIZE	: SetInt(*server, ++it);						break;
+			case MAX_BODY_SIZE	: SetBodySize(*server, ++it);						break;
 			case ERROR_PAGES		: SetErrorPages(*server, ++it);	break;
 			case INDEX					: SetMultiValue(*server, it);		break;
 			case ROOT						: SetSingleValue(*server, it);		break;
@@ -152,9 +154,10 @@ void GenerateServer::SetMultiValue(Server &ser, TOKEN_IT &it){
 	ser.setItIndex(tmpIndex.begin(), tmpIndex.end());
 }
 
-void GenerateServer::SetInt(Server &ser, TOKEN_IT &it){
-	int		size;
+void GenerateServer::SetBodySize(Server &ser, TOKEN_IT &it){
+	size_t		size, tmp;
 	std::string value;
+	std::stringstream ss;
 
 	if (it->first != WORD)
 		error("Expected value after max_body_size");
@@ -165,7 +168,12 @@ void GenerateServer::SetInt(Server &ser, TOKEN_IT &it){
 	if (it->first != SEMICOLON) 
 		error("max_body_size Accept Singel Value");
 
-	size = std::atoi(value.c_str()); 
+	ss << value;
+	ss >> tmp;
+
+	size = tmp * MEGABYTE;
+	if (size / tmp != MEGABYTE)
+		error("max_body_size is to large");
 	ser.setClientMaxBodySize(size);
 }
 
