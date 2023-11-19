@@ -276,14 +276,12 @@ bool ResponseHandler::checkRedirection(){
 	return false;
 }
 
-
-
 void ResponseHandler::ResponseHandlere(Server &ser, Request &req, Response &res)
 {
 	LOCATION_ITT it;
 	res.redirection = false;
 	if (isLocation(it)) {
-		Logger::fastLog(Logger::ERROR, "./Log/" + Global::id ,  "is location " + it->first);//DEBUG
+		// Logger::fastLog(Logger::ERROR, "./Log/" + Global::id ,  "is location " + it->first);//DEBUG
 		isLoacation = true;
 		location = it->second;
 		res.location = location;
@@ -303,7 +301,7 @@ void ResponseHandler::ResponseHandlere(Server &ser, Request &req, Response &res)
 	}
 	else
 	{
-		Logger::fastLog(Logger::ERROR, "./Log/" + Global::id ,  "is not a location");//DEBUG
+		// Logger::fastLog(Logger::ERROR, "./Log/" + Global::id ,  "is not a location");//DEBUG
 		isLoacation = false;
 		autoindex = ser.getAutoIndex();
 		root = ser.getRoot();
