@@ -3,6 +3,7 @@
 
 #include <sstream>
 #include <fstream>
+#include <sys/_types/_size_t.h>
 #include <unistd.h>
 
 std::string const&							RequestBuffer::getBody() const {return _body_path;};
@@ -186,7 +187,8 @@ int	RequestBuffer::_get_body_level()
 		std::string _tmp = _headers.substr(_pos, _headers.find("\n", _pos) - _pos);
 		std::stringstream ss(_tmp);
 		ss >> _contentLength;
-		if (_contentLength > _maxBodySize) return 413;
+		if ((_contentLength) > _maxBodySize) return (_status = 413, _status);
+		if (_contentLength == 0) return (_status = 1, _status);
 		return 1;
 	}
 	return (-1);
@@ -330,7 +332,7 @@ int RequestBuffer::_body_handler()
 		return 1; // This mean that the request does not have a body. so we return.
 	else if (_body_level > 3)
 		return _body_level; // This mean that the body type is not supported.
-	if (_buffer.size() == 0)				return 0; // This mean that the buffer is empty.
+	if (_buffer.size() == 0)				return _status; // This mean that the buffer is empty.
 
 	switch (_body_level)
 	{
