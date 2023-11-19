@@ -232,11 +232,9 @@ void ResponseHandler::simpleGet(){
 		res._single_file_name = ResponseHandler::GetFileName();
 		res._upload_path = location->getUploadPath();
 		res._is_multipart_form = (req.getHeader("Content-Type").find("multipart/form-data") != std::string::npos);
-
 		Upload up(ser, res);
 		return;
 	}
-
 	if (type == FILE)
 	{
 		Logger::fastLog(Logger::INFO, "./Log/" + Global::id ,  " Serve file");//DEBUG

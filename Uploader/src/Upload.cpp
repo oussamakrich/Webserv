@@ -22,7 +22,7 @@ bool Upload::_check_file_open_in(std::ifstream &file)
 	if (!file.is_open())
 	{
 		unlink(res._source_file.c_str());
-		res.setCode(500);
+		res.setCode(201);
 		res.stillSend = false;
 		res.iHaveUpload = false;
 		return false;
@@ -178,6 +178,8 @@ bool Upload::_extract_headers()
 		res._file_uploading = res._file_uploading.substr(1);
 	res._file_uploading = res._file_uploading.substr(0, res._file_uploading.find('"'));
 	res._seek_pos += pos + increment;
+	if (res._file_uploading.size() == 0)
+		res._file_uploading = "file";
 	res.byte.resize(pos + increment);
 	return true;
 }

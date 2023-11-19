@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <sys/_types/_size_t.h>
 #include <unistd.h>
 
 #include "Byte.hpp"
@@ -29,9 +30,9 @@ class RequestBuffer
 	private:
 
 		Byte										_buffer;
-		int											_maxBodySize;
+		long long									_maxBodySize;
 		int											_level;
-		int											_contentLength;
+		long long									_contentLength;
 		bool										_found;
 		std::string									_boundary;
 		int											_chunkSize;

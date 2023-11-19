@@ -63,15 +63,14 @@
 </nav>
 <h2 class="title">upload Page</h2>
 
- <body>
-    <label for="fileInput">Choose a file</label>
-<input type="file" id="fileInput" style="display:none;">
-<button onclick="uploadFile()">Upload File</button>
+     <!-- <label for="fileInput">Choose a file</label>
+     <input type="file" id="fileInput" style="display:none;">
+     <button onclick="uploadFile()">Upload File</button>
 
-<script>
-function uploadFile() {
-    const fileInput = document.getElementById('fileInput');
-    const file = fileInput.files[0];
+     <script>
+         function uploadFile() {
+             const fileInput = document.getElementById('fileInput');
+             const file = fileInput.files[0];
 
     if (file) {
         const formData = new FormData();
@@ -92,8 +91,11 @@ function uploadFile() {
         console.error('No file selected');
     }
 }
-</script>
-
+</script> -->
+<form method="POST" action="/upload">
+    <input type="file" />
+    <input type="submit"  value="upload"/>
+</form>
  <footer>
     Http Hustler Web Server &copy 2023 - 1337
  </footer>
