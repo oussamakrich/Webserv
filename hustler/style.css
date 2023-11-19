@@ -4,9 +4,14 @@ h1, hr , h6
 
     color: #F99417;
 }
+
 body 
 {
-background-color: #363062;
+        text-align: center;
+            text-transform: capitalize;
+            color: #F5F5F5;
+            font-size: large;
+        background-color: #363062;
 }
 
 .navbar

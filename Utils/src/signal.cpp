@@ -7,7 +7,7 @@ void sigHandler(int sig)
 {
 	errno = 0;
 	signal(sig, sigHandler);
-
+	std::cout << "Websever receive a Single ->" << sig << std::endl;
 }
 
 void sigChange()
