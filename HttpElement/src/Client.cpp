@@ -8,7 +8,7 @@
 
 #define N_READ 50000
 
-Client::Client(int bodySize, int fd) : reqBuff(bodySize){
+Client::Client(size_t bodySize, int fd) : reqBuff(bodySize){
 
 	lastTime = std::time(NULL);
 	IhaveResponse = false;
@@ -125,7 +125,7 @@ void Client::ClientUpload(Server &ser){
 			response->sendResponse();
 			IhaveResponse = false;
 			switchEvent(this->fd, POLLIN);
-		//resetClient() , delete Response??   
+		//resetClient() , delete Response??
 		}
 }
 
@@ -190,6 +190,6 @@ bool Client::NewRequest(Server &ser){
 	IhaveResponse = response->stillSend;
 	if (!IhaveResponse)
 		this->resetClient();
-	
+
 	return true;
 }

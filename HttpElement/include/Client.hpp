@@ -3,6 +3,7 @@
 #include "../../include/includes.hpp"
 #include "../../Parsing/include/ParsRequest.hpp"
 #include "../../Response/include/Response.hpp"
+#include <iterator>
 
 
 #define ITT_CLIENT	std::vector<Client*>::iterator
@@ -13,7 +14,7 @@ class Server;
 class Client{
 
 	public :
-		Client(int bodySize, int fd);
+		Client(size_t bodySize, int fd);
 		~Client();
 		int					fd;
 		std::string			id;

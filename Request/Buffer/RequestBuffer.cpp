@@ -18,7 +18,7 @@ std::string	const &							RequestBuffer::getHeaders() const {return _headers;};
 void										RequestBuffer::setProtocol(std::string const &Protocol) {_protocol = Protocol;};
 void										RequestBuffer::setHeaders(std::string const &Headers) {_headers = Headers;};
 void										RequestBuffer::setMethod(std::string const &Method) {_method = Method;};
-void										RequestBuffer::setMaxBodySize(int MaxBodySize) {_maxBodySize = MaxBodySize;};
+void										RequestBuffer::setMaxBodySize(size_t MaxBodySize) {_maxBodySize = MaxBodySize;};
 void										RequestBuffer::setURI(std::string const &URI) {_uri = URI;};
 void										RequestBuffer::setBody(char *body, int size) {_body_path = std::string(body, size);};
 
@@ -38,7 +38,7 @@ void RequestBuffer::clear()
 	_increment = 0;
 }
 
-RequestBuffer::RequestBuffer(long long MaxBodySize)
+RequestBuffer::RequestBuffer(size_t MaxBodySize)
 {
 	_increment = 0;
 	_maxBodySize = MaxBodySize;
@@ -187,7 +187,7 @@ int	RequestBuffer::_get_body_level()
 		std::string _tmp = _headers.substr(_pos, _headers.find("\n", _pos) - _pos);
 		std::stringstream ss(_tmp);
 		ss >> _contentLength;
-		if ((_contentLength) > _maxBodySize) return (_status = 413, _status);
+		if (static_cast<size_t>(_contentLength) > _maxBodySize) return (_status = 413, _status);
 		if (_contentLength == 0) return (_status = 1, _status);
 		return 1;
 	}
@@ -299,13 +299,13 @@ int RequestBuffer::_multipart_handler()
 	if ((_pos = _buffer.find((_boundary + "--").c_str(), (_boundary.size() + 2)))
 	== -1)
 	{
-		_maxBodySize -= _buffer.size();
-		if (_maxBodySize <= 0)
+		if (_buffer.size() > _maxBodySize)
 		{
 			_file.close();
 			_file2.close();
 			return (unlink(_body_path.c_str()), _status = 413, _status);
 		}
+		_maxBodySize -= _buffer.size();
 		_file.write(_buffer.getData(), _buffer.size());
 		_buffer.resize(_buffer.size());
 		_file.close();
