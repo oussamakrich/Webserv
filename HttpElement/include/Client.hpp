@@ -13,7 +13,7 @@ class Server;
 class Client{
 
 	public :
-		Client(int bodySize, int fd);
+		Client(size_t bodySize, int fd);
 		~Client();
 		int					fd;
 		std::string			id;

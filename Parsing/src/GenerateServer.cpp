@@ -169,8 +169,8 @@ void GenerateServer::SetBodySize(Server &ser, TOKEN_IT &it){
 		error("max_body_size Accept Singel Value");
 
 	ss << value;
-	ss >> tmp;
-
+	if (!(ss >> tmp))
+		error("max_body_size is to large");
 	size = tmp * MEGABYTE;
 	if (size / tmp != MEGABYTE)
 		error("max_body_size is to large");

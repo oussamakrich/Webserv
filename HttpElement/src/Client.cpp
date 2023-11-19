@@ -8,7 +8,7 @@
 
 #define N_READ 50000
 
-Client::Client(int bodySize, int fd) : reqBuff(bodySize){
+Client::Client(size_t bodySize, int fd) : reqBuff(bodySize){
 
 	lastTime = std::time(NULL);
 	IhaveResponse = false;
@@ -123,9 +123,7 @@ void Client::ClientUpload(Server &ser){
 			response->setHeadr("Content-Length: 0");
 			response->setHeaderAndStart(GenerateResponse::generateHeaderAndSt(*response, keepAlive));
 			response->sendResponse();
-			IhaveResponse = false;
-			switchEvent(this->fd, POLLIN);
-		//resetClient() , delete Response??   
+			resetClient();
 		}
 }
 
@@ -145,8 +143,10 @@ bool Client::ReadRequest(){
 	char buffer[N_READ];
 	memset(buffer, 0, N_READ);
 	status = recv(this->fd, buffer, N_READ, 0);
-	if (status == 0 || status == -1)
+	if (status == 0 || status == -1){
+		std::cerr << "Error while read request from client" << std::endl;
 		return false;
+	}
 	reqBuff.insertBuffer(buffer, status);
 	return true;
 }
