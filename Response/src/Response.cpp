@@ -4,12 +4,8 @@
 #include "../../HttpElement/include/Server.hpp"
 #include "../include/GenerateResponse.hpp"
 #include "../../include/includes.hpp"
-
 #include "../../Utils/include/Logger.hpp"
 #include "../../HttpElement/include/Global.hpp"
-#include <cstring>
-#include <string>
-#include <sys/_types/_size_t.h>
 
 Response::Response(int fd){
 	this->_seek_pos = 0;
@@ -66,10 +62,11 @@ void Response::sendErrorResponse(int fd, bool keepAlive){
 		stillSend = false;
 		ErrorResponse err = GenerateError::generateError(this->code, this->errorPage);
 		std::string error =  err.getErrorPage(keepAlive);
-		send(fd, error.c_str(), error.size(), 0); // WARNING : check
+		int ret = send(fd, error.c_str(), error.size(), 0); // WARNING : check
+		if (ret == 0 || ret == -1)
+			close(fd);
+
 }
-
-
 
 void Response::CgiHeaders(bool keepAlive, std::ifstream &file, size_t sizeOfFile){
 	std::string header;
@@ -113,7 +110,11 @@ bool Response::CgiRead(bool keepAlive){
 		stillSend = false;
 		return true;
 	}
-	buffer = new char[R_READ];
+	buffer = new(std::nothrow) char[R_READ];
+	if (!buffer){
+		setCode(500);
+		return false;
+	}
 	std::memset(buffer, 0, R_READ);
 	file.read(buffer, R_READ);
 	bufferSize = file.gcount();
@@ -126,24 +127,22 @@ bool Response::CgiRead(bool keepAlive){
 bool Response::CgiResponse(bool keepAlive){
 
 	int status;
+	errrCgi = false;
 	if (Cgi::isFinished(cgiInfo, status)){
 		if (status != 0){
-			Logger::fastLog(Logger::INFO, "./Log/" + Global::id,  "CGI status != 0");
-			setCode(500);
-			stillSend = false;
+			// Logger::fastLog(Logger::INFO, "./Log/" + Global::id,  "CGI status != 0");
+			setCode(502);
 			errrCgi	= true;
-			Cgi::CgiUnlink(cgiInfo);
 			return false;
 		}
-		CgiRead(keepAlive);
-		sendResponse();
-		return true;
+		if (!CgiRead(keepAlive) || !sendResponse()){
+			errrCgi = true;
+			return false;
+		}
 	}
 	if (Cgi::isTimeOut(cgiInfo)){
 		setCode(504);
-		Cgi::CgiUnlink(cgiInfo);
 		Cgi::KillCgi(cgiInfo);
-		stillSend = false;
 		errrCgi	= true;
 		return false;
 	}
@@ -154,23 +153,29 @@ bool Response::sendResponse(){
 	if (this->code >= 400 && this->redirection == false)
 		return false;
 	const char *resp = Responsejoin(HeaderAndStart.c_str(), buffer, HeaderAndStart.size(), bufferSize);
-	// Logger::fastLog(Logger::INFO, "./Log/" + Global::id,  "/n--------------------Reponse headers-------------------\n" + HeaderAndStart + "\n--------------------Reponse headers-------------------\n");
 	buffer = NULL;
+	if (!resp){
+		this->code = 500;	
+		return false;
+	}
 	int ret = send(fd, resp, HeaderAndStart.size() + bufferSize, 0);
 	delete []  resp;
+	if (ret == 0 || ret == -1)
+		return true;				
 	if (ret - HeaderAndStart.size() != bufferSize)
 		pos -= ret - HeaderAndStart.size();
 	this->redirection = false;
 	return true;
-	
+
 }
 
 bool Response::ReminderResponse(){
-	Logger::fastLog(Logger::INFO, "./Log/" + Global::id,  "ReminderResponse function.");
+	// Logger::fastLog(Logger::INFO, "./Log/" + Global::id,  "ReminderResponse function.");
 	std::ifstream file(path.c_str());
-	if (!file.is_open()){
+	if (!file.is_open())
+	{
+		// TODO: switch the event.
 		setCode(500);
-		std::cerr << "Error open file" << std::endl;
 		return false;
 	}
 	buffer = new char[R_READ];
@@ -181,14 +186,17 @@ bool Response::ReminderResponse(){
 	pos += file.gcount();
 	stillSend = !file.eof();
 	file.close();
-	size_t sizeoffile;
-	isFile(path.c_str(), sizeoffile);
+	// size_t sizeoffile; //Debugg
+	// isFile(path.c_str(), sizeoffile); //Debuug
 	int ret = send(fd, buffer, bufferSize, 0);
-	Logger::fastLog(Logger::INFO, "./Log/" + Global::id,  "Sending " + std::to_string(ret) + " pos: " + std::to_string(pos) + " of: " + std::to_string(file.tellg() / (double) sizeoffile * 100.00) + " bytes to client.");
-	if (file.gcount() != ret)
-		pos -= file.gcount() - ret;
 	delete [] buffer;
 	buffer = NULL;
+	if (ret == 0 || ret == -1)
+		return false;
+
+	// Logger::fastLog(Logger::INFO, "./Log/" + Global::id,  "Sending " + std::to_string(ret) + " pos: " + std::to_string(pos) + " of: " + std::to_string(file.tellg() / (double) sizeoffile * 100.00) + " bytes to client.");
+	if (file.gcount() != ret)
+		pos -= file.gcount() - ret;
 	this->redirection = false;
 	return true;
 }

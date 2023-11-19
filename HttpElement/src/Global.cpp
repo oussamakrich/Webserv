@@ -1,4 +1,3 @@
-
 #include "../include/Global.hpp"
 
 std::vector<struct pollfd> Global::gPollFds =  std::vector<struct pollfd>();
@@ -12,7 +11,7 @@ Global::Global(){}
 
 Global::~Global(){
 
-	std::vector<Server *>::iterator it = servers.begin();	
+	std::vector<Server *>::iterator it = servers.begin();
 	for (; it != servers.end(); it++)
 		delete *it;
 	servers.clear();
@@ -26,7 +25,7 @@ void Global::addServer(Server *server){
 	this->servers.push_back(server);
 }
 
-void  Global::print(){
+void  Global::print() {
 		std::vector<Server *>::iterator it = servers.begin();
 		for(;it != servers.end(); it++){
 			std::cout << *(*it) << std::endl;
@@ -142,10 +141,8 @@ void Global::switchEvent(int fd, int Flag){
 	}
 }
 
-void Global::insertFd(int fd){
-
+void Global::insertFd(int fd) {
 	struct pollfd pfd;
-
 	pfd.fd = fd;
 	pfd.events = POLLIN;
 	pfd.revents = 0;

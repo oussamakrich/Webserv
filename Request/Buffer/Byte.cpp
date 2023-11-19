@@ -142,7 +142,10 @@ void Byte::resize(size_t _start)
 		_data = tmp;
 		return ;
 	}
-	_size -= _start;
+	if (_start > _size)
+		_size = 0;
+	else
+		_size -= _start;
 	delete [] tmp;
 }
 

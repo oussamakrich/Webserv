@@ -25,7 +25,7 @@ class RequestBuffer
 		std::string									_headers;
 		std::string									_body_path;
 		int											_status;
-
+		int											_increment;
 	private:
 
 		Byte										_buffer;
@@ -68,7 +68,6 @@ class RequestBuffer
 		int				_first_line_handler();
 		int				_headers_handler();
 		int				_get_body_level();
-		std::string		_generate_tmp_file_path();
 		int				_multipart_handler();
 		int				_content_length_handler();
 		int				_body_handler();

@@ -10,7 +10,7 @@
 
 
 
-#define BOUNDARY_READ_SIZE 500000
+#define BOUNDARY_READ_SIZE 5000000
 class Upload
 {
 	private:

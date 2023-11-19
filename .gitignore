@@ -2,7 +2,7 @@
 .DS_Store
 *.o
 webserver
-.tldr
+*.tldr
 a.out
 test.cpp
 *.log

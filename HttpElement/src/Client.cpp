@@ -61,8 +61,8 @@ void Client::clearClient(){
 	}
 	else if (this->IhaveCGI && !this->CGIFinish){
 		Logger::fastLog(Logger::ERROR, "./Log/" + id,  " connection reset and cgi still wait -> KillCgi unlink files");
-		Cgi::KillCgi(response->cgiInfo);		
-		Cgi::CgiUnlink(response->cgiInfo);		
+		Cgi::KillCgi(response->cgiInfo);
+		Cgi::CgiUnlink(response->cgiInfo);
 	}
 	if (this->IhaveUpload) {
 		Logger::fastLog(Logger::ERROR, "./Log/" + id,  " connection reset and I have upload -> unlink files");
@@ -73,47 +73,43 @@ void Client::clearClient(){
 bool Client::OldRequest(){
 
 	if (!response->ReminderResponse() /*&& !response->errorInSend*/){
-		Logger::fastLog(Logger::ERROR, "./Log/" + id,  " error while handling old requeset");
+		// Logger::fastLog(Logger::ERROR, "./Log/" + id,  " error while handling old requeset");
 		return false;
 	}
 	IhaveResponse = response->stillSend;
 	if (!IhaveResponse){
 		if (response->isCGI)
 			Cgi::CgiUnlink(response->cgiInfo);
-		delete  response;
-		response = NULL;
-		switchEvent(getFd(), POLLIN);
 		resetClient();
 	}
 	return true;
 }
 
 bool Client::CgiRequest(){
+
 	switchEvent(this->fd, POLLOUT);
-		Logger::fastLog(Logger::INFO, "./Log/" + id,  "client switch event to POLLOUT");
+		// Logger::fastLog(Logger::INFO, "./Log/" + id,  "client switch event to POLLOUT");
 	if (response->CgiResponse(this->keepAlive)){
-		Logger::fastLog(Logger::INFO, "./Log/" + id,  "Cgi Finished");
+		// Logger::fastLog(Logger::INFO, "./Log/" + id,  "Cgi Finished");
 		CGIFinish = true;
 		IhaveResponse = response->stillSend;
 		if (!IhaveResponse){
-			Logger::fastLog(Logger::INFO, "./Log/" + id,  "Cgi response Send finish");
-			switchEvent(this->fd, POLLIN);
-			Logger::fastLog(Logger::INFO, "./Log/" + id,  "client switch event to POLLIN");
-			response->isCGI = false;
+			// Logger::fastLog(Logger::INFO, "./Log/" + id,  "Cgi response Send finish");
+			// Logger::fastLog(Logger::INFO, "./Log/" + id,  "client switch event to POLLIN");
 			Cgi::CgiUnlink(response->cgiInfo);
-		Logger::fastLog(Logger::INFO, "./Log/" + id,  "client unlink cgi files");
-			delete response;
-			response = NULL;
+			this->resetClient();
+		// Logger::fastLog(Logger::INFO, "./Log/" + id,  "client unlink cgi files");
 		}
 		return true;
 	}
 	if (response->errrCgi){
-		Logger::fastLog(Logger::INFO, "./Log/" + id,  "Cgi Error");
-		IhaveResponse = false;
+		// Logger::fastLog(Logger::INFO, "./Log/" + id,  "Cgi Error");
+		Cgi::CgiUnlink(response->cgiInfo);
 		response->sendErrorResponse(getFd(), this->keepAlive);
+		resetClient();
 		return true;
 	}
-	Logger::fastLog(Logger::INFO, "./Log/" + id,  "Cgi still waiting");
+	// Logger::fastLog(Logger::INFO, "./Log/" + id,  "Cgi still waiting");
 	return false;
 }
 
@@ -123,22 +119,28 @@ void Client::ClientUpload(Server &ser){
 		IhaveUpload = response->iHaveUpload;
 		if (!IhaveUpload)
 		{
-			response->setMsg(GenerateResponse::generateMsg(response->getCode()));;
+			response->setMsg(GenerateResponse::generateMsg(response->getCode()));
+			response->setHeadr("Content-Length: 0");
 			response->setHeaderAndStart(GenerateResponse::generateHeaderAndSt(*response, keepAlive));
 			response->sendResponse();
 			IhaveResponse = false;
 			switchEvent(this->fd, POLLIN);
+		//resetClient() , delete Response??   
 		}
 }
 
 void Client::resetClient(){
+
+	delete this->response;
+	this->response = NULL;
 	IhaveResponse = false;
 	IhaveUpload = false;
 	IhaveCGI = false;
 	CGIFinish = false;
+	switchEvent(this->fd, POLLIN);
 }
 
-bool Client::ReadRequest(){ 
+bool Client::ReadRequest(){
 
 	char buffer[N_READ];
 	memset(buffer, 0, N_READ);
@@ -146,9 +148,6 @@ bool Client::ReadRequest(){
 	if (status == 0 || status == -1)
 		return false;
 	reqBuff.insertBuffer(buffer, status);
-	// Logger::fastLog(Logger::INFO, "./Log/" + id,  "------------------- Start buffer request -------------------");
-	// Logger::fastLog(Logger::INFO, "./Log/" + id,  buffer);
-	// Logger::fastLog(Logger::INFO, "./Log/" + id,  "------------------ End buffer request --------------------");
 	return true;
 }
 
@@ -156,24 +155,19 @@ bool Client::NewRequest(Server &ser){
 	Request *req;
 
 	this->keepAlive = true;
-	if (!ReadRequest()){ 
+	if (!ReadRequest()){
 		this->IhaveResponse = false;
 		this->keepAlive = false;
 		return true;
 	}
 	if (!isRequestAvailable()){
-		// Logger::fastLog(Logger::INFO, "./Log/" + id,  "request not available");
 		return true;
 	}
-	// Logger::fastLog(Logger::INFO, "./Log/" + id,  "request is available");
 	switchEvent(this->fd, POLLOUT);
-	// Logger::fastLog(Logger::INFO, "./Log/" + id,  "switch event to POLLOUT");
 	req = getRequest();
-	// Logger::fastLog(Logger::INFO, "./Log/" + id, ("get request path: " + req->getPath()));
 	reqBuff.clear();
 	if (req->getType() < 0)
 	{
-		// Logger::fastLog(Logger::INFO, "./Log/" + id,  "Bad request");
 		this->response = new Response(this->fd);
 		response->errorPage = ser.getErrorPages();
 		response->setCode(req->getErrorCode());
@@ -183,7 +177,6 @@ bool Client::NewRequest(Server &ser){
 	Server &server = Global::FindServer(req->getHeaders(),  ser);
 	response = GenerateResponse::generateResponse(server, *req, this->fd);
 
-	// Logger::fastLog(Logger::INFO, "./Log/" + id,  "response generated");
 	this->keepAlive = req->getConnection();
 	delete req;
 	IhaveCGI = response->isCGI;
@@ -195,11 +188,8 @@ bool Client::NewRequest(Server &ser){
 	if (!response->sendResponse())
 		return false;
 	IhaveResponse = response->stillSend;
-	if (!IhaveResponse){
-		delete  response;
-		response = NULL;
-		switchEvent(this->fd, POLLIN);
-		Logger::fastLog(Logger::INFO, "./Log/" + id,  "client switch event to POLLIN");
-	}
+	if (!IhaveResponse)
+		this->resetClient();
+	
 	return true;
 }

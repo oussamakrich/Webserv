@@ -83,7 +83,6 @@ void Server::acceptClient(){
 	newClient->id = generateId();//Debug
 	newClient->time = getTime();//Debug
 	Logger::fastLog(Logger::INFO, "./Log/" + (newClient->id),  "Accept new client");
-	std::cout << "Accept new client with the id: " << newClient->id << std::endl;
 	this->clients.push_back(newClient);
 	Global::insertFd(clientFd);
 }
@@ -125,7 +124,7 @@ bool Server::handelClient(ITT_CLIENT it, pollfd pfd){
 	Global::time = client->time;//Debug
 	if (pfd.revents & POLLHUP){
 		// Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "revents is POLLHUP: ");
-		client->clearClient();	
+		client->clearClient();
 		this->closeConnection(it);
 		return true;
 	}
@@ -142,18 +141,13 @@ bool Server::handelClient(ITT_CLIENT it, pollfd pfd){
 			closeConnection(it);
 	}
 	else if (!client->NewRequest(*this)){
-		// Logger::fastLog(Logger::ERROR, "./Log/" + client->id,  " Send Error Response $" + convertCode(client->response->getCode()));
 		client->response->sendErrorResponse(client->getFd(), client->keepAlive);
-		delete client->response;
 		client->resetClient();
-		client->response = NULL;
 		client->switchEvent(pfd.fd, POLLIN);
 		return true;
 	}
 	client->setLastTime(time(NULL));
-	// Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "set second last time: " + convertCode((client->getLastTime())));
 	if (!client->keepAlive && !client->IhaveResponse){
-		std::cout <<"KeepAlive is false && Idont have resp" << std::endl;
 		closeConnection(it);
 	}
 	return true;
@@ -179,3 +173,4 @@ void Server::checkTimeOut(){
 		it++;
 	}
 }
+

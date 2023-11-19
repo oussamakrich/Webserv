@@ -65,20 +65,12 @@ void Upload::multipart()
 	tmp._data = NULL;
 	tmp._size = 0;
 
-	std::ofstream debug("tmp.txt", std::ios::app);
-
-	debug << "buffer address: " << &buffer << std::endl;
-	// print the address of tmp._data
-	debug << "tmp._data address: " << &tmp._data << std::endl;
-	// print the address of res.byte._data
-	debug << "res.byte._data address: " << &res.byte._data << std::endl;
-
 	_pos_of_boundary = res.byte.find(res._boundary.c_str(), res._boundary.size());
 	std::string _end = res._boundary + "--";
 	_pos_of_end_boundary = res.byte.find((_end).c_str(), _end.size());
 	if (_pos_of_end_boundary == 0)
 	{
-		// print the address of buffer
+		std::cout << RED"Success: " << RESET << "File uploaded successfully " << U_WHITE << res.location->getUploadPath() + "/" + res._file_uploading << RESET << std::endl;
 		unlink(res._source_file.c_str());
 		res.setCode(201);
 		res.byte.clear();
@@ -87,7 +79,6 @@ void Upload::multipart()
 		res.iHaveUpload = false;
 		return;
 	}
-
 	switch (_pos_of_boundary)
 	{
 		case 0:
@@ -96,6 +87,7 @@ void Upload::multipart()
 			_pos_of_end_boundary = res.byte.find((res._boundary + "--").c_str(), res._boundary.size() + 2);
 			if (_pos_of_end_boundary == 0)
 			{
+				std::cout << RED"Success: " << RESET << "File uploaded successfully " << U_WHITE << res.location->getUploadPath() + "/" + res._file_uploading << RESET << std::endl;
 				res.setCode(201);
 				unlink(res._source_file.c_str());
 				file.close();
@@ -108,8 +100,6 @@ void Upload::multipart()
 				std::ofstream _out_file(res.location->getUploadPath() + "/" + res._file_uploading, std::ios::binary | std::ios::app);
 				if (!Upload::_check_file_open_out(_out_file))			return(res.byte.clear());
 				char *extra = new char[res._boundary.size()];
-				// print the address of extra
-				debug << "extra address: " << &extra << std::endl;
 				file.read(extra, res._boundary.size());
 				delete [] extra;
 				extra = NULL;
@@ -194,11 +184,8 @@ bool Upload::_extract_headers()
 
 void Upload::Uploader()
 {
-
 	if (res._is_multipart_form)
-	{
 		multipart();
-	}
 	else
 	{
 		std::string destinationFile = res.location->getUploadPath() + "/" + res._single_file_name;
@@ -215,7 +202,7 @@ void Upload::Uploader()
 		res._seek_pos += file.gcount();
 		if (file.eof())
 		{
-			std::cout << "File uploaded" << std::endl;
+			std::cout << GREEN"Success: " << RESET << "File uploaded successfully " << U_WHITE << destinationFile << RESET << std::endl;
 			unlink(res._source_file.c_str());
 			res.setCode(201);
 			res.stillSend = false;
@@ -223,7 +210,6 @@ void Upload::Uploader()
 		}
 		else
 		{
-			std::cout << "File not uploaded" << std::endl;
 			res.stillSend = true;
 			res.iHaveUpload = true;
 		}
