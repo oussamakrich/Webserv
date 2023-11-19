@@ -33,6 +33,7 @@ class Response{
 
 	public:
 
+		bool redirection;
 		std::string HeaderAndStart;
 		bool iHaveUpload;// false
 		bool stillSend;// sttll send the reminder

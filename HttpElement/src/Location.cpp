@@ -32,7 +32,15 @@ void Location::final()
 }
 /*********************************< adder >*******************/
 
-bool	Location::AddErrorPage(const string &page, int code) 		{	return Add(error_page, std::make_pair(code, page)); }
+bool	Location::AddErrorPage(const string &page, int code) 		
+{
+	for(size_t i = 0; i < this->error_page.size(); i++)
+		if (this->error_page[i].first == code)
+			return false;
+		error_page.push_back(std::make_pair(code, page));
+				return true;
+}
+
 bool    Location::AddHttpMethod(const string &method)				{	return Add(Allowed_Method, method);   }
 bool    Location::AddIndex(const string &index)   					{	return Add(indexes, index);    }
 bool 	Location::AddCGI(string bin, string ex)

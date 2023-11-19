@@ -26,6 +26,7 @@ Response::Response(int fd){
 	this->iHaveUpload = false;// false
 	this->stillSend = false;// sttll send the reminder
 	this->isCGI = false;
+	this->redirection = false;
 }
 
 Response::~Response(){
@@ -149,19 +150,20 @@ bool Response::CgiResponse(bool keepAlive){
 	return false;
 }
 
-bool Response::sendResponse()
-{
-	if (this->code >= 400)
+bool Response::sendResponse(){
+	if (this->code >= 400 && this->redirection == false)
 		return false;
 	const char *resp = Responsejoin(HeaderAndStart.c_str(), buffer, HeaderAndStart.size(), bufferSize);
-	Logger::fastLog(Logger::INFO, "./Log/" + Global::id,  "/n--------------------Reponse headers-------------------\n" + HeaderAndStart + "\n--------------------Reponse headers-------------------\n");
+	// Logger::fastLog(Logger::INFO, "./Log/" + Global::id,  "/n--------------------Reponse headers-------------------\n" + HeaderAndStart + "\n--------------------Reponse headers-------------------\n");
 	buffer = NULL;
 
 	int ret = send(fd, resp, HeaderAndStart.size() + bufferSize, 0);
 	delete []  resp;
 	if (ret - HeaderAndStart.size() != bufferSize)
 		pos -= ret - HeaderAndStart.size();
+	this->redirection = false;
 	return true;
+
 }
 
 bool Response::ReminderResponse(){
@@ -190,5 +192,6 @@ bool Response::ReminderResponse(){
 		pos -= file.gcount() - ret;
 	delete [] buffer;
 	buffer = NULL;
+	this->redirection = false;
 	return true;
 }
