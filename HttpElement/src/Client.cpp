@@ -138,7 +138,7 @@ void Client::resetClient(){
 	CGIFinish = false;
 }
 
-bool Client::ReadRequest(){ //TODO : send 500 if read fail
+bool Client::ReadRequest(){ 
 
 	char buffer[N_READ];
 	memset(buffer, 0, N_READ);

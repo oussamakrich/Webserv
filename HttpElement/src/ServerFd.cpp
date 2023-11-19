@@ -124,17 +124,17 @@ bool Server::handelClient(ITT_CLIENT it, pollfd pfd){
 	Global::id = client->id;//Debug
 	Global::time = client->time;//Debug
 	if (pfd.revents & POLLHUP){
-		Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "revents is POLLHUP: ");
+		// Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "revents is POLLHUP: ");
 		client->clearClient();	
 		this->closeConnection(it);
 		return true;
 	}
 	client->setLastTime(time(NULL));
-	Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "set last time: " + convertCode((client->getLastTime())));
+	// Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "set last time: " + convertCode((client->getLastTime())));
 	if (client->IhaveUpload)
 		client->ClientUpload(*this);
 	else if (client->IhaveCGI && !client->CGIFinish){
-		Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "Ihave cgi and cgiFinish false");
+		// Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "Ihave cgi and cgiFinish false");
 		client->CgiRequest();
 	}
 	else if (client->IhaveResponse){
@@ -151,7 +151,7 @@ bool Server::handelClient(ITT_CLIENT it, pollfd pfd){
 		return true;
 	}
 	client->setLastTime(time(NULL));
-	Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "set second last time: " + convertCode((client->getLastTime())));
+	// Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "set second last time: " + convertCode((client->getLastTime())));
 	if (!client->keepAlive && !client->IhaveResponse){
 		std::cout <<"KeepAlive is false && Idont have resp" << std::endl;
 		closeConnection(it);
