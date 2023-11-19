@@ -1,7 +1,5 @@
-
 #include "../include/Global.hpp"
-#include <cstdio>
-#include <sys/poll.h>
+
 std::vector<struct pollfd> Global::gPollFds =  std::vector<struct pollfd>();
 std::vector<std::string> Global::serverNames =  std::vector<std::string>();
 std::vector<Server *> Global::servers =  std::vector<Server *>();
@@ -11,13 +9,16 @@ long long Global::time = 0; //DEBUG
 
 Global::Global(){}
 
-Global::~Global(){}
+Global::~Global(){
 
-Global::Global(const Global &copy){*this = copy;}
-
-Global &Global::operator=(const Global &copy){
-	servers = copy.servers;
-	return *this;
+	std::vector<Server *>::iterator it = servers.begin();
+	for (; it != servers.end(); it++)
+		delete *it;
+	servers.clear();
+	std::vector<struct pollfd>::iterator itFds =  gPollFds.begin();
+	for (; itFds != gPollFds.end(); itFds++)
+		close(itFds->fd);
+	gPollFds.clear();
 }
 
 void Global::addServer(Server *server){
@@ -26,14 +27,14 @@ void Global::addServer(Server *server){
 
 void  Global::print() {
 		std::vector<Server *>::iterator it = servers.begin();
-		for(;it != servers.end(); it++) {
+		for(;it != servers.end(); it++){
 			std::cout << *(*it) << std::endl;
 		}
 };
 
 void Global::callHandelFds(struct pollfd pfd){
 
-	for (unsigned int i =0; i < servers.size(); i++)
+	for (size_t i =0; i < servers.size(); i++)
 	{
 		if (servers[i]->handelFd(pfd))
 			break;
@@ -57,35 +58,49 @@ void checkTimeOut(vector<Server*> &servers){
 	}
 }
 
-void  Global::run()
-{
-	std::vector<Server *>::iterator it = servers.begin();
+void Global::startServers(){
+	size_t i = 0;
+	Server *server;
 
-	for(;it != servers.end(); it++) {
-		if (!(*it)->start()) {
-			delete *it;
-			servers.erase(it);
+	while (i < servers.size()){
+		server = servers[i];
+		if (!server->start()){
+			warning("error While starting server : " + server->getHost() +":" + convertCode(server->getPort()) + " " + server->getServerName());
+			delete server;
+			servers.erase(servers.begin() + i);
+			if (servers.size() == 0)
+				exit(1);
+			continue;
 		}
-		if (servers.size() == 0)				exit(1);
-		if (!(*it)->getServerName().empty())	serverNames.push_back((*it)->getServerName());
+		if (!server->getServerName().empty())
+			serverNames.push_back(server->getServerName());
+		i++;
 	}
-	while(true) {
+}
+
+void  Global::run(){
+	int pollStatus;
+	size_t i;
+
+	startServers();
+	while(true){
+
 		checkTimeOut(servers);
-		int pollStatus = poll(this->gPollFds.data(), this->gPollFds.size(), -1);
+		pollStatus = poll(this->gPollFds.data(), this->gPollFds.size(), -1);
 		if (pollStatus == -1)
 		{
 			perror("poll");
 			continue;
 		}
-		for(size_t i = 0; i < gPollFds.size() && pollStatus ; i++)
+		for (i = 0; i < gPollFds.size() && pollStatus ; i++)
 		{
 			if (gPollFds[i].revents & POLLHUP){
 				this->callHandelFds(gPollFds[i]);
-				std::cout <<"pilhup " << Global::id << std::endl;
+				std::cerr <<"pollhup " << Global::id << std::endl;
 				pollStatus--;
 				continue;
 			}
-			else if (((gPollFds[i].revents & POLLIN) || (gPollFds[i].revents & POLLOUT))){
+			if (((gPollFds[i].revents & POLLIN) || (gPollFds[i].revents & POLLOUT))){
 				this->callHandelFds(gPollFds[i]);
 				pollStatus--;
 			}

@@ -23,7 +23,6 @@ class Client{
 		std::time_t			lastTime;
 		int							status;
 		std::string			address;
-		sockaddr			sockaddr;
 
 	public:
 		RequestBuffer reqBuff;
@@ -49,8 +48,6 @@ class Client{
 
 	public: //Geters
 		int getFd();
-		struct sockaddr &getAddr();
-		void setAddr(struct sockaddr &addr);
 		void setLastTime(std::time_t tm);
 		void switchEvent(int fd, int Flag);
 		void resetClient();

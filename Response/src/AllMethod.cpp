@@ -2,9 +2,9 @@
 #include "../include/AllMethod.hpp"
 #include "../../Utils/include/DirListing.hpp"
 #include "../../Uploader/include/Upload.hpp"
-#include <cstdlib>
 #include "../../Utils/include/Logger.hpp"
 #include "../../HttpElement/include/Global.hpp"
+
 ResponseHandler::ResponseHandler(Server &ser, Request &req, Response &res) : ser(ser), req(req), res(res)
 {
 	ResponseHandlere(ser, req, res);

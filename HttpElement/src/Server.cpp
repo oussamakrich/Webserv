@@ -9,7 +9,6 @@ Server::Server(){
 	this->clientMaxBodySize = 1000000;
 	this->autoIndex = false;
 	this->listenRepeat = false;
-	this->ServerOff = false;
 }
 
 Server::~Server()
@@ -36,8 +35,6 @@ Server &Server::operator=(const Server &copy)
 		locations = copy.locations;
 		_listen = copy._listen;
 		clients	= copy.clients;
-
-
 	return *this;
 }
 
@@ -143,28 +140,31 @@ std::map<std::string, std::string>	Server::getMimeType() const{return mimeType;}
 //INFO : ++++++++++++++++++++++++++for Print++++++++++++++++++++++++++++++++++++
 
 std::ostream &operator<<(std::ostream &out, Server &server){
-	out << BLUE "serverName: " << U_YELLOW << server.getServerName() << std::endl;
+	if (!server.getServerName().empty())
+		out << BLUE "serverName: " << U_YELLOW << server.getServerName() << std::endl;
 	out << RED "\tport: " << GREEN << server.getPort() << std::endl;
 	out << RED "\tclientMaxBodySize: " <<GREEN <<  server.getClientMaxBodySize() << std::endl;
 	out << RED "\thost: " <<GREEN <<  server.getHost() << std::endl;
 	out << RED "\troot: " <<GREEN <<  server.getRoot() << std::endl;
-	out << RED "\tserverName: " <<GREEN <<  server.getServerName() << std::endl;
-	out << RED "\tindex: " << GREEN;
-	for (size_t i = 0; i < server.getIndex().size(); i++)
-		out << server.getIndex()[i] << " ";
-	out << std::endl;
+	if (server.getIndex().size() != 0){
+		out << RED "\tindex: " << GREEN;
+		for (size_t i = 0; i < server.getIndex().size(); i++)
+			out << server.getIndex()[i] << " ";
+		out << std::endl;
+	}
+	if (server.getErrorPages().size() != 0){
 	out << RED"\terrorPages: "<< RESET;
 	for (size_t i = 0; i < server.getErrorPages().size(); i++)
 		out << server.getErrorPages()[i].first << " " << server.getErrorPages()[i].second << " ";
 	out << std::endl;
+	}
 	out << RED"\tdefaultType: " << GREEN << server.getDefaultType() << std::endl;
 	out << RED"\tmimeType: " << std::endl;
-
-	std::map<std::string, std::string> mime = server.getMimeType();
-	for (std::map<std::string, std::string>::const_iterator it = mime.begin(); it != mime.end(); it++)
-		out << GREEN"\t\t"<< it -> first << " " << it -> second << std::endl;
-	out << RED"\tlocations: " << std::endl;
-	std::cout << RESET;
+	// std::map<std::string, std::string> mime = server.getMimeType();
+	// for (std::map<std::string, std::string>::const_iterator it = mime.begin(); it != mime.end(); it++)
+	// 	out << GREEN"\t\t"<< it -> first << " " << it -> second << std::endl;
+	// out << RED"\tlocations: " << std::endl;
+	// std::cout << RESET;
 	LOCATION_MAP loc = server.getAllLocation();
 	for (std::map<std::string, Location*>::const_iterator it = loc.begin(); it != loc.end(); it++)
 	{
@@ -172,5 +172,6 @@ std::ostream &operator<<(std::ostream &out, Server &server){
 		it -> second->printLocation();
 		std::cout << std::endl;
 	}
+	out << "IsRepeated : " << std::boolalpha << server.listenRepeat << std::endl;
 	return out;
 }

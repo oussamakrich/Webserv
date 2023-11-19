@@ -79,7 +79,6 @@ void Upload::multipart()
 		res.iHaveUpload = false;
 		return;
 	}
-
 	switch (_pos_of_boundary)
 	{
 		case 0:
@@ -203,7 +202,7 @@ void Upload::Uploader()
 		res._seek_pos += file.gcount();
 		if (file.eof())
 		{
-			std::cout << RED"Success: " << RESET << "File uploaded successfully " << U_WHITE << destinationFile << RESET << std::endl;
+			std::cout << GREEN"Success: " << RESET << "File uploaded successfully " << U_WHITE << destinationFile << RESET << std::endl;
 			unlink(res._source_file.c_str());
 			res.setCode(201);
 			res.stillSend = false;

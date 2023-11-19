@@ -4,11 +4,10 @@
 #include "../include/Server.hpp"
 #include "../../Response/include/GenerateResponse.hpp"
 #include "../../Uploader/include/Upload.hpp"
-#include <istream>
+#include "../../Utils/include/Logger.hpp"
 
 #define N_READ 50000
 
-#include "../../Utils/include/Logger.hpp"
 Client::Client(int bodySize, int fd) : reqBuff(bodySize){
 
 	lastTime = std::time(NULL);
@@ -28,28 +27,12 @@ Client::~Client(){
 
 int Client::getFd(){return fd; }
 
-bool Client::ReadRequest(){ //TODO : send 500 if read fail
+std::time_t Client::getLastTime(){ return lastTime;}
 
-	char *buffer;
-	buffer = new char[N_READ];
-	if (!buffer){
-		std::cerr << "Fail to allocate for read" << std::endl;
-		return false;
-	}
-	memset(buffer, 0, N_READ);
-	status = recv(this->fd, buffer, N_READ, 0);
-	if (status == 0)
-	{
-		delete  [] buffer;
-		return false;
-	}
-	reqBuff.insertBuffer(buffer, status);
-	Logger::fastLog(Logger::INFO, "./Log/" + id,  "------------------- Start buffer request -------------------");
-	Logger::fastLog(Logger::INFO, "./Log/" + id,  buffer);
-	Logger::fastLog(Logger::INFO, "./Log/" + id,  "------------------ End buffer request --------------------");
-	delete [] buffer;
-	return true;
-}
+void Client::setLastTime(std::time_t tm){ this->lastTime = tm;}
+
+void Client::switchEvent(int fd, int Flag) {Global::switchEvent(fd, Flag);}
+
 
 bool Client::isRequestAvailable(){
 	if (status == -1)
@@ -64,18 +47,6 @@ Request *Client::getRequest(){
 	Request *req;
 	req = ParsRequest::Pars(this->reqBuff);
 	return req;
-}
-
-struct sockaddr &Client::getAddr(){ return sockaddr;}
-
-void Client::setAddr(struct sockaddr &addr){ sockaddr = addr;}
-
-std::time_t Client::getLastTime(){ return lastTime;}
-
-void Client::setLastTime(std::time_t tm){ this->lastTime = tm;}
-
-void Client::switchEvent(int fd, int Flag){
-	Global::switchEvent(fd, Flag);
 }
 
 void Client::clearClient(){
@@ -97,7 +68,6 @@ void Client::clearClient(){
 		Logger::fastLog(Logger::ERROR, "./Log/" + id,  " connection reset and I have upload -> unlink files");
 		unlink(response->_source_file.c_str());
 	}
-
 }
 
 bool Client::OldRequest(){
@@ -154,14 +124,13 @@ void Client::ClientUpload(Server &ser){
 		if (!IhaveUpload)
 		{
 			response->setMsg(GenerateResponse::generateMsg(response->getCode()));
+			response->setHeadr("Content-Length: 0");
 			response->setHeaderAndStart(GenerateResponse::generateHeaderAndSt(*response, keepAlive));
 			response->sendResponse();
 			IhaveResponse = false;
 			switchEvent(this->fd, POLLIN);
 		}
 }
-
-#include "../../Utils/include/Logger.hpp"
 
 void Client::resetClient(){
 	IhaveResponse = false;
@@ -170,32 +139,42 @@ void Client::resetClient(){
 	CGIFinish = false;
 }
 
+bool Client::ReadRequest(){
+
+	char buffer[N_READ];
+	memset(buffer, 0, N_READ);
+	status = recv(this->fd, buffer, N_READ, 0);
+	if (status == 0 || status == -1)
+		return false;
+	reqBuff.insertBuffer(buffer, status);
+	// Logger::fastLog(Logger::INFO, "./Log/" + id,  "------------------- Start buffer request -------------------");
+	// Logger::fastLog(Logger::INFO, "./Log/" + id,  buffer);
+	// Logger::fastLog(Logger::INFO, "./Log/" + id,  "------------------ End buffer request --------------------");
+	return true;
+}
+
 bool Client::NewRequest(Server &ser){
 	Request *req;
 
 	this->keepAlive = true;
-	if (!ReadRequest())
-	{
-		this->response = new Response(this->fd);
-		response->errorPage = ser.getErrorPages();
-		response->setCode(500);
-		return false;
-	}
-	if (!isRequestAvailable())
-	{
-		Logger::fastLog(Logger::INFO, "./Log/" + id,  "request not available");
+	if (!ReadRequest()){
+		this->IhaveResponse = false;
+		this->keepAlive = false;
 		return true;
 	}
-
-	Logger::fastLog(Logger::INFO, "./Log/" + id,  "request is available");
+	if (!isRequestAvailable()){
+		// Logger::fastLog(Logger::INFO, "./Log/" + id,  "request not available");
+		return true;
+	}
+	// Logger::fastLog(Logger::INFO, "./Log/" + id,  "request is available");
 	switchEvent(this->fd, POLLOUT);
-	Logger::fastLog(Logger::INFO, "./Log/" + id,  "switch event to POLLOUT");
+	// Logger::fastLog(Logger::INFO, "./Log/" + id,  "switch event to POLLOUT");
 	req = getRequest();
-	Logger::fastLog(Logger::INFO, "./Log/" + id, ("get request path: " + req->getPath()));
+	// Logger::fastLog(Logger::INFO, "./Log/" + id, ("get request path: " + req->getPath()));
 	reqBuff.clear();
 	if (req->getType() < 0)
 	{
-		Logger::fastLog(Logger::INFO, "./Log/" + id,  "Bad request");
+		// Logger::fastLog(Logger::INFO, "./Log/" + id,  "Bad request");
 		this->response = new Response(this->fd);
 		response->errorPage = ser.getErrorPages();
 		response->setCode(req->getErrorCode());
@@ -205,12 +184,10 @@ bool Client::NewRequest(Server &ser){
 	Server &server = Global::FindServer(req->getHeaders(),  ser);
 	response = GenerateResponse::generateResponse(server, *req, this->fd);
 
-	Logger::fastLog(Logger::INFO, "./Log/" + id,  "response generated");
-
+	// Logger::fastLog(Logger::INFO, "./Log/" + id,  "response generated");
 	this->keepAlive = req->getConnection();
 	delete req;
 	IhaveCGI = response->isCGI;
-	std::cerr <<std::boolalpha << response->isCGI << std::endl;
 	IhaveUpload = response->iHaveUpload;
 	IhaveResponse = response->stillSend;
 	CGIFinish = false;
@@ -218,7 +195,6 @@ bool Client::NewRequest(Server &ser){
 		return true;
 	if (!response->sendResponse())
 		return false;
-	IhaveUpload = response->iHaveUpload;
 	IhaveResponse = response->stillSend;
 	if (!IhaveResponse){
 		delete  response;

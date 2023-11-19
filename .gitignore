@@ -2,7 +2,7 @@
 .DS_Store
 *.o
 webserver
-.tldr
+*.tldr
 a.out
 test.cpp
 *.log
@@ -13,4 +13,3 @@ MyLab
 ./tmp/*
 config.conf
 ./hustler/test2.mp4
-*.mp4

@@ -13,7 +13,7 @@ Server *GenerateServer::NewServer(TOKEN_IT &it){
 		switch (it->first) {
 			case LOCATION				: fillLocation(*server, ++it);		break;
 			case TYPES					:	SetTypes(*server, ++it);				break;
-			case MAX_BODY_SIZE	: SetInt(*server, it);						break;
+			case MAX_BODY_SIZE	: SetInt(*server, ++it);						break;
 			case ERROR_PAGES		: SetErrorPages(*server, ++it);	break;
 			case INDEX					: SetMultiValue(*server, it);		break;
 			case ROOT						: SetSingleValue(*server, it);		break;
@@ -22,7 +22,6 @@ Server *GenerateServer::NewServer(TOKEN_IT &it){
 			case DEFAULT_TYPE		: SetSingleValue(*server, it);		break;
 			case AUTO_INDEX			: SetSingleValue(*server, it);		break;
 			case OPEN_C_BRACKET :	break;
-			case COLON					:	break;
 			case SEMICOLON			:	error("Unexpected SEMICOLONE");
 			default							: error("Unexpected key : " + it->second);
 		}
@@ -36,14 +35,14 @@ Server *GenerateServer::NewServer(TOKEN_IT &it){
 
 int GenerateServer::parseErrorPage(std::vector<int> &CheckRepeat,std::string codeValue){
 	if (codeValue.find_first_not_of("0123456789") != codeValue.npos)
-		error("error code should be a number in ErrorPage");
+		error("code should be a number in ErrorPage");
 	if (codeValue.size() != 3)
-		error("error code range between 400 To 599");
+		error("code range between 400 To 599");
 	int errorCode = atoi(codeValue.c_str());
 	if (errorCode < 400 || errorCode > 599)
-		error("error code range between 400 To 599");
+		error("code range between 400 To 599");
 	if (std::find(CheckRepeat.begin(), CheckRepeat.end(), errorCode) != CheckRepeat.end())
-			error("errorCode is repeated twice in ErrorPage");
+			error("Code is repeated twice in ErrorPage");
 	CheckRepeat.push_back(errorCode);
 	return errorCode;
 }
@@ -106,6 +105,8 @@ void checkReapeat(Server &ser, Token Key){
 		error("\"root\" directive is duplicate");
 	if (Key == DEFAULT_TYPE && !ser.getDefaultType().empty())
 		error("\"default_type\" directive is duplicate");
+	if (Key == SERVER_NAME && !ser.getServerName().empty())
+		error("\"server_name\" directive is duplicate");
 }
 
 bool parseIndex(std::string value){
@@ -123,11 +124,11 @@ void GenerateServer::SetSingleValue(Server &ser,TOKEN_IT &it){
 	keyWord = it->second;
 	it++;
 	if (it->first != WORD)
-		error("Error: " + keyWord + " Should be followed by WORD");
+		error(keyWord + " Should be followed by WORD");
 	value = it->second;
 	it++;
 	if (it->first != SEMICOLON)
-		error("Error: " + keyWord +" Accept only one Value");
+		error(keyWord +" Accept Singel Value");
 	checkReapeat(ser, key);
 	if (key == SERVER_NAME)				ser.setServerName(value);
 	else if (key == AUTO_INDEX)		ser.setAutoIndex(parseIndex(value));
@@ -153,12 +154,18 @@ void GenerateServer::SetMultiValue(Server &ser, TOKEN_IT &it){
 
 void GenerateServer::SetInt(Server &ser, TOKEN_IT &it){
 	int		size;
-	while (it->first != SEMICOLON)
-	{
-		if (it->first == WORD)
-			size = atoi(it->second.c_str());
-		it++;
-	}
+	std::string value;
+
+	if (it->first != WORD)
+		error("Expected value after max_body_size");
+	value = it->second;
+	it++;
+	if (value.find_first_not_of("0123456789") != value.npos) 
+		error("max_body_size accept only digit");	
+	if (it->first != SEMICOLON) 
+		error("max_body_size Accept Singel Value");
+
+	size = std::atoi(value.c_str()); 
 	ser.setClientMaxBodySize(size);
 }
 
@@ -166,7 +173,7 @@ void	GenerateServer::handelOne(Server &ser,std::string line){
 	size_t pos= line.find_first_not_of("0123456789");
 	if (pos == line.npos){
 		if (line.size() > 5)
-			error("Port is grather tha max");
+			error("Port is grather than max");
 		ser.setPort(atoi(line.c_str()));
 	}
 	else
@@ -181,11 +188,11 @@ void GenerateServer::hostV6(Server &ser, std::string line)
 	if (pos == line.npos)
 			error("Listen '[' Should be closed");
 	ser.setHost(line.substr(1, pos - 1));
-	if (ser.getHost().find_first_not_of("ABCDEFabcdef0123456789:[]") != ser.getHost().npos)
+	if (ser.getHost().find_first_not_of("ABCDEFabcdef0123456789:") != ser.getHost().npos)
 		error("Unexpected Charachter in host");
 	line.erase(0, pos + 1);
 	if (!line.empty()){
-		if (line.front() != ':' || line.back() == ':')
+		if (line.front() != ':')
 			error("Listen expect ':' after host");
 		portStr = line.substr(1);
 		if (portStr.find_first_not_of("0123456789") != line.npos || portStr.size() > 5)
@@ -206,7 +213,7 @@ void GenerateServer::parseListen(Server &ser, std::string line){
 			handelOne(ser, line);
 		else
 		{
-			if (pos !=line.rfind(':'))
+			if (pos != line.rfind(':'))
 				error("Identifier repeated twice ':' ");
 			ser.setHost(line.substr(0, pos));
 			portStr = line.substr(pos + 1);
@@ -225,10 +232,9 @@ void	GenerateServer::SetHostAndPort(Server &ser, TOKEN_IT &it){
 	it++;
 	if (it->first != SEMICOLON)
 		error("Listen accept one value");
-	if(value.back() == ':')
+	if (value.back() == ':')
 		error("':' cannot be in the back");
-	if(value.front() == ':')
+	if (value.front() == ':')
 		error("':' cannot be in the front");
 	parseListen(ser, value);
 }
-

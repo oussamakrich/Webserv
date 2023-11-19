@@ -5,7 +5,26 @@
 #include "../../Uploader/include/Upload.hpp"
 #include "../../Utils/include/Logger.hpp"
 #include <cstdio>
-#include <sys/poll.h>
+
+addrinfo *addrInfo(std::string host, int port){
+
+	addrinfo *MyAddr;
+	stringstream PortString;
+	PortString << port;
+	struct addrinfo hints;
+	bzero(&hints, sizeof(hints));
+	hints.ai_flags = AI_PASSIVE;
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+
+	int	ret = getaddrinfo(host.c_str(), PortString.str().c_str(), &hints, &MyAddr);
+	if(ret){
+		std::cerr << gai_strerror(ret) << std::endl;
+		freeaddrinfo(MyAddr);
+		return NULL;
+	}
+	return MyAddr;
+}
 
 bool creatSocket(int *listen, addrinfo *MyAddr){
 	*listen = socket(MyAddr->ai_family , MyAddr->ai_socktype , 0);
@@ -23,28 +42,16 @@ bool creatSocket(int *listen, addrinfo *MyAddr){
 }
 
 bool Server::start(){
+
 	if (listenRepeat == true) // NOTE : if the server is repeated dont start it
 		return true;
-
-	stringstream PortString;
-	PortString << this->port;
-	struct addrinfo hints;
-	bzero(&hints, sizeof(hints));
-	hints.ai_flags = AI_PASSIVE;
-	hints.ai_family = AF_UNSPEC;// AF_UNSPEC :
-	hints.ai_socktype = SOCK_STREAM;
-
-	struct addrinfo *MyAddr;
-	int	ret = getaddrinfo(this->getHost().c_str(), PortString.str().c_str(), &hints, &MyAddr);
-	if(ret)
-	{
-		std::cerr << gai_strerror(ret) << std::endl;
-		freeaddrinfo(MyAddr);
+	addrinfo *MyAddr = addrInfo(this->getHost(), this->getPort());
+	if (!MyAddr)
 		return false;
-	}
 	if (!creatSocket(&_listen, MyAddr))
 		return false;
-	if (bind(_listen, MyAddr->ai_addr,MyAddr->ai_addrlen) != 0){
+
+	if (bind(_listen, MyAddr->ai_addr, MyAddr->ai_addrlen) != 0){
 		perror("bind");
 		freeaddrinfo(MyAddr);
 		return false;
@@ -60,13 +67,11 @@ bool Server::start(){
 }
 
 void Server::acceptClient(){
+
 	Client	*newClient = NULL;
-	struct sockaddr sockaddr;
-	bzero(&sockaddr, sizeof(sockaddr));
-	socklen_t len = sizeof(sockaddr);
-	int clientFd = accept(_listen, &sockaddr, &len);
+	int clientFd = accept(_listen, NULL, NULL);
 	if (clientFd  == -1){
-		std::cerr << "ERROR : Connection failed" << std::endl;
+		perror("accept");
 		return;
 	}
 	fcntl(clientFd, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
@@ -75,7 +80,6 @@ void Server::acceptClient(){
 		std::cerr << "ERROR : new Client failed" << std::endl;
 		return;
 	}
-	newClient->setAddr(sockaddr);
 	newClient->id = generateId();//Debug
 	newClient->time = getTime();//Debug
 	Logger::fastLog(Logger::INFO, "./Log/" + (newClient->id),  "Accept new client");
@@ -84,12 +88,24 @@ void Server::acceptClient(){
 }
 
 ITT_CLIENT Server::findClient(pollfd pfd){
-	ITT_CLIENT it = clients.begin();
 
+	ITT_CLIENT it = clients.begin();
 	for(; it != clients.end(); it++)
 		if (pfd.fd == (*it)->getFd())
 				break ;
 	return it;
+}
+
+bool Server::handelFd(struct pollfd pfd){
+
+	if (pfd.fd == _listen){
+		if (pfd.revents & POLLOUT)
+			return false;
+		this->acceptClient();
+		return true;
+	}
+	else
+		 return this->handelClient(findClient(pfd), pfd);
 }
 
 void Server::closeConnection(ITT_CLIENT it){
@@ -107,25 +123,25 @@ bool Server::handelClient(ITT_CLIENT it, pollfd pfd){
 	Global::id = client->id;//Debug
 	Global::time = client->time;//Debug
 	if (pfd.revents & POLLHUP){
-		Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "revents is POLLHUP: ");
+		// Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "revents is POLLHUP: ");
 		client->clearClient();
-		closeConnection(it);
+		this->closeConnection(it);
 		return true;
 	}
 	client->setLastTime(time(NULL));
-	Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "set last time: " + convertCode((client->getLastTime())));
+	// Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "set last time: " + convertCode((client->getLastTime())));
 	if (client->IhaveUpload)
 		client->ClientUpload(*this);
 	else if (client->IhaveCGI && !client->CGIFinish){
-		Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "Ihave cgi and cgiFinish false");
+		// Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "Ihave cgi and cgiFinish false");
 		client->CgiRequest();
 	}
 	else if (client->IhaveResponse){
 		if (client->OldRequest() == false)
 			closeConnection(it);
 	}
-	else if (!client->NewRequest(*this)) {
-		Logger::fastLog(Logger::ERROR, "./Log/" + client->id,  " Send Error Response $" + convertCode(client->response->getCode()));
+	else if (!client->NewRequest(*this)){
+		// Logger::fastLog(Logger::ERROR, "./Log/" + client->id,  " Send Error Response $" + convertCode(client->response->getCode()));
 		client->response->sendErrorResponse(client->getFd(), client->keepAlive);
 		delete client->response;
 		client->resetClient();
@@ -134,24 +150,11 @@ bool Server::handelClient(ITT_CLIENT it, pollfd pfd){
 		return true;
 	}
 	client->setLastTime(time(NULL));
-	Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "set second last time: " + convertCode((client->getLastTime())));
+	// Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "set second last time: " + convertCode((client->getLastTime())));
 	if (!client->keepAlive && !client->IhaveResponse){
 		closeConnection(it);
 	}
 	return true;
-}
-
-bool Server::handelFd(struct pollfd pfd){
-
-	if (pfd.fd == _listen)
-	{
-		if (pfd.revents & POLLOUT)
-			return false;
-		this->acceptClient();
-		return true;
-	}
-	else
-		return this->handelClient(findClient(pfd), pfd);
 }
 
 void Server::checkTimeOut(){
