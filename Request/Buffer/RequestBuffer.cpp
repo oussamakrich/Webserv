@@ -38,7 +38,7 @@ void RequestBuffer::clear()
 	_increment = 0;
 }
 
-RequestBuffer::RequestBuffer(int MaxBodySize)
+RequestBuffer::RequestBuffer(long long MaxBodySize)
 {
 	_increment = 0;
 	_maxBodySize = MaxBodySize;

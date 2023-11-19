@@ -43,7 +43,7 @@ class RequestBuffer
 
 	public:
 
-		RequestBuffer(int MaxBodySize);
+		RequestBuffer(long long MaxBodySize);
 
 
 	public: //Getters:
