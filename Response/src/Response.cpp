@@ -6,6 +6,9 @@
 #include "../../include/includes.hpp"
 #include "../../Utils/include/Logger.hpp"
 #include "../../HttpElement/include/Global.hpp"
+#include <cctype>
+#include <string>
+#include <sys/_types/_size_t.h>
 
 Response::Response(int fd){
 	this->_seek_pos = 0;
@@ -68,10 +71,29 @@ void Response::sendErrorResponse(int fd, bool keepAlive){
 
 }
 
+bool parseHeader(std::string header){
+	std::string key, value;
+	size_t pos;
+
+	pos = header.find(':');
+	if (pos == header.npos || pos == 0 || pos == header.size() - 1)
+		return false;
+	key = header.substr(0, pos);
+	value = header.substr(pos + 1);
+	if (!ParsRequest::isValidKey(key))
+		return false;
+	for (size_t i = 0;i < value.size(); i++){
+		if (!std::isprint(value[i]))
+			return false;
+	}
+	return true;
+}
+
 void Response::CgiHeaders(bool keepAlive, std::ifstream &file, size_t sizeOfFile){
 	std::string header;
-	size_t pos;
-	size_t headerPos = 0;
+	size_t pos, headerPos = 0;
+	bool thereIsLenght = false;
+
 	while (!file.eof()){
 		std::getline(file, header);
 		if (header.empty())
@@ -81,15 +103,23 @@ void Response::CgiHeaders(bool keepAlive, std::ifstream &file, size_t sizeOfFile
 			header.erase(pos);
 		if (header.empty())
 			break;
+		if (!parseHeader(header)){
+			this->code = 502;
+			return;
+		}
 		headers.push_back(header);
 	}
 	headerPos = file.tellg();
 	this->msg = "OK";
 	this->code = 200;
-	if (file.eof())
+	for (size_t i =0; i < headers.size(); i++){		
+		if (headers[i].find("Content-Length") != std::string::npos)
+			thereIsLenght = true;
+	}
+	if (file.eof() && !thereIsLenght)
 		setHeadr("Content-Length: 0");
-	else
-		setHeadr("Content-Length: " + convertCode(sizeOfFile - headerPos));
+	else if (!thereIsLenght)
+			setHeadr("Content-Length: " + convertCode(sizeOfFile - headerPos));
 	this->HeaderAndStart = GenerateResponse::generateHeaderAndSt(*this, keepAlive);
 	this->pos = headerPos;
 }
