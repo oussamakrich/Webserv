@@ -130,7 +130,7 @@ void ResponseHandler::serveFile(std::string path, size_t size){
 	}
 	if (req.getMethod() == "DELETE") {//NOTE : req is DELETE
 		if (unlink(path.c_str()) == 0)
-			res.setCode(200);//NOTE : No Content???
+			res.setCode(200);
 		else
 			res.setCode(500); //NOTE : check permission
 		return;

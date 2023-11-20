@@ -120,7 +120,6 @@ void Client::ClientUpload(Server &ser){
 		if (!IhaveUpload)
 		{
 			response->setMsg(GenerateResponse::generateMsg(response->getCode()));
-			response->setHeadr("Content-Length: 0");
 			response->setHeaderAndStart(GenerateResponse::generateHeaderAndSt(*response, keepAlive));
 			response->sendResponse();
 			resetClient();
@@ -143,6 +142,7 @@ bool Client::ReadRequest(){
 	char buffer[N_READ];
 	memset(buffer, 0, N_READ);
 	status = recv(this->fd, buffer, N_READ, 0);
+	std::cout << buffer << std::endl;
 	if (status == 0 || status == -1){
 		std::cerr << "Error while read request from client" << std::endl;
 		return false;

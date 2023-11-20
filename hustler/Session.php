@@ -20,8 +20,8 @@ session_start();
     <li><a href="Upload.html"> Upload</a>  </li>
     <li><a href="Download.html"> Download </a>   </li>
     <li><a href="Get.html">  Get </a>     </li>
-    <li><a href="Delete.html"> Post </a>    </li>
-    <li><a href="Post.html"> Delete </a>  </li>
+    <li><a href="Delete.php"> Delete </a>    </li>
+    <li><a href="Post.html"> Post </a>  </li>
     <li><a href="Session.php" class = "select_menu" > Session</a>  </li>
     <li><a href="Python-Cgi.py" > Python Cgi </a>  </li>
     <li><a href="phpCgi.php"> php Cgi  </a> </li> 

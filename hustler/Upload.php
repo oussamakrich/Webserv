@@ -76,7 +76,8 @@ if (!(isset($_SESSION['user']) && isset($_SESSION['pass'])))
     <li><a href="Upload.php" class = "select_menu"> Upload</a>  </li>
     <li><a href="Download.php"> Download </a>   </li>
     <li><a href="Get.php">  Get </a>     </li>
-    <li><a href="Delete.php"> Post </a>    </li>
+    <li><a href="Delete.php"> Delete </a>    </li>
+    <li><a href="Post.php"> Post </a>    </li>
     <li><a href="Python-Cgi.php" > Python Cgi </a>  </li>
     <li><a href="Session.php"> Session</a>  </li>
     <li><a href="phpCgi.php"> php Cgi  </a> </li>

@@ -28,6 +28,7 @@ std::string GenerateResponse::generateHeaderAndSt(Response &res, bool keepAlive)
 	std::string str;
 	std::string headersTmp = "";
 	std::string connection = "Connection: close";
+	bool content = false;
 
 	str = res.getVersion() + " " + convertCode(res.getCode()) + " " + res.getMsg() + "\r\n";
 	std::vector<std::string> headers = res.getHeaders();
@@ -40,7 +41,11 @@ std::string GenerateResponse::generateHeaderAndSt(Response &res, bool keepAlive)
 			extractStatus(res, headers[i]);
 			str = res.getVersion() + " " + convertCode(res.getCode()) + " " + res.getMsg() + "\r\n";
 		}
+		if (headers[i].find("Content-Length: ") != headers[i].npos)
+			content = true;
 	}
+	if (content == false && res.isCGI == false)
+		res.setHeadr("Content-Length: 0\r\n");
 	str += headersTmp + "\r\n";
 	return str;
 }
