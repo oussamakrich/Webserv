@@ -75,7 +75,8 @@ void GenerateServer::fillLocation(Server &ser, TOKEN_IT &it){
 
 	Location *location =	GenerateLocation::generateLocation(it);
 	std::string path = location->getPath();
-	ser.setSingleLocation(std::make_pair(path, location));
+	if (!ser.setSingleLocation(std::make_pair(path, location)))
+		error("duplicate Location " + path);
 }
 
 void GenerateServer::SetTypes(Server &ser, TOKEN_IT &it){

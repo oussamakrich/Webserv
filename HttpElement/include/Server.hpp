@@ -62,7 +62,7 @@ class Server {
 		  void setMimeType(const TYPES_MAP& mimeType);
 		  bool setMimeType(const TYPES_PAIR& mimeType);
 		  void setLocations(const LOCATION_MAP& locations);
-		  void setSingleLocation(const LOCATION_PAIR& location);
+		  bool setSingleLocation(const LOCATION_PAIR& location);
 		  void setItIndex(str_it begin, str_it end);
 
 	public:
