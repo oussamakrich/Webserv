@@ -123,3 +123,5 @@ std::string generateId();
 std::string timeToString(long long time);
 long long getTime();
 void warning(std::string warn);
+
+int getMethodCode(std::string  method);

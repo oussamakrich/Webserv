@@ -76,7 +76,8 @@ int RequestBuffer::_first_line_handler()
 	if (_pos != 2)						return 400;
 	std::stringstream ss(first_line);
 	ss >> _method >> _uri >> _protocol; // insert first line.
-	if (!IS_METHOD_SUPORTED(_method))	return 501; // not implemented.
+	if (getMethodCode(_method) == Request::NOT_SUPPORTED)	return 501; // not implemented.
+	if (getMethodCode(_method) == Request::INVALID_REQUEST)	return 400; // not implemented.
 	// if the protocol is not HTTP/1.1, return 505: HTTP version not supported.
 	if (_protocol != "HTTP/1.1")		return 505;
 	// URI too long.
