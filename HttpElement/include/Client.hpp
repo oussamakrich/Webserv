@@ -22,7 +22,6 @@ class Client{
 
 	private:
 		std::time_t			lastTime;
-		int							status;
 		std::string			address;
 
 	public:

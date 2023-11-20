@@ -35,8 +35,6 @@ void Client::switchEvent(int fd, int Flag) {Global::switchEvent(fd, Flag);}
 
 
 bool Client::isRequestAvailable(){
-	if (status == -1)
-		return true;
 	int check = reqBuff.getLevel();
 	if (check)
 		return true;
@@ -125,12 +123,19 @@ bool Client::ReadRequest(){
 
 	char buffer[N_READ];
 	memset(buffer, 0, N_READ);
-	status = recv(this->fd, buffer, N_READ, 0);
+	ssize_t status = recv(this->fd, buffer, N_READ, 0);
 	if (status == 0 || status == -1){
 		std::cerr << "Error while read request from client" << std::endl;
 		return false;
 	}
-	reqBuff.insertBuffer(buffer, status);
+	try{
+		reqBuff.insertBuffer(buffer, status);
+	}
+	catch (std::exception &e){
+		std::cerr << e.what() << std::endl;
+		reqBuff._status = 500;
+		return true;
+	}
 	return true;
 }
 

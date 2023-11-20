@@ -24,7 +24,6 @@ class RequestBuffer
 		std::string									_protocol;
 		std::string									_headers;
 		std::string									_body_path;
-		int											_status;
 		int											_increment;
 	private:
 
@@ -42,6 +41,7 @@ class RequestBuffer
 
 	public:
 
+		int											_status;
 		RequestBuffer(size_t MaxBodySize);
 
 
