@@ -14,6 +14,7 @@ int main (int argc, char **argv)
 		std::ifstream file(argv[1]);
 		std::vector<TOKEN> tokens = Tokenizer::tokenGenerator(file);
 		Global *WebServer = GenerateGlobalClass::generateGlobalClass(tokens);
+		WebServer->print();
 
 		sigChange();
 		WebServer->run();

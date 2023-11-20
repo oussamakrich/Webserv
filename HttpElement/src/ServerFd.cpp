@@ -48,6 +48,8 @@ bool Server::handelFd(struct pollfd pfd){
 }
 
 void Server::closeConnection(ITT_CLIENT it){
+
+	std::cout << "Connection Closed" << std::endl;
 	Client *client = *it;
 	clients.erase(it);
 	Global::removeFd(client->getFd());
