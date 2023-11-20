@@ -84,7 +84,7 @@ char *Responsejoin(const char *s1, char *s2, size_t size1, size_t size2)
 std::string generateId(){
 
 	timeval tm;
-    	gettimeofday(&tm, nullptr);
+    	gettimeofday(&tm, NULL);
 
 	std::stringstream ss;
 	ss <<tm.tv_sec << "@" << tm.tv_usec;
@@ -93,7 +93,7 @@ std::string generateId(){
 
 long long getTime(){
 	timeval tm;
-	gettimeofday(&tm, nullptr);
+	gettimeofday(&tm, NULL);
 	return tm.tv_sec * 1000000 + tm.tv_usec;
 }
 
