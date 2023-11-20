@@ -51,31 +51,22 @@ Request *Client::getRequest(){
 
 void Client::clearClient(){
 
-	if (!response){
-		Logger::fastLog(Logger::ERROR, "./Log/" + id,  " try to clear but i dont have response");
+	if (!response)
 		return;
-	}
-	if (this->IhaveCGI && this->CGIFinish){
-		Logger::fastLog(Logger::ERROR, "./Log/" + id,  " connection reset and cgi finish -> unlink files");
+	if (this->IhaveCGI && this->CGIFinish)
 		Cgi::CgiUnlink(response->cgiInfo);
-	}
 	else if (this->IhaveCGI && !this->CGIFinish){
-		Logger::fastLog(Logger::ERROR, "./Log/" + id,  " connection reset and cgi still wait -> KillCgi unlink files");
 		Cgi::KillCgi(response->cgiInfo);
 		Cgi::CgiUnlink(response->cgiInfo);
 	}
-	if (this->IhaveUpload) {
-		Logger::fastLog(Logger::ERROR, "./Log/" + id,  " connection reset and I have upload -> unlink files");
+	if (this->IhaveUpload)
 		unlink(response->_source_file.c_str());
-	}
 }
 
 bool Client::OldRequest(){
 
-	if (!response->ReminderResponse() /*&& !response->errorInSend*/){
-		// Logger::fastLog(Logger::ERROR, "./Log/" + id,  " error while handling old requeset");
+	if (!response->ReminderResponse())
 		return false;
-	}
 	IhaveResponse = response->stillSend;
 	if (!IhaveResponse){
 		if (response->isCGI)
@@ -88,28 +79,21 @@ bool Client::OldRequest(){
 bool Client::CgiRequest(){
 
 	switchEvent(this->fd, POLLOUT);
-		// Logger::fastLog(Logger::INFO, "./Log/" + id,  "client switch event to POLLOUT");
 	if (response->CgiResponse(this->keepAlive)){
-		// Logger::fastLog(Logger::INFO, "./Log/" + id,  "Cgi Finished");
 		CGIFinish = true;
 		IhaveResponse = response->stillSend;
 		if (!IhaveResponse){
-			// Logger::fastLog(Logger::INFO, "./Log/" + id,  "Cgi response Send finish");
-			// Logger::fastLog(Logger::INFO, "./Log/" + id,  "client switch event to POLLIN");
 			Cgi::CgiUnlink(response->cgiInfo);
 			this->resetClient();
-		// Logger::fastLog(Logger::INFO, "./Log/" + id,  "client unlink cgi files");
 		}
 		return true;
 	}
 	if (response->errrCgi){
-		// Logger::fastLog(Logger::INFO, "./Log/" + id,  "Cgi Error");
 		Cgi::CgiUnlink(response->cgiInfo);
 		response->sendErrorResponse(getFd(), this->keepAlive);
 		resetClient();
 		return true;
 	}
-	// Logger::fastLog(Logger::INFO, "./Log/" + id,  "Cgi still waiting");
 	return false;
 }
 
@@ -142,7 +126,6 @@ bool Client::ReadRequest(){
 	char buffer[N_READ];
 	memset(buffer, 0, N_READ);
 	status = recv(this->fd, buffer, N_READ, 0);
-	std::cout << buffer << std::endl;
 	if (status == 0 || status == -1){
 		std::cerr << "Error while read request from client" << std::endl;
 		return false;

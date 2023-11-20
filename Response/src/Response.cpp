@@ -62,7 +62,7 @@ void Response::sendErrorResponse(int fd, bool keepAlive){
 		stillSend = false;
 		ErrorResponse err = GenerateError::generateError(this->code, this->errorPage);
 		std::string error =  err.getErrorPage(keepAlive);
-		int ret = send(fd, error.c_str(), error.size(), 0); // WARNING : check
+		int ret = send(fd, error.c_str(), error.size(), 0);
 		if (ret == 0 || ret == -1)
 			close(fd);
 
@@ -130,7 +130,6 @@ bool Response::CgiResponse(bool keepAlive){
 	errrCgi = false;
 	if (Cgi::isFinished(cgiInfo, status)){
 		if (status != 0){
-			// Logger::fastLog(Logger::INFO, "./Log/" + Global::id,  "CGI status != 0");
 			setCode(502);
 			errrCgi	= true;
 			return false;
@@ -169,15 +168,11 @@ bool Response::sendResponse(){
 
 }
 
-bool Response::ReminderResponse(){
-	// Logger::fastLog(Logger::INFO, "./Log/" + Global::id,  "ReminderResponse function.");
+bool Response::ReminderResponse() {
+	
 	std::ifstream file(path.c_str());
 	if (!file.is_open())
-	{
-		// TODO: switch the event.
-		setCode(500);
 		return false;
-	}
 	buffer = new char[R_READ];
 	memset(buffer, 0, R_READ);
 	file.seekg(pos);
@@ -186,15 +181,12 @@ bool Response::ReminderResponse(){
 	pos += file.gcount();
 	stillSend = !file.eof();
 	file.close();
-	// size_t sizeoffile; //Debugg
-	// isFile(path.c_str(), sizeoffile); //Debuug
 	int ret = send(fd, buffer, bufferSize, 0);
 	delete [] buffer;
 	buffer = NULL;
 	if (ret == 0 || ret == -1)
 		return false;
 
-	// Logger::fastLog(Logger::INFO, "./Log/" + Global::id,  "Sending " + std::to_string(ret) + " pos: " + std::to_string(pos) + " of: " + std::to_string(file.tellg() / (double) sizeoffile * 100.00) + " bytes to client.");
 	if (file.gcount() != ret)
 		pos -= file.gcount() - ret;
 	this->redirection = false;
