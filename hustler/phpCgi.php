@@ -10,10 +10,6 @@
     <ul>
     <li><a href="index.html">  Home </a>    </li>
     <li><a href="Upload.html"> Upload</a>  </li>
-    <li><a href="Download.html"> Download </a>   </li>
-    <li><a href="Get.html">  Get </a>     </li>
-    <li><a href="Delete.html"> Post </a>    </li>
-    <li><a href="Post.html   "> Delete </a>  </li>
     <li><a href="Session.php"> Session</a>  </li>
     <li><a href="Python-Cgi.py" > Python Cgi </a>  </li>
     <li><a href="phpCgi.php" class = "select_menu"> php Cgi  </a> </li> 

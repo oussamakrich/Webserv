@@ -6,10 +6,9 @@ session_start();
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>Hustler server </title>
+	<title> Hustler server </title>
 	 <link rel="stylesheet" href="login.css"> 
 </head>
-
 <head>
     <link rel="stylesheet" href="style.css"/>
 </head>
@@ -18,18 +17,12 @@ session_start();
     <ul>
     <li><a href="index.html">  Home </a>    </li>
     <li><a href="Upload.html"> Upload</a>  </li>
-    <li><a href="Download.html"> Download </a>   </li>
-    <li><a href="Get.html">  Get </a>     </li>
-    <li><a href="Delete.php"> Delete </a>    </li>
-    <li><a href="Post.html"> Post </a>  </li>
     <li><a href="Session.php" class = "select_menu" > Session</a>  </li>
     <li><a href="Python-Cgi.py" > Python Cgi </a>  </li>
     <li><a href="phpCgi.php"> php Cgi  </a> </li> 
     <li><a href="logout.php" class = "logout">Log out </a></li>
 </ul>
 </nav>
-<!--  
-login  page -->
 
 <?php 
     if (isset($_POST['user']) && isset($_POST['pass']))
