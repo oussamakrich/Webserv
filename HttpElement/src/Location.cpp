@@ -1,5 +1,6 @@
 
 #include "../include/Location.hpp"
+#include "../../Parsing/include/ParsRequest.hpp"
 using namespace std;
 
 /*********************************< helper >*******************/
@@ -26,6 +27,12 @@ void Location::final()
 {
 	if (this->default_type.empty())
 		this->default_type = "application/octet-stream";
+	if (this->upload  == true && this->upload_path.empty())
+		SyntaxError(ERR_UPLOAD_PATH);
+	if (this->root.empty())
+		SyntaxError(ERR_ROOT_REQUIRE);
+
+
 	Allowed_Method.shrink_to_fit();
 	indexes.shrink_to_fit();
 	error_page.shrink_to_fit();

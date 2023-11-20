@@ -57,21 +57,20 @@ HEADER =	./HttpElement/include/Client.hpp \
 
 OBJ = $(SRC:.cpp=.o)
 
-FLAGS =   -Wall -Wextra -Werror -std=c++98 -g #-fsanitize=address
+CURRENT_DIR = $(shell pwd)
+CONFIG = $(CURRENT_DIR)"/default.conf"
 
+FLAGS = -Wall -Wextra -Werror -std=c++98 -g -fsanitize=address
 
-# CURRENT_DIRECTORY = $(shell pwd)
-#
-# CONFIG_PATH = $(CURRENT_DIRECTORY)/defualtConfig.conf
 
 all:$(NAME)
 
 $(NAME): $(OBJ) $(HEADER)
-			# echo "server { listen localhost:8080;  server_name localhost;  root $(CURRENT_DIRECTORY);  location / { allowed_methods GET; autoindex on;  }  }" > $(CONFIG_PATH)
-			c++ $(FLAGS) $(OBJ)  -o $(NAME)
+		@echo "server { listen localhost:8080;  server_name localhost;  root $(CURRENT_DIR);  location / { allowed_methods GET;  autoindex on;  }  }" > $(CONFIG)
+		c++ $(FLAGS) $(OBJ) -o $(NAME)
 
 %.o: %.cpp $(HEADER)
-			c++ $(FLAGS) -c $< -o $@
+			c++ $(FLAGS) -c $< -o $@ -DCONFIG_PATH=\"$(CONFIG)\"
 
 clean c:
 			rm -rf $(OBJ)

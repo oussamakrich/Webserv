@@ -13,6 +13,7 @@ class Tokenizer {
 		static std::map<std::string, Token> SpecialWords;
 		static std::stack<Token> curlyBrackets;
 		static int serverFound;
+		static std::string fileName;
 	private:
 		Tokenizer();
 		static void QuotesHandler(std::string &line, int lineNumber, unsigned int &i, TOKEN_STRUCTS &tokens, char quote);
@@ -28,7 +29,7 @@ class Tokenizer {
 		static void validateTokens(TOKEN_STRUCTS &tokens);
 		static void generateTokenMap(void);
 	public:
-		static TOKEN_OUT tokenGenerator(std::ifstream &file);
+		static TOKEN_OUT tokenGenerator(std::ifstream &file, std::string filename);
 		~Tokenizer();
 };
 

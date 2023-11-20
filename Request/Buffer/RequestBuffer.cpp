@@ -96,6 +96,7 @@ int RequestBuffer::_headers_handler()
 {
 	int increment = 0;
 	if (_buffer.size() == 0)				return 0; // This mean that the buffer is empty.
+
 	int _pos  = _buffer.find("\r\n", 2);
 	increment = 2;
 	if (_pos == -1)
@@ -334,7 +335,6 @@ int RequestBuffer::_body_handler()
 	else if (_body_level > 3)
 		return _body_level; // This mean that the body type is not supported.
 	if (_buffer.size() == 0)				return _status; // This mean that the buffer is empty.
-
 	switch (_body_level)
 	{
 		case 1:
@@ -354,13 +354,19 @@ int RequestBuffer::_body_handler()
 
 int	RequestBuffer::insertBuffer(const char *buffer, int size)
 {
-	_buffer = _buffer + Byte(buffer, size);
-	switch (_level)
-	{
-		case 0: _status = _first_line_handler(); break;
-		case 1: _status = _headers_handler(); break;
-		case 2: _status = _body_handler(); break;
-		default: break;
-	}
+	// try {
+		_buffer = _buffer + Byte(buffer, size);
+		switch (_level)
+		{
+			case 0: _status = _first_line_handler(); break;
+			case 1: _status = _headers_handler(); break;
+			case 2: _status = _body_handler(); break;
+			default: break;
+		}
+	// }
+	// catch (std::exception &e)
+	// {
+	// 	_status = 500;
+	// }
 	return _status;
 }
