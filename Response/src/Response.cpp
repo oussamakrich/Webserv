@@ -6,9 +6,6 @@
 #include "../../include/includes.hpp"
 #include "../../Utils/include/Logger.hpp"
 #include "../../HttpElement/include/Global.hpp"
-#include <cctype>
-#include <string>
-#include <sys/_types/_size_t.h>
 
 Response::Response(int fd){
 	this->_seek_pos = 0;
@@ -29,8 +26,7 @@ Response::Response(int fd){
 }
 
 Response::~Response(){
-	if (this->buffer != NULL)
-		delete [] this->buffer;
+	delete [] this->buffer;
 }
 
 int Response::getCode(){ return this->code;}

@@ -225,13 +225,13 @@ std::ostream &operator<<(std::ostream &out, Server &server){
 	// 	out << GREEN"\t\t"<< it -> first << " " << it -> second << std::endl;
 	// out << RED"\tlocations: " << std::endl;
 	// std::cout << RESET;
-	LOCATION_MAP loc = server.getAllLocation();
-	for (std::map<std::string, Location*>::const_iterator it = loc.begin(); it != loc.end(); it++)
-	{
-		out <<it -> first << " " ;
-		it -> second->printLocation();
-		std::cout << std::endl;
-	}
+	// LOCATION_MAP loc = server.getAllLocation();
+	// for (std::map<std::string, Location*>::const_iterator it = loc.begin(); it != loc.end(); it++)
+	// {
+	// 	out <<it -> first << " " ;
+	// 	it -> second->printLocation();
+	// 	std::cout << std::endl;
+	// }
 	out << "IsRepeated : " << std::boolalpha << server.listenRepeat << std::endl;
 	return out;
 }
