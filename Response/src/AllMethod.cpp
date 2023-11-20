@@ -138,7 +138,7 @@ void ResponseHandler::serveFile(std::string path, size_t size){
 	std::ifstream file(path.c_str());
 
 	if (!file.is_open()){
-		res.setCode(500);
+		res.setCode(403);
 		return;
 	}
 	char *buffer = new char[R_READ];
