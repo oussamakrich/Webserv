@@ -1,3 +1,10 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
 h1, hr , h6
 {
     text-align:  center;
@@ -5,7 +12,7 @@ h1, hr , h6
     color: #F99417;
 }
 
-body 
+body
 {
         text-align: center;
             text-transform: capitalize;
@@ -18,19 +25,23 @@ body
 {
     width:  100%;
     background-color: #4D4C7D;
+    display: flex;
+    justify-content: center;
+    align-items: space-between;
 }
 
 .navbar ul
 {
     list-style-type: none;
     text-decoration:  none;
-    padding:  0px;
+    /* padding:  100px; */
     margin: 0;
     overflow: hidden;
 
+
 }
 
-.navbar a 
+.navbar a
 {
     color : #F5F5F5;
     text-decoration:  none;
@@ -46,10 +57,10 @@ body
     background-color: #F99417;
     border-radius: 8px;
 }
-.navbar li 
+.navbar li
 {
     float: left;
-    
+
 }
 .select_menu
 {
@@ -72,7 +83,7 @@ footer
 
 }
 
-.download 
+.download
 {
     color: #F5F5F5;
     background-color: #4D4C7D;
@@ -94,14 +105,14 @@ footer
 {
     background-color: #F99417;
     padding:  5px;
-   
+
     top:  5px;
     left: 50%;
     text-decoration: none;
     text-indent: 25%;
 
 }
-.download  a 
+.download  a
 {
     color: #F5F5F5;
 }
