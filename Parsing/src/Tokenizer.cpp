@@ -5,6 +5,8 @@ std::map<std::string, Token> Tokenizer::SpecialSymbols = std::map<std::string, T
 std::stack<Token> Tokenizer::curlyBrackets = std::stack<Token>();
 int Tokenizer::serverFound = 0;
 
+std::string Tokenizer::fileName = "";
+
 Tokenizer::Tokenizer() {}
 
 Tokenizer::~Tokenizer() {}
@@ -92,8 +94,8 @@ void Tokenizer::QuotesHandler(std::string &line, int lineNumber, unsigned int  &
 {
 	if (line.find(quote, i + 1) == std::string::npos)
 	{
-		if (quote == '\"') std::cout << "Unclosed Double Quotes: line: " << U_WHITE"config.conf:" << lineNumber << ":" << i;
-		else std::cout << "Unclosed Single Quotes: line: " << U_WHITE"config.conf:" << lineNumber << ":" << i;
+		if (quote == '\"') std::cout << "Unclosed Double Quotes: line: " << U_WHITE << fileName<<":" << lineNumber << ":" << i;
+		else std::cout << "Unclosed Single Quotes: line: " << U_WHITE<<fileName << ":" << lineNumber << ":" << i;
 		exit(1);
 	}
 	tokens.push_back((t_tokens){
@@ -114,12 +116,14 @@ void Tokenizer::QuotesHandler(std::string &line, int lineNumber, unsigned int  &
 	}
 }
 
-TOKEN_OUT Tokenizer::tokenGenerator(std::ifstream &file)
+TOKEN_OUT Tokenizer::tokenGenerator(std::ifstream &file, std::string filename)
 {
 	TOKEN_STRUCTS	tokens;
 	TOKEN_OUT 	tokenizedFile;
 	int					lineNumber = 1;
 	std::string			line;
+	Tokenizer::fileName = filename;
+
 	Tokenizer::generateTokenMap();
 	while (std::getline(file, line))
 	{
