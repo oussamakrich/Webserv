@@ -60,7 +60,7 @@ void ResponseHandler::serveDirectory(){
 	size_t size;
 	int type;
 
-	if (req.getMethod() == "DELETE") {//NOTE : req is DELETE
+	if (req.getMethod() == "DELETE") {
 		res.setCode(403);
 		return;
 	}
@@ -73,7 +73,7 @@ void ResponseHandler::serveDirectory(){
 			return;
 		}
 	}
-	if (autoindex){ //TODO : List Dir if auto index on
+	if (autoindex){
 		std::string output;
 		if (DirListing::getDirlistigHtml(res.path, output, req.getPath())){
 			char *buffer = new char[output.size()];
@@ -100,7 +100,7 @@ bool ResponseHandler::checkCGI(std::string path){
 
 void ResponseHandler::handelCGI(){
 
-	if (req.getMethod() == "DELETE") {//NOTE : req is DELETE  && iscgi == Not Implemented
+	if (req.getMethod() == "DELETE") {
 		res.setCode(501);
 		return;
 	}
@@ -121,7 +121,7 @@ void ResponseHandler::serveFile(std::string path, size_t size){
 		handelCGI();
 		return;
 	}
-	if (req.getMethod() == "DELETE") {//NOTE : req is DELETE
+	if (req.getMethod() == "DELETE") {
 		if (unlink(path.c_str()) == 0)
 			res.setCode(200);
 		else
@@ -229,9 +229,9 @@ void ResponseHandler::simpleGet(){
 	}
 	if (type == FILE)
 		serveFile(res.path, size);
-	else if (type == DIRECTORY) //TODO :  try index.html || check auto index
+	else if (type == DIRECTORY)
 		serveDirectory();
-	else if (type == NOT_FOUND) //TODO : Generate 404
+	else if (type == NOT_FOUND)
 		res.setCode(404);
 
 }

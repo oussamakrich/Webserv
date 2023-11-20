@@ -33,8 +33,8 @@ t_cgiInfo  Cgi::Run(Request &req, std::string  &bin, std::string &path)
 		return Cgi::INTERNAL_ERROR;
 	}
 
-	info.output = getRandomName("/tmp/", "-cgi-output"); //TODO: select root , default rot is /tmp
-	info.input  = req.getBody(); //TODO: select root , default rot is /tmp
+	info.output = getRandomName("/tmp/", "-cgi-output");
+	info.input  = req.getBody();
 	info.code  	= 0;
 	info.time	=  time(NULL);
 	info.pid =  fork();
@@ -188,7 +188,7 @@ char **Cgi::makeEnv(Request &req,std::string &path)
 		string tmp;
 		env = new(std::nothrow) char *[size];
 		if (env == NULL) return NULL;
-		map<string, string> header = req.getHeaders(); // TODO: use refernce ??
+		map<string, string> header = req.getHeaders();
 		map<string, string>::iterator it = header.begin();
 		pos = STATIC_VAR_NUM;
 		if (makeStaticVariable(env, req, path) == false)
