@@ -55,16 +55,21 @@ HEADER =	./HttpElement/include/Client.hpp \
 			./Uploader/include/Upload.hpp \
 
 
-
 OBJ = $(SRC:.cpp=.o)
 
 FLAGS =   -Wall -Wextra -Werror -std=c++98 -g #-fsanitize=address
 
+
+# CURRENT_DIRECTORY = $(shell pwd)
+#
+# CONFIG_PATH = $(CURRENT_DIRECTORY)/defualtConfig.conf
+
 all:$(NAME)
 
 $(NAME): $(OBJ) $(HEADER)
-			c++ $(FLAGS) $(OBJ) -o $(NAME)
-			@mkdir -p tmp
+			# echo "server { listen localhost:8080;  server_name localhost;  root $(CURRENT_DIRECTORY);  location / { allowed_methods GET; autoindex on;  }  }" > $(CONFIG_PATH)
+			c++ $(FLAGS) $(OBJ)  -o $(NAME)
+
 %.o: %.cpp $(HEADER)
 			c++ $(FLAGS) -c $< -o $@
 

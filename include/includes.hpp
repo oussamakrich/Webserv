@@ -29,6 +29,8 @@
 
 #define IS_METHOD_SUPORTED(method)((method == "GET" || method == "DELETE" || method == "POST" ))
 #define xout std::cout << __FILE__ << ":" << __LINE__ << ":> "
+
+
 typedef enum {
 	DIRECTIVE_SYNTAX_ERROR,
 	UNKNOWN_DIRECTIVE,
