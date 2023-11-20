@@ -2,19 +2,17 @@
 #include "Parsing/include/Tokenizer.hpp"
 #include "Parsing/include/GenerateGlobalClass.hpp"
 #include "HttpElement/include/Cgi.hpp"
-
+#ifndef CONFIG_PATH
+# define CONFIG_PATH "./config/defaultff.conf"
+#endif
 int main (int argc, char **argv)
 {
-
-	if (argc != 2)
-	{
-		std::cerr << "Error: required a config file" << std::endl;
-		return 1;
-	}
+	std::cout << CONFIG_PATH << std::endl;
+	std::string path = argc == 1 ? "./config/default.conf" : argv[1];
 	try
 	{
 		std::ifstream file(argv[1]);
-		std::vector<TOKEN> tokens = Tokenizer::tokenGenerator(file);//
+		std::vector<TOKEN> tokens = Tokenizer::tokenGenerator(file);
 		Global *WebServer = GenerateGlobalClass::generateGlobalClass(tokens);
 
 		sigChange();

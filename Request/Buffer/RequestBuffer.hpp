@@ -12,7 +12,6 @@
 
 
 #define ALLOWED_CHARS "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?#[]@!$&'()*+,;=%"
-
 #define IS_METHOD_SUPORTED(method)((method == "GET" || method == "DELETE" || method == "POST" ))
 
 class RequestBuffer

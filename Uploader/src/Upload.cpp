@@ -10,7 +10,18 @@
 
 Upload::Upload(Server &ser, Response &res):ser(ser), res(res)
 {
-	Uploader();
+	// try
+	// {
+		std::cout << "Uploading...\n";
+		Uploader();
+	// }
+	// catch(const std::exception& e)
+	// {
+	// 	unlink(res._source_file.c_str());
+	// 	res.setCode(500);
+	// 	res.stillSend = false;
+	// 	res.iHaveUpload = false;
+	// }
 }
 
 /*	This function will extract the boundary and the path of the file from the request
@@ -33,6 +44,14 @@ bool Upload::_check_file_open_out(std::ofstream &file)
 {
 	if (!file.is_open())
 	{
+		if (access(res.location->getUploadPath().c_str(), W_OK) == -1)
+		{
+			unlink(res._source_file.c_str());
+			res.setCode(403);
+			res.stillSend = false;
+			res.iHaveUpload = false;
+			return false;
+		}
 		unlink(res._source_file.c_str());
 		res.setCode(507);
 		res.stillSend = false;
