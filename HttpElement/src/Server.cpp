@@ -104,7 +104,7 @@ bool Server::setMimeType(const TYPES_PAIR& mimeType){ return this->mimeType.inse
 
 void Server::setLocations(const LOCATION_MAP& locations) { this->locations = locations; }
 
-void Server::setSingleLocation(const LOCATION_PAIR& location) {this->locations.insert(location);}
+bool Server::setSingleLocation(const LOCATION_PAIR& location) {return  this->locations.insert(location).second;}
 
 void Server::setItIndex(str_it begin, str_it end){ index.insert(index.end(), begin, end);}
 

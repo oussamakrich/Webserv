@@ -75,7 +75,8 @@ void GenerateServer::fillLocation(Server &ser, TOKEN_IT &it){
 
 	Location *location =	GenerateLocation::generateLocation(it);
 	std::string path = location->getPath();
-	ser.setSingleLocation(std::make_pair(path, location));
+	if (!ser.setSingleLocation(std::make_pair(path, location)))
+		error("duplicate Location " + path);
 }
 
 void GenerateServer::SetTypes(Server &ser, TOKEN_IT &it){
@@ -169,8 +170,8 @@ void GenerateServer::SetBodySize(Server &ser, TOKEN_IT &it){
 		error("max_body_size Accept Singel Value");
 
 	ss << value;
-	ss >> tmp;
-
+	if (!(ss >> tmp))
+		error("max_body_size is to large");
 	size = tmp * MEGABYTE;
 	if (size / tmp != MEGABYTE)
 		error("max_body_size is to large");

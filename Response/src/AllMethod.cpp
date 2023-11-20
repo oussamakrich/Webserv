@@ -83,13 +83,10 @@ void ResponseHandler::serveDirectory(){
 			res.setHeadr("Content-Length: " + convertCode(output.size()));
 			res.setHeadr("Content-Type: text/html");
 			res.setCode(200);
+			return;
 		}
-		else
-			res.setCode(403);
 	}
-	else{
-		res.setCode(403);
-	}
+	res.setCode(403);
 }
 
 
@@ -109,13 +106,10 @@ void ResponseHandler::handelCGI(){
 	}
 	std::string bin = location->getCgiBinFor(res.path);
 	res.cgiInfo =  Cgi::Run(req, bin, res.path);
-	Logger::fastLog(Logger::INFO, "./Log/" + Global::id ,  "Cgi info : code : " + convertCode(res.cgiInfo.code) + " input : " + res.cgiInfo.input);//DEBUG
 	if (res.cgiInfo.code == 500){
-		Logger::fastLog(Logger::INFO, "./Log/" + Global::id ,  "Cgi Failed");//DEBUG
 		res.setCode(500);
 		return;
 	}
-	Logger::fastLog(Logger::INFO, "./Log/" + Global::id ,  "Cgi run : seccusse");//DEBUG
 	res.isCGI = true;
 }
 
@@ -124,13 +118,12 @@ void ResponseHandler::serveFile(std::string path, size_t size){
 	res.isCGI = false;
 	if (checkCGI(path)){
 		res.path = path;
-		Logger::fastLog(Logger::INFO, "./Log/" + Global::id ,  path + " is match as cgi");//DEBUG
 		handelCGI();
 		return;
 	}
 	if (req.getMethod() == "DELETE") {//NOTE : req is DELETE
 		if (unlink(path.c_str()) == 0)
-			res.setCode(200);//NOTE : No Content???
+			res.setCode(200);
 		else
 			res.setCode(500); //NOTE : check permission
 		return;
@@ -221,7 +214,6 @@ std::string ResponseHandler::GetFileName()
 
 
 void ResponseHandler::simpleGet(){
-	Logger::fastLog(Logger::INFO, "./Log/" + Global::id ,  " Simple get function");//DEBUG
 	res.path = this->root + '/' + req.getPath();
 	size_t size;
 	int type = isFile(res.path, size);
@@ -236,20 +228,11 @@ void ResponseHandler::simpleGet(){
 		return;
 	}
 	if (type == FILE)
-	{
-		Logger::fastLog(Logger::INFO, "./Log/" + Global::id ,  " Serve file");//DEBUG
 		serveFile(res.path, size);
-	}
 	else if (type == DIRECTORY) //TODO :  try index.html || check auto index
-	{
-		Logger::fastLog(Logger::INFO, "./Log/" + Global::id ,  " Serve directory");//DEBUG
 		serveDirectory();
-	}
 	else if (type == NOT_FOUND) //TODO : Generate 404
-	{
-		Logger::fastLog(Logger::WARNING, "./Log/" + Global::id ,  " Not found");//DEBUG
 		res.setCode(404);
-	}
 
 }
 
@@ -258,10 +241,8 @@ bool ResponseHandler::checkRedirection(){
 	if (location->isRedirection()){
 		res.redirection = true;
 		res.setCode(location->getRedirectionCode());
-		if (res.getCode() >= 300 && res.getCode() < 400){
+		if (res.getCode() >= 300 && res.getCode() < 400)
 			res.setHeadr("Location: " + location->getRedirectionText());
-			res.setHeadr("Content-Length: 0");
-		}
 		else {
 			res.setHeadr("Content-Length: " + convertCode(location->getRedirectionText().size()));
 			res.setHeadr("Content-Type: text/html");
@@ -279,7 +260,6 @@ void ResponseHandler::ResponseHandlere(Server &ser, Request &req, Response &res)
 	LOCATION_ITT it;
 	res.redirection = false;
 	if (isLocation(it)) {
-		// Logger::fastLog(Logger::ERROR, "./Log/" + Global::id ,  "is location " + it->first);//DEBUG
 		isLoacation = true;
 		location = it->second;
 		res.location = location;
@@ -299,7 +279,6 @@ void ResponseHandler::ResponseHandlere(Server &ser, Request &req, Response &res)
 	}
 	else
 	{
-		// Logger::fastLog(Logger::ERROR, "./Log/" + Global::id ,  "is not a location");//DEBUG
 		isLoacation = false;
 		autoindex = ser.getAutoIndex();
 		root = ser.getRoot();

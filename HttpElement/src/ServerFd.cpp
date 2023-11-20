@@ -19,9 +19,9 @@ void Server::acceptClient(){
 		std::cerr << "ERROR : new Client failed" << std::endl;
 		return;
 	}
+	std::cout << "new Client Accepted" << std::endl;
 	newClient->id = generateId();//Debug
 	newClient->time = getTime();//Debug
-	Logger::fastLog(Logger::INFO, "./Log/" + (newClient->id),  "Accept new client");
 	this->clients.push_back(newClient);
 	Global::insertFd(clientFd);
 }
@@ -49,7 +49,6 @@ bool Server::handelFd(struct pollfd pfd){
 
 void Server::closeConnection(ITT_CLIENT it){
 	Client *client = *it;
-	Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "client closed the connection");
 	clients.erase(it);
 	Global::removeFd(client->getFd());
 	delete client;
@@ -62,19 +61,15 @@ bool Server::handelClient(ITT_CLIENT it, pollfd pfd){
 	Global::id = client->id;//Debug
 	Global::time = client->time;//Debug
 	if (pfd.revents & POLLHUP){
-		// Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "revents is POLLHUP: ");
 		client->clearClient();
 		this->closeConnection(it);
 		return true;
 	}
 	client->setLastTime(time(NULL));
-	// Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "set last time: " + convertCode((client->getLastTime())));
 	if (client->IhaveUpload)
 		client->ClientUpload(*this);
-	else if (client->IhaveCGI && !client->CGIFinish){
-		// Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "Ihave cgi and cgiFinish false");
+	else if (client->IhaveCGI && !client->CGIFinish)
 		client->CgiRequest();
-	}
 	else if (client->IhaveResponse){
 		if (client->OldRequest() == false)
 			closeConnection(it);
@@ -86,9 +81,8 @@ bool Server::handelClient(ITT_CLIENT it, pollfd pfd){
 		return true;
 	}
 	client->setLastTime(time(NULL));
-	if (!client->keepAlive && !client->IhaveResponse){
+	if (!client->keepAlive && !client->IhaveResponse)
 		closeConnection(it);
-	}
 	return true;
 }
 
@@ -104,7 +98,6 @@ void Server::checkTimeOut(){
 			Global::id = client->id;
 			Global::time = client->time;
 	 		std::cout << "Client fd: " << client->getFd()  << " TIME : " << now - tm<< "\n";
-			Logger::fastLog(Logger::INFO, "./Log/" + client->id,  "client timeout");
 
 			closeConnection(it);
 			continue;
