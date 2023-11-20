@@ -19,8 +19,6 @@ SRC =	./Request/Buffer/RequestBuffer.cpp\
 		./Response/src/AllMethod.cpp\
 		./HttpElement/src/Location.cpp\
 		./Parsing/src/GenerateLocation.cpp\
-		./Utils/src/Logger.cpp\
-		./Utils/src/printTokens.cpp\
 		./Utils/src/trim.cpp\
 		./Utils/src/DirListing.cpp\
 		./Parsing/src/ParsRequest.cpp\
@@ -45,7 +43,6 @@ HEADER =	./HttpElement/include/Client.hpp \
 			./HttpElement/include/Location.hpp \
 			./Parsing/include/GenerateLocation.hpp \
 			./Parsing/include/Tokenizer.hpp \
-			./Utils/include/Logger.hpp\
 			./Utils/include/DirListing.hpp\
 			./Parsing/include/ParsRequest.hpp\
 			./Request/Buffer/RequestBuffer.hpp\

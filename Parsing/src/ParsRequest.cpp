@@ -18,7 +18,6 @@ Request *ParsRequest::Pars(RequestBuffer &reqBuff)
 		{
 			if (ParsHeaders(*req, header_vect[i]) == false)
 			{
-				// std::cout << header_vect[i] << std::endl;K
 				req->setType(Request::INVALID_REQUEST);
 				break;
 			}

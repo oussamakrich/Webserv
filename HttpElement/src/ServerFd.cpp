@@ -20,8 +20,6 @@ void Server::acceptClient(){
 		return;
 	}
 	std::cout << "new Client Accepted" << std::endl;
-	newClient->id = generateId();//Debug
-	newClient->time = getTime();//Debug
 	this->clients.push_back(newClient);
 	Global::insertFd(clientFd);
 }
@@ -60,8 +58,6 @@ bool Server::handelClient(ITT_CLIENT it, pollfd pfd){
 	if (it == clients.end())	return false;
 
 	Client *client = *it;
-	Global::id = client->id;//Debug
-	Global::time = client->time;//Debug
 	if (pfd.revents & POLLHUP){
 		client->clearClient();
 		this->closeConnection(it);
@@ -97,9 +93,7 @@ void Server::checkTimeOut(){
 		std::time_t tm = client->getLastTime();
 		std::time_t now = std::time(NULL);
 		if(now - tm >= TIME_OUT){
-			Global::id = client->id;
-			Global::time = client->time;
-	 		std::cout << "Client fd: " << client->getFd()  << " TIME : " << now - tm<< "\n";
+	 		std::cout << "Client Time-Out" << std::endl;
 
 			closeConnection(it);
 			continue;

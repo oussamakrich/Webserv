@@ -73,5 +73,4 @@ public :
 		bool isDownloadEnable()						const;	
 /*********************************< for Debug  >*******************/
 
-		void printLocation();
 };

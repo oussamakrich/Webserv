@@ -1,6 +1,4 @@
 #include "../../include/includes.hpp"
-#include <new>
-#include <sys/time.h>
 
 std::string hexToChar(std::string hex){
     int i;
@@ -81,35 +79,8 @@ char *Responsejoin(const char *s1, char *s2, size_t size1, size_t size2)
 	return (tmp);
 }
 
-std::string generateId(){
-
-	timeval tm;
-    	gettimeofday(&tm, NULL);
-
-	std::stringstream ss;
-	ss <<tm.tv_sec << "@" << tm.tv_usec;
-	return ss.str();
-}
-
-long long getTime(){
-	timeval tm;
-	gettimeofday(&tm, NULL);
-	return tm.tv_sec * 1000000 + tm.tv_usec;
-}
-
-std::string timeToString(long long time){
-    std::stringstream ss;
-    int s,ms,us;
-
-    s = time / 1000000;
-    ms = (time - s * 1000000) / 1000;
-    us = time - s * 1000000 - ms * 1000;
-    if (s > 0)
-	ss << s << "s";
-    if (ms > 0)
-	ss << ms << "ms";
-    if (us > 0)
-	ss << us << "us";
-
-    return ss.str();
-}
+// long long getTime(){
+// 	timeval tm;
+// 	gettimeofday(&tm, NULL);
+// 	return tm.tv_sec * 1000000 + tm.tv_usec;
+// }

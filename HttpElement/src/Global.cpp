@@ -4,9 +4,6 @@ std::vector<struct pollfd> Global::gPollFds =  std::vector<struct pollfd>();
 std::vector<std::string> Global::serverNames =  std::vector<std::string>();
 std::vector<Server *> Global::servers =  std::vector<Server *>();
 
-std::string Global::id = "0"; //DEBUG
-long long Global::time = 0; //DEBUG
-
 Global::Global(){}
 
 Global::~Global(){
@@ -24,13 +21,6 @@ Global::~Global(){
 void Global::addServer(Server *server){
 	this->servers.push_back(server);
 }
-
-void  Global::print() {
-		std::vector<Server *>::iterator it = servers.begin();
-		for(;it != servers.end(); it++){
-			std::cout << *(*it) << std::endl;
-		}
-};
 
 void Global::callHandelFds(struct pollfd pfd){
 
@@ -96,7 +86,6 @@ void  Global::run(){
 		{
 			if (gPollFds[i].revents & POLLHUP){
 				this->callHandelFds(gPollFds[i]);
-				std::cerr <<"pollhup " << Global::id << std::endl;
 				pollStatus--;
 				continue;
 			}

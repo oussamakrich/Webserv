@@ -42,7 +42,7 @@ t_cgiInfo  Cgi::Run(Request &req, std::string  &bin, std::string &path)
 	{
 		deleteDP(env  , INT_MAX);
 		deleteDP(args , INT_MAX);
-		std::cout << "Fork FAIL : ";
+		std::cerr << "Fork FAIL : ";
 		return Cgi::INTERNAL_ERROR;
 	}
 	else if (info.pid == 0)
@@ -145,7 +145,7 @@ bool Cgi::makeStaticVariable(char **env, Request &req, string &path)
 		}
 	catch(std::exception &ex)
 	{
-		std::cout << ex.what() << std::endl;
+		std::cerr << ex.what() << std::endl;
 		return false;
 	}
 	return true;
@@ -228,7 +228,7 @@ char **Cgi::MakeArgs(string &bin, string &path)
 	}
 	catch(std::exception &ex)
 	{
-		 std::cout << ex.what();
+		 std::cerr << ex.what();
 		return NULL;
 	}
 

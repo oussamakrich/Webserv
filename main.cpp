@@ -17,22 +17,25 @@ int main (int argc, char **argv)
 		path = argv[1];
 	else
 	{
-		std::cout << "Usage: ./webserv [config_file]" << std::endl;
+		std::cerr << "Usage: ./webserv [config_file]" << std::endl;
 		return (1);
 	}
 	try
 	{
 		std::ifstream file(path);
+		if (!file.is_open())
+			throw std::runtime_error("Error: Can't open config file");
 		std::vector<TOKEN> tokens = Tokenizer::tokenGenerator(file, path);
+
+		file.close();
 		Global *WebServer = GenerateGlobalClass::generateGlobalClass(tokens);
-		// WebServer->print();
 
 		sigChange();
 		WebServer->run();
 	}
 	catch (std::exception &e)
 	{
-		std::cout << e.what() << std::endl;
+		std::cerr << e.what() << std::endl;
 	}
 	return (0);
 }

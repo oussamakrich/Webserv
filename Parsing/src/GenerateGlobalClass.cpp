@@ -3,7 +3,7 @@
 
 
 void warning(std::string warn){
-	std::cout << YELLOW"WARNING : " << RESET << warn << std::endl;
+	std::cerr << YELLOW"WARNING : " << RESET << warn << std::endl;
 }
 
 bool	GenerateGlobalClass::checkHostAndPort(Server *server, std::vector<HOST_PORT> &vect){
@@ -37,6 +37,7 @@ bool checkservername(std::vector<Server *> &ser, Server *server){
 }
 
 Global *GenerateGlobalClass::generateGlobalClass(std::vector<TOKEN> tokens){
+
 	Global *global = new Global();
 	Server *server;
 	std::vector<HOST_PORT> portAndHost;

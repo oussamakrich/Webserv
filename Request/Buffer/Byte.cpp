@@ -9,7 +9,7 @@ char *strdup(const char *s, int size)
 	try {
 		d = new char[size];
 	} catch (std::exception &e) {
-		std::cout << e.what() << std::endl;
+		std::cerr << e.what() << std::endl;
 		return NULL;
 	}
 	if (d == NULL) return NULL;
@@ -23,7 +23,7 @@ char *strjoin(const char *lhs, const char *rhs, int lhs_size, int rhs_size)
 	try {
 		ret = new char[lhs_size + rhs_size];
 	} catch (std::exception &e) {
-		std::cout << e.what() << std::endl;
+		std::cerr << e.what() << std::endl;
 		return NULL;
 	}
 	if (lhs_size > 0)
@@ -39,7 +39,7 @@ char *nullTerminate(char *s, int size)
 	try {
 		ret = new char[size + 1];
 	} catch (std::exception &e) {
-		std::cout << e.what() << std::endl;
+		std::cerr << e.what() << std::endl;
 		return NULL;
 	}
 	if (size > 0)
@@ -102,7 +102,7 @@ char *Byte::substr(int start, int len) const
 	try {
 		ret = new char[len];
 	} catch (std::exception &e) {
-		std::cout << e.what() << std::endl;
+		std::cerr << e.what() << std::endl;
 		return NULL;
 	}
 	std::memmove(ret, _data + static_cast<size_t>(start), len);
@@ -117,7 +117,7 @@ char *Byte::substr(int start)
 	try {
 		ret = new char[_size - start];
 	} catch (std::exception &e) {
-		std::cout << e.what() << std::endl;
+		std::cerr << e.what() << std::endl;
 		return NULL;
 	}
 	std::memmove(ret, _data + start, _size - start);

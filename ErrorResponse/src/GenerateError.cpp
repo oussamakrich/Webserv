@@ -70,8 +70,7 @@ std::string	GenerateError::generateBody(int code, VECT_ERRORPIR errorPage){
 	std::ifstream file(page.c_str());
 	if (!file.is_open())
 	{
-		std::cout << page.c_str() << std::endl;
-		std::cerr << "Error: file couldn't open " << std::endl;
+		std::cerr << "Error: errorPage couldn't open " << std::endl;
 		return simpleBody(code);
 	}
 	std::string line;

@@ -133,30 +133,3 @@ bool Location::isCgiExtention(string file)	const
 }
 
 /*********************************< for Debug >*******************/
-	void Location::printLocation() {
-		std::cout << "Allowed_Method: ";
-		for (std::vector<std::string>::const_iterator it = Allowed_Method.begin(); it != Allowed_Method.end(); ++it) {
-			std::cout << *it << " ";
-		}
-		std::cout << std::endl;
-
-		std::cout << "Indexes: ";
-		for (std::vector<std::string>::const_iterator it = indexes.begin(); it != indexes.end(); ++it) {
-			std::cout << *it << " ";
-		}
-		std::cout << std::endl;
-
-		std::cout << "Error_Page: ";
-		for (std::vector<std::pair<int, std::string> >::const_iterator it = error_page.begin(); it != error_page.end(); ++it) {
-			std::cout << "[" << it->first << ", " << it->second << "] ";
-		}
-		std::cout << std::endl;
-
-		std::cout << "Root: " << root << std::endl;
-		std::cout << "Redirection_Text: " << redirection_text << std::endl;
-		std::cout << "Default_Type: " << default_type << std::endl;
-		std::cout << "Path: " << path << std::endl;
-		std::cout << "Redirection_Code: " << redirection_code << std::endl;
-		std::cout << "AutoIndex: " << (AutoIndex ? "true" : "false") << std::endl;
-		std::cout << "_isRedirection: " << (_isRedirection ? "true" : "false") << std::endl;
-	}

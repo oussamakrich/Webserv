@@ -81,7 +81,6 @@ void	GenerateLocation::ParsReturn(Location &lc, tk_iterator &tokens)
 	}
 	catch(const std::exception& e)
 	{
-		cout << tokens->second;
 		SyntaxError(e.what());
 	}
 

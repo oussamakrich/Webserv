@@ -32,8 +32,6 @@ class Global {
 	static long long time;
 
 
-		void  print();
-
 		Global();
 		~Global();
 };

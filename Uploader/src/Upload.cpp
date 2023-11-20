@@ -10,18 +10,17 @@
 
 Upload::Upload(Server &ser, Response &res):ser(ser), res(res)
 {
-	// try
-	// {
-		std::cout << "Uploading...\n";
+	try
+	{
 		Uploader();
-	// }
-	// catch(const std::exception& e)
-	// {
-	// 	unlink(res._source_file.c_str());
-	// 	res.setCode(500);
-	// 	res.stillSend = false;
-	// 	res.iHaveUpload = false;
-	// }
+	}
+	catch(const std::exception& e)
+	{
+		unlink(res._source_file.c_str());
+		res.setCode(500);
+		res.stillSend = false;
+		res.iHaveUpload = false;
+	}
 }
 
 /*	This function will extract the boundary and the path of the file from the request
@@ -89,7 +88,7 @@ void Upload::multipart()
 	_pos_of_end_boundary = res.byte.find((_end).c_str(), _end.size());
 	if (_pos_of_end_boundary == 0)
 	{
-		std::cout << RED"Success: " << RESET << "File uploaded successfully " << U_WHITE << res.location->getUploadPath() + "/" + res._file_uploading << RESET << std::endl;
+		std::cout << GREEN"Success: " << RESET << "File uploaded successfully " << U_WHITE << res.location->getUploadPath() + "/" + res._file_uploading << RESET << std::endl;
 		unlink(res._source_file.c_str());
 		res.setCode(201);
 		res.byte.clear();
@@ -106,7 +105,7 @@ void Upload::multipart()
 			_pos_of_end_boundary = res.byte.find((res._boundary + "--").c_str(), res._boundary.size() + 2);
 			if (_pos_of_end_boundary == 0)
 			{
-				std::cout << RED"Success: " << RESET << "File uploaded successfully " << U_WHITE << res.location->getUploadPath() + "/" + res._file_uploading << RESET << std::endl;
+				std::cout << GREEN"Success: " << RESET << "File uploaded successfully " << U_WHITE << res.location->getUploadPath() + "/" + res._file_uploading << RESET << std::endl;
 				res.setCode(201);
 				unlink(res._source_file.c_str());
 				file.close();
