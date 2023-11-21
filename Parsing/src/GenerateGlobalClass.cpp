@@ -1,10 +1,9 @@
 #include "../include/GenerateGlobalClass.hpp"
 #include "../include/GenerateServer.hpp"
-#include <sys/_types/_size_t.h>
 
 
 void warning(std::string warn){
-	std::cout << YELLOW"WARNING : " << RESET << warn << std::endl;
+	std::cerr << YELLOW"WARNING : " << RESET << warn << std::endl;
 }
 
 bool	GenerateGlobalClass::checkHostAndPort(Server *server, std::vector<HOST_PORT> &vect){
@@ -13,9 +12,6 @@ bool	GenerateGlobalClass::checkHostAndPort(Server *server, std::vector<HOST_PORT
 	pair.first = server->getPort();
 	pair.second = server->getHost();
 
-	std::stringstream ss;
-	ss << "Server Duplicate : "  << pair.first << " and "+ pair.second;
-
 	if (std::find(vect.begin(), vect.end(), pair) != vect.end()){
 		return false;
 	}
@@ -23,11 +19,7 @@ bool	GenerateGlobalClass::checkHostAndPort(Server *server, std::vector<HOST_PORT
 	return true;
 }
 
-//TODO : store listen && server_name for check repetition
-// add flag if listen repeated for not start the server
-
-
-void checkservername(std::vector<Server *> &ser, Server *server){
+bool checkservername(std::vector<Server *> &ser, Server *server){
 		int port = server->getPort();
 		std::string host = server->getHost();
 		std::string serverName = server->getServerName();
@@ -38,11 +30,14 @@ void checkservername(std::vector<Server *> &ser, Server *server){
 				warning("Server : " + server->getServerName() + " is repeated");
 			else
 				warning("Server : " + server->getHost() + ":" + convertCode(server->getPort()) + " is repeated");
+			return true;
 		}
 	}
+	return false;
 }
 
 Global *GenerateGlobalClass::generateGlobalClass(std::vector<TOKEN> tokens){
+
 	Global *global = new Global();
 	Server *server;
 	std::vector<HOST_PORT> portAndHost;
@@ -54,12 +49,12 @@ Global *GenerateGlobalClass::generateGlobalClass(std::vector<TOKEN> tokens){
 			server = GenerateServer::NewServer(++it);
 			if (!checkHostAndPort(server, portAndHost)){
 				server->listenRepeat = true;
-				checkservername(Global::servers, server);
+				if (checkservername(Global::servers, server)){
+					delete server;
+					continue;
+				}
 			}
-			if (server->ServerOff)
-				delete server;
-			else
-				global->addServer(server);
+			global->addServer(server);
 		}
 	}
 	return global;

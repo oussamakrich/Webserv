@@ -3,7 +3,7 @@
 #include "../../include/includes.hpp"
 #include "../../HttpElement/include/Cgi.hpp"
 #include "../../HttpElement/include/Location.hpp"
-#define R_READ 5000
+#define R_READ 50000
 #define VECT_STR std::vector<std::string>
 #define VECT_ERRORPIR std::vector<ERRPAGE_PAIR>
 
@@ -17,7 +17,7 @@ class Response{
 		std::string msg;
 		std::vector<std::string> headers;
 		char *buffer;
-		int bufferSize;
+		size_t bufferSize;
 
 
 	public:
@@ -33,6 +33,7 @@ class Response{
 
 	public:
 
+		bool redirection;
 		std::string HeaderAndStart;
 		bool iHaveUpload;// false
 		bool stillSend;// sttll send the reminder
@@ -43,7 +44,6 @@ class Response{
 		bool isCGI;
 		bool errrCgi;
 		t_cgiInfo cgiInfo;
-		bool		errorInSend;
 		std::string		multiDataFormPath;
 
 
@@ -80,7 +80,7 @@ class Response{
 		bool CgiRead(bool keepAlive);
 		void CgiHeaders(bool keepAlive, std::ifstream &file, size_t sizeOfFile);
 
-		void sendErrorResponse(int fd);
+		void sendErrorResponse(int fd, bool keepAlive);
 		void HandelLocation();
 
 

@@ -28,7 +28,8 @@
 #define BLUE "\033[0;34m"
 
 #define IS_METHOD_SUPORTED(method)((method == "GET" || method == "DELETE" || method == "POST" ))
-#define xout std::cout << __FILE__ << ":" << __LINE__ << ":> "
+
+
 typedef enum {
 	DIRECTIVE_SYNTAX_ERROR,
 	UNKNOWN_DIRECTIVE,
@@ -96,22 +97,14 @@ std::string trim(const std::string &s);
 std::string UrlDecode(std::string codedStr);
 std::string UrlEncode(std::string simpleStr);
 
-void Otrim(std::string &line);
 void error(std::string error);
-
-// Printers: this section will be removed its for debugging purposes only.
-void printTokens(std::vector<TOKEN> tokens);
-void printEnam(Token t);
 
 
 std::string convertCode(int code);
-// int isClientValid(int fd);
 
 int isFile(std::string path, size_t &size);
 
 void sigChange();
-void sigRestDefault();
-void sigHandler(int sig);
 
 std::vector<std::string> splitStream(const std::string& str);
 
@@ -119,3 +112,8 @@ void removeSlash(std::string &path);
 
 char *Responsejoin(const char *s1, char *s2, size_t size1, size_t size2);
 
+// long long getTime();
+
+void warning(std::string warn);
+
+int getMethodCode(std::string  method);

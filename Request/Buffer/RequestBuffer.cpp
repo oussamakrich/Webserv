@@ -3,6 +3,8 @@
 
 #include <sstream>
 #include <fstream>
+#include <sys/_types/_size_t.h>
+#include <unistd.h>
 
 std::string const&							RequestBuffer::getBody() const {return _body_path;};
 int											RequestBuffer::getBodySize() {return (_buffer.size());};
@@ -16,7 +18,7 @@ std::string	const &							RequestBuffer::getHeaders() const {return _headers;};
 void										RequestBuffer::setProtocol(std::string const &Protocol) {_protocol = Protocol;};
 void										RequestBuffer::setHeaders(std::string const &Headers) {_headers = Headers;};
 void										RequestBuffer::setMethod(std::string const &Method) {_method = Method;};
-void										RequestBuffer::setMaxBodySize(int MaxBodySize) {_maxBodySize = MaxBodySize;};
+void										RequestBuffer::setMaxBodySize(size_t MaxBodySize) {_maxBodySize = MaxBodySize;};
 void										RequestBuffer::setURI(std::string const &URI) {_uri = URI;};
 void										RequestBuffer::setBody(char *body, int size) {_body_path = std::string(body, size);};
 
@@ -33,10 +35,12 @@ void RequestBuffer::clear()
 	_boundary = "";
 	_body_level = -1;
 	_seek_pos = 0;
+	_increment = 0;
 }
 
-RequestBuffer::RequestBuffer(int MaxBodySize)
+RequestBuffer::RequestBuffer(size_t MaxBodySize)
 {
+	_increment = 0;
 	_maxBodySize = MaxBodySize;
 	_level = 0;
 	_contentLength = -1;
@@ -72,7 +76,8 @@ int RequestBuffer::_first_line_handler()
 	if (_pos != 2)						return 400;
 	std::stringstream ss(first_line);
 	ss >> _method >> _uri >> _protocol; // insert first line.
-	if (!IS_METHOD_SUPORTED(_method))	return 501; // not implemented.
+	if (getMethodCode(_method) == Request::NOT_SUPPORTED)	return 501; // not implemented.
+	if (getMethodCode(_method) == Request::INVALID_REQUEST)	return 400; // not implemented.
 	// if the protocol is not HTTP/1.1, return 505: HTTP version not supported.
 	if (_protocol != "HTTP/1.1")		return 505;
 	// URI too long.
@@ -91,6 +96,7 @@ int RequestBuffer::_headers_handler()
 {
 	int increment = 0;
 	if (_buffer.size() == 0)				return 0; // This mean that the buffer is empty.
+
 	int _pos  = _buffer.find("\r\n", 2);
 	increment = 2;
 	if (_pos == -1)
@@ -183,7 +189,8 @@ int	RequestBuffer::_get_body_level()
 		std::string _tmp = _headers.substr(_pos, _headers.find("\n", _pos) - _pos);
 		std::stringstream ss(_tmp);
 		ss >> _contentLength;
-		if (_contentLength > _maxBodySize* 100) return 413;
+		if (static_cast<size_t>(_contentLength) > _maxBodySize) return (_status = 413, _status);
+		if (_contentLength == 0) return (_status = 1, _status);
 		return 1;
 	}
 	return (-1);
@@ -195,14 +202,10 @@ int RequestBuffer::_content_length_handler()
 	if (_body_path.size() == 0)	{_body_path = Cgi::getRandomName("/tmp/", "omm");}
 	std::ofstream _file(_body_path, std::ios::out | std::ios::binary | std::ios::app);
 	if (_file.is_open() == false)
-	{
-		std::cout << RED"Inernal server error: " << "failed to create a tmp file." << _body_path << std::endl;
 		return (_status = 507, _status);
-	}
 	if ((_buffer.size()) >= static_cast<unsigned long>(_contentLength))
 	{
 		_file.write(_buffer.getData(), _contentLength);
-		_file.close();
 		_buffer.resize(_contentLength);
 		_contentLength = 0;
 		return (_status = 1, _status);
@@ -212,60 +215,33 @@ int RequestBuffer::_content_length_handler()
 		_file.write(_buffer.getData(), _buffer.size());
 		_contentLength -= _buffer.size();
 		_buffer.resize(_buffer.size());
-		_file.close();
 	}
+	_file.close();
 	return 0;
 }
 
-
-std::string RequestBuffer::_generate_tmp_file_path()
-{
-	std::string _path;
-	struct stat info;
-	int i = 0;
-
-	if (!(stat("tmp", &info) == 0 && S_ISDIR(info.st_mode)))
-	{
-		if (mkdir("tmp", 0777) == -1)
-		{
-			std::cout << RED"Inernal server error: " << "failed to create a tmp directory." << std::endl;
-			return "";
-		}
-	}
-	while (true)
-	{
-		_path = "./tmp/file_";
-		std::stringstream ss;
-		ss << i++;
-		_path += ss.str();
-		if (access(_path.c_str(), F_OK) != 0)
-		{
-				break;
-		}
-	}
-	return _path;
-}
-
-
 int	RequestBuffer::_chunked_handler()
 {
-	int increment;
 	if (_buffer.size() == 0)				return 0; // This mean that the buffer is empty.
+	if (_maxBodySize <= 0)					return (unlink(_body_path.c_str()), _status = 413, _status);
 	if (_chunkSize == -1)
 	{
 		int _pos = _buffer.find("\r\n", 2);
-		increment = 2;
+		_increment = 2;
 		if (_pos == -1)
 		{
 			_pos = _buffer.find("\n", 1);
-			increment = 1;
+			_increment = 1;
 			if (_pos == -1)						return 0; // This mean that the buffer does not contain a full line. so we return.
 		}
 		char *_tmp = nullTerminate(_buffer.substr(0, _pos), _pos);
 		std::stringstream ss(_tmp);
 		ss >> std::hex >> _chunkSize;
 		if (_tmp != NULL) delete [] _tmp;
-		_buffer.resize(_pos + increment);
+		_buffer.resize(_pos + _increment);
+		if ((_pos + _increment > _maxBodySize))
+			return (_maxBodySize = 0, unlink(_body_path.c_str()), _status = 413, _status);
+		_maxBodySize -= _pos + _increment;
 	}
 	if (_chunkSize == 0)	return (_status = 1, _status);
 	else
@@ -274,14 +250,13 @@ int	RequestBuffer::_chunked_handler()
 		std::ofstream _file(_body_path, std::ios::out | std::ios::binary | std::ios::app);
 		if (_file.is_open() == false)
 		{
-			std::cout << RED"Inernal server error: " << "failed to create a tmp file." << _body_path << std::endl;
 			return (_status = 507, _status);
 		}
 		if (static_cast<int>(_buffer.size()) >= _chunkSize)
 		{
 			_file.write(_buffer.getData(), _chunkSize);
 			_file.close();
-			_buffer.resize(_chunkSize + increment);
+			_buffer.resize(_chunkSize + _increment);
 			_chunkSize = -1;
 		}
 		else
@@ -301,19 +276,17 @@ int RequestBuffer::_multipart_handler()
 {
 	int _pos;
 	if (_body_path.size() == 0)
-	{
-		_body_path = Cgi::getRandomName("/tmp/", "omm");
-	}
+		_body_path = Cgi::getRandomName("/tmp/", "_file");
+	if (_maxBodySize <= 0)
+		return (unlink(_body_path.c_str()), _status = 413, _status);
 	std::ofstream _file(_body_path, std::ios::out | std::ios::binary |
 	std::ios::app);
 	if (_file.is_open() == false)
-	{
-		std::cout << RED"Inernal server error: " << "failed to create a tmp file." <<
-	_body_path << std::endl;
 		return (_status = 507, _status);
-	}
 	std::string _line;
 	std::ifstream _file2(_body_path, std::ios::in | std::ios::binary);
+	if (_file2.is_open() == false)
+		return (_status = 507, _file.close(), _status);
 	_file2.seekg(_seek_pos);
 	while (std::getline(_file2, _line))
 	{
@@ -321,7 +294,8 @@ int RequestBuffer::_multipart_handler()
 		{
 			_file.close();
 			_file2.close();
-			_buffer.resize(_buffer.size());
+			delete [] _buffer._data;
+			_buffer._size = 0;
 			return (_status = 1, _status);
 		}
 	}
@@ -329,16 +303,26 @@ int RequestBuffer::_multipart_handler()
 	if ((_pos = _buffer.find((_boundary + "--").c_str(), (_boundary.size() + 2)))
 	== -1)
 	{
+		if (_buffer.size() > _maxBodySize)
+		{
+			_file.close();
+			_file2.close();
+			return (unlink(_body_path.c_str()), _status = 413, _status);
+		}
+		_maxBodySize -= _buffer.size();
 		_file.write(_buffer.getData(), _buffer.size());
 		_buffer.resize(_buffer.size());
 		_file.close();
+		_file2.close();
 		return (0);
 	}
 	else
 	{
 		_file.write(_buffer.getData(), _pos + (_boundary.size() + 2));
 		_file.close();
-		_buffer.resize(_pos + (_boundary.size() + 2));
+		_file2.close();
+		delete []_buffer._data;
+		_buffer._size = 0;
 		return (_status = 1, _status);
 	}
 	return (0);
@@ -352,8 +336,7 @@ int RequestBuffer::_body_handler()
 		return 1; // This mean that the request does not have a body. so we return.
 	else if (_body_level > 3)
 		return _body_level; // This mean that the body type is not supported.
-	if (_buffer.size() == 0)				return 0; // This mean that the buffer is empty.
-
+	if (_buffer.size() == 0)				return _status; // This mean that the buffer is empty.
 	switch (_body_level)
 	{
 		case 1:
@@ -373,9 +356,7 @@ int RequestBuffer::_body_handler()
 
 int	RequestBuffer::insertBuffer(const char *buffer, int size)
 {
-	// std::cout << buffer << " " << size<< std::endl;
 	_buffer = _buffer + Byte(buffer, size);
-
 	switch (_level)
 	{
 		case 0: _status = _first_line_handler(); break;

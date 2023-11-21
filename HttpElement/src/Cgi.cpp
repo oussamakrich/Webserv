@@ -33,8 +33,8 @@ t_cgiInfo  Cgi::Run(Request &req, std::string  &bin, std::string &path)
 		return Cgi::INTERNAL_ERROR;
 	}
 
-	info.output = getRandomName("/tmp/", "-cgi-output"); //TODO: select root , default rot is /tmp
-	info.input  = req.getBody(); //TODO: select root , default rot is /tmp
+	info.output = getRandomName("/tmp/", "-cgi-output");
+	info.input  = req.getBody();
 	info.code  	= 0;
 	info.time	=  time(NULL);
 	info.pid =  fork();
@@ -42,7 +42,7 @@ t_cgiInfo  Cgi::Run(Request &req, std::string  &bin, std::string &path)
 	{
 		deleteDP(env  , INT_MAX);
 		deleteDP(args , INT_MAX);
-		std::cout << "Fork FAIL : ";
+		std::cerr << "Fork FAIL : ";
 		return Cgi::INTERNAL_ERROR;
 	}
 	else if (info.pid == 0)
@@ -110,7 +110,7 @@ void Cgi::cgiProcess(t_cgiInfo &info, Request &req, char **env,  char **args)
 	catch(const std::exception& e)
 	{
 		std::cerr << e.what() << '\n';
-			perror("erro : ");
+			perror("CgiProcess");
 		exit(-1);
 	}
 	exit(-1);
@@ -145,7 +145,7 @@ bool Cgi::makeStaticVariable(char **env, Request &req, string &path)
 		}
 	catch(std::exception &ex)
 	{
-		std::cout << ex.what() << std::endl;
+		std::cerr << ex.what() << std::endl;
 		return false;
 	}
 	return true;
@@ -188,7 +188,7 @@ char **Cgi::makeEnv(Request &req,std::string &path)
 		string tmp;
 		env = new(std::nothrow) char *[size];
 		if (env == NULL) return NULL;
-		map<string, string> header = req.getHeaders(); // TODO: use refernce ??
+		map<string, string> header = req.getHeaders();
 		map<string, string>::iterator it = header.begin();
 		pos = STATIC_VAR_NUM;
 		if (makeStaticVariable(env, req, path) == false)
@@ -228,7 +228,7 @@ char **Cgi::MakeArgs(string &bin, string &path)
 	}
 	catch(std::exception &ex)
 	{
-		 std::cout << ex.what();
+		 std::cerr << ex.what();
 		return NULL;
 	}
 

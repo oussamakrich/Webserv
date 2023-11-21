@@ -5,7 +5,7 @@
 #define																		TOKEN_OUT std::vector<TOKEN>
 #define																		TOKEN_STRUCTS std::vector<t_tokens>
 #define																		TOKEN_ITERATOR std::vector<t_tokens>::iterator
-#define SYNTAX_ERROR														"\033[0;31mSyntax Error: \033[0mline \033[4;37mconfig.conf:"
+#define SYNTAX_ERROR														"\033[0;31mSyntax Error: \033[0mline \033[4;37m"
 
 class Tokenizer {
 	private:
@@ -13,6 +13,7 @@ class Tokenizer {
 		static std::map<std::string, Token> SpecialWords;
 		static std::stack<Token> curlyBrackets;
 		static int serverFound;
+		static std::string fileName;
 	private:
 		Tokenizer();
 		static void QuotesHandler(std::string &line, int lineNumber, unsigned int &i, TOKEN_STRUCTS &tokens, char quote);
@@ -28,7 +29,7 @@ class Tokenizer {
 		static void validateTokens(TOKEN_STRUCTS &tokens);
 		static void generateTokenMap(void);
 	public:
-		static TOKEN_OUT tokenGenerator(std::ifstream &file);
+		static TOKEN_OUT tokenGenerator(std::ifstream &file, std::string filename);
 		~Tokenizer();
 };
 

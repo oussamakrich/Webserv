@@ -14,7 +14,7 @@ class GenerateServer{
 		static void fillLocation(Server &srv, TOKEN_IT &it);
 		static void SetSingleValue(Server &srv, TOKEN_IT &it);
 		static void SetMultiValue(Server &srv, TOKEN_IT &it);
-		static void SetInt(Server &srv, TOKEN_IT &it);
+		static void SetBodySize(Server &srv, TOKEN_IT &it);
 		static void SetTypes(Server &srv, TOKEN_IT &it);
 		static void SetErrorPages(Server &srv, TOKEN_IT &it);
 		static int parseErrorPage(std::vector<int> &check, std::string codeValue);

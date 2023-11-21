@@ -24,7 +24,7 @@ std::string	GenerateError::generateMsg(int code){
 	if (code == 410) return "Gone";
 	if (code == 411) return "Length Required";
 	if (code == 412) return "Precondition Failed";
-	if (code == 413) return "Payload Too Large";
+	if (code == 413) return "Content Too Large";
 	if (code == 414) return "URI Too Long";
 	if (code == 415) return "Unsupported Media Type";
 	if (code == 416) return "Range Not Satisfiable";
@@ -35,8 +35,8 @@ std::string	GenerateError::generateMsg(int code){
 	if (code == 503) return "Service Unavailable";
 	if (code == 504) return "Gateway Timeout";
 	if (code == 505) return "HTTP Version Not Supported";
-	if (code == 507) return "Insufficient Storage"; 
-	else return "error";
+	if (code == 507) return "Insufficient Storage";
+	else return "Undefined Error";
 }
 
 std::string findPage(VECT_ERRORPIR errorPage, int code){
@@ -70,8 +70,7 @@ std::string	GenerateError::generateBody(int code, VECT_ERRORPIR errorPage){
 	std::ifstream file(page.c_str());
 	if (!file.is_open())
 	{
-		std::cout << page.c_str() << std::endl;
-		std::cerr << "Error: file couldn't open " << std::endl;
+		std::cerr << "Error: errorPage couldn't open " << std::endl;
 		return simpleBody(code);
 	}
 	std::string line;

@@ -9,25 +9,6 @@
 #include "../include/GenerateLocation.hpp"
 #include "../../HttpElement/include/Location.hpp"
 
-#define ERR_MET_NOT_SUPR 	"Method not suported"
-#define ERR_INVALID_RANGE 	"Exception : Invalid Range ! end must be big than start\n"
-#define ERR_MET_REPEAT 		"Method Repeated !"
-#define ERR_LOCATION 		"Location messing path or open curly bracket }"
-#define ERR_HTTP_INV_RANGE 	"invalid http code number"
-#define ERR_MESS_SEMICOLON	"messing semicolon [ ; ]"
-#define ERR_OUT_OF_MEM      "Fatal Error : out of memory"
-#define ERR_SYN_RETURN 		"return directive"
-#define ERR_ERR_PAGE        "error_page  directive"
-#define ERR_ERR_PAGE_MULT   "error_page  \"multi page of code\""
-#define ERR_REPEAT_VAL        "Repeat value"
-#define ERR_AUTOINDEX_VAL 	"AutoIndex accept on/off value"
-#define ERR_UPLOAD_ON_VAL 	"Upload  accept on/off value"
-#define ERR_DOWNLOAD_ON_VAL "Dowload accept on/off value"
-#define ERR_DIRECTIVE    	"Directive must be followed by value(s)"
-#define ERR_CGI_DIRECTIVE "Loaction::cgi , \n hint : cgi php-cgi .php\n"
-#define ERR_CGI_EXTENSION "CGI extension must be start with '.'\n example .php .py ... "
-#define ERR_RETURN_POS	"Return : use in location  :\n\nloction /path {\n		return code text;\n}"
-
 
 
 Location *GenerateLocation::generateLocation(std::vector<TOKEN>::iterator &tokens)
@@ -66,6 +47,7 @@ Location *GenerateLocation::generateLocation(std::vector<TOKEN>::iterator &token
 		if (tokens->first != SEMICOLON)   throw std::runtime_error(ERR_MESS_SEMICOLON);
 		tokens++;
 	}// end while
+		lc->final();
 		return lc;
 } // end GenerateLocation
 
@@ -99,7 +81,6 @@ void	GenerateLocation::ParsReturn(Location &lc, tk_iterator &tokens)
 	}
 	catch(const std::exception& e)
 	{
-		cout << tokens->second;
 		SyntaxError(e.what());
 	}
 

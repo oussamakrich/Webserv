@@ -1,4 +1,4 @@
-NAME = webserver
+NAME = webserv
 
 SRC =	./Request/Buffer/RequestBuffer.cpp\
 		./Parsing/src/Tokenizer.cpp\
@@ -19,8 +19,6 @@ SRC =	./Request/Buffer/RequestBuffer.cpp\
 		./Response/src/AllMethod.cpp\
 		./HttpElement/src/Location.cpp\
 		./Parsing/src/GenerateLocation.cpp\
-		./Utils/src/Logger.cpp\
-		./Utils/src/printTokens.cpp\
 		./Utils/src/trim.cpp\
 		./Utils/src/DirListing.cpp\
 		./Parsing/src/ParsRequest.cpp\
@@ -45,7 +43,6 @@ HEADER =	./HttpElement/include/Client.hpp \
 			./HttpElement/include/Location.hpp \
 			./Parsing/include/GenerateLocation.hpp \
 			./Parsing/include/Tokenizer.hpp \
-			./Utils/include/Logger.hpp\
 			./Utils/include/DirListing.hpp\
 			./Parsing/include/ParsRequest.hpp\
 			./Request/Buffer/RequestBuffer.hpp\
@@ -55,24 +52,28 @@ HEADER =	./HttpElement/include/Client.hpp \
 			./Uploader/include/Upload.hpp \
 
 
-
 OBJ = $(SRC:.cpp=.o)
 
-FLAGS = -g -fsanitize=address  -Wall -Wextra -Werror -std=c++98
+CURRENT_DIR = $(shell pwd)
+CONFIG = $(CURRENT_DIR)"/default.conf"
 
-all:  $(NAME)
+FLAGS = -Wall -Wextra -Werror -std=c++98 -g
+
+
+all:$(NAME)
 
 $(NAME): $(OBJ) $(HEADER)
-			c++ $(FLAGS) $(OBJ) -o $(NAME)
-			@mkdir -p tmp
+		@echo "server { listen localhost:8080;  server_name localhost;  root $(CURRENT_DIR)/hustler;  location / { allowed_methods GET;  autoindex on;  root $(CURRENT_DIR)/hustler;}  }" > $(CONFIG)
+		c++ $(FLAGS) $(OBJ) -o $(NAME)
+
 %.o: %.cpp $(HEADER)
-			c++ $(FLAGS) -c $< -o $@
+			c++ $(FLAGS) -c $< -o $@ -DCONFIG_PATH=\"$(CONFIG)\"
 
 clean c:
 			rm -rf $(OBJ)
 
 fclean f: clean
-			rm -rf $(NAME) ./tmp
+			rm -rf $(NAME)
 
 re: fclean all
 

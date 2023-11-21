@@ -1,4 +1,5 @@
 #include "../include/ErrorResponse.hpp"
+#include <string>
 
 void ErrorResponse::setErrorCode(int code)	{errorCode = code;}
 
@@ -21,14 +22,17 @@ std::string convertCode(int code){
 	return codeStr;
 }
 
-std::string ErrorResponse::getErrorPage(){
+std::string ErrorResponse::getErrorPage(bool KeepAlive){
 	errorCodeStr = convertCode(errorCode);	
+	std::string connection = "Connection: Close\r\n";
+	if (KeepAlive)
+		connection = "Connection: keep-alive\r\nKeep-Alive: timeout=" + convertCode(TIME_OUT) + "\r\n";
 
 	errorPage = "HTTP/1.1 " + errorCodeStr + " " + errorMsg + "\r\n";
 	errorPage += "Server: webserver\r\n";
 	errorPage += "Content-Type: text/html\r\n";
 	errorPage += "Content-Length: " + convertCode(errorBody.length()) + "\r\n";
-	errorPage += "Connection: Close\r\n\r\n";
+	errorPage += connection + "\r\n";
 	errorPage += errorBody;
 	return 	errorPage;
 }
