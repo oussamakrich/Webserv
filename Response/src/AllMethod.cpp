@@ -279,6 +279,10 @@ void ResponseHandler::ResponseHandlere(Server &ser, Request &req, Response &res)
 	}
 	else
 	{
+		if (req.getMethod() == "POST" || req.getMethod() == "DELETE"){
+			res.setCode(405);
+			return ;
+		}
 		isLoacation = false;
 		autoindex = ser.getAutoIndex();
 		root = ser.getRoot();
