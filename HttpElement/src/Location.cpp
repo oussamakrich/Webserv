@@ -1,5 +1,6 @@
 
 #include "../include/Location.hpp"
+#include "../../Parsing/include/ParsRequest.hpp"
 using namespace std;
 
 /*********************************< helper >*******************/
@@ -16,21 +17,37 @@ Location::Location(string path): path(path)
 	this->redirection_text = "ok";
 	this->AutoIndex = false;
 	this->upload = false;
+	this->_isRedirection = false; // add 
 	this->isDown = false;
 	this->upload_path = "";
+	this->_isRedirection = false;
 }
 Location::~Location(){}
 void Location::final()
 {
 	if (this->default_type.empty())
 		this->default_type = "application/octet-stream";
+	if (this->upload  == true && this->upload_path.empty())
+		SyntaxError(ERR_UPLOAD_PATH);
+	if (this->root.empty())
+		SyntaxError(ERR_ROOT_REQUIRE);
+
+
 	Allowed_Method.shrink_to_fit();
 	indexes.shrink_to_fit();
 	error_page.shrink_to_fit();
 }
 /*********************************< adder >*******************/
 
-bool	Location::AddErrorPage(const string &page, int code) 		{	return Add(error_page, std::make_pair(code, page)); }
+bool	Location::AddErrorPage(const string &page, int code) 		
+{
+	for(size_t i = 0; i < this->error_page.size(); i++)
+		if (this->error_page[i].first == code)
+			return false;
+		error_page.push_back(std::make_pair(code, page));
+				return true;
+}
+
 bool    Location::AddHttpMethod(const string &method)				{	return Add(Allowed_Method, method);   }
 bool    Location::AddIndex(const string &index)   					{	return Add(indexes, index);    }
 bool 	Location::AddCGI(string bin, string ex)
@@ -54,7 +71,7 @@ void	Location::setPath(string &path)                        {   this->path = pat
 void	Location::setUploadOn(bool b)						   {   this->upload = b;                                      	}
 void	Location::setUploadPath(const string	&upload_path)	{	this->upload_path = upload_path;						}
 void 	Location::setDownload(bool b) 							{	 this->isDown = b;										}
-	
+
 
 /*********************************< getter >*******************/
 
@@ -105,7 +122,7 @@ bool  Location::isMatch(string uri)    const
 	return uri.at(this->path.size()) == '/' ;
 }
 bool Location::isUploadOn()					const          { return upload; }
-bool Location::isDownloadEnable()			const			{ return  isDown; }  
+bool Location::isDownloadEnable()			const			{ return  isDown; }
 bool Location::isCgiExtention(string file)	const
 {
 	size_t pos = file.find(".");
@@ -116,30 +133,3 @@ bool Location::isCgiExtention(string file)	const
 }
 
 /*********************************< for Debug >*******************/
-	void Location::printLocation() {
-		std::cout << "Allowed_Method: ";
-		for (std::vector<std::string>::const_iterator it = Allowed_Method.begin(); it != Allowed_Method.end(); ++it) {
-			std::cout << *it << " ";
-		}
-		std::cout << std::endl;
-
-		std::cout << "Indexes: ";
-		for (std::vector<std::string>::const_iterator it = indexes.begin(); it != indexes.end(); ++it) {
-			std::cout << *it << " ";
-		}
-		std::cout << std::endl;
-
-		std::cout << "Error_Page: ";
-		for (std::vector<std::pair<int, std::string> >::const_iterator it = error_page.begin(); it != error_page.end(); ++it) {
-			std::cout << "[" << it->first << ", " << it->second << "] ";
-		}
-		std::cout << std::endl;
-
-		std::cout << "Root: " << root << std::endl;
-		std::cout << "Redirection_Text: " << redirection_text << std::endl;
-		std::cout << "Default_Type: " << default_type << std::endl;
-		std::cout << "Path: " << path << std::endl;
-		std::cout << "Redirection_Code: " << redirection_code << std::endl;
-		std::cout << "AutoIndex: " << (AutoIndex ? "true" : "false") << std::endl;
-		std::cout << "_isRedirection: " << (_isRedirection ? "true" : "false") << std::endl;
-	}

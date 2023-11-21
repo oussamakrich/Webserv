@@ -1,5 +1,4 @@
 #include "../../include/includes.hpp"
-#include <ios>
 
 std::string hexToChar(std::string hex){
     int i;
@@ -16,7 +15,7 @@ std::string hexToChar(std::string hex){
 }
 
 std::string UrlDecode(std::string codedStr){
-    std::string uncodedStr; 
+    std::string uncodedStr;
 
     for(unsigned int i=0;i< codedStr.size(); i++){
         if(codedStr[i] == '%'){
@@ -44,9 +43,9 @@ std::string UrlEncode(std::string simpleStr)
     std::string codedStr;
     std::string unreserved = "-_.~";
     for (unsigned int i=0;i< simpleStr.size(); i++){
-        if (isalnum(simpleStr[i]) || unreserved.find(simpleStr[i]) != unreserved.npos) 
+        if (isalnum(simpleStr[i]) || unreserved.find(simpleStr[i]) != unreserved.npos)
             codedStr += simpleStr[i];
-        else 
+        else
             codedStr += "%" + CharToHex(simpleStr[i]);
     }
 
@@ -61,7 +60,11 @@ char *Responsejoin(const char *s1, char *s2, size_t size1, size_t size2)
 
 	i = 0;
 	j = 0;
-	tmp = new char[size1 + size2 + 1];
+	tmp = new(std::nothrow) char[size1 + size2 + 1];
+	if (!tmp){
+	    delete[] s2;
+	    return NULL;
+	 }
 	while (i < size1)
 	{
 		tmp[i] = s1[i];
@@ -72,7 +75,12 @@ char *Responsejoin(const char *s1, char *s2, size_t size1, size_t size2)
 		tmp[i + j] = s2[j];
 		j++;
 	}
-	if (size2 > 0)
-		delete[] s2;
+	delete[] s2;
 	return (tmp);
 }
+
+// long long getTime(){
+// 	timeval tm;
+// 	gettimeofday(&tm, NULL);
+// 	return tm.tv_sec * 1000000 + tm.tv_usec;
+// }

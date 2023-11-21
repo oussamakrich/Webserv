@@ -3,6 +3,7 @@
 #include "../../include/includes.hpp"
 #include "../../Parsing/include/ParsRequest.hpp"
 #include "../../Response/include/Response.hpp"
+#include <iterator>
 
 
 #define ITT_CLIENT	std::vector<Client*>::iterator
@@ -13,15 +14,15 @@ class Server;
 class Client{
 
 	public :
-		Client(int bodySize, int fd);
+		Client(size_t bodySize, int fd);
 		~Client();
 		int					fd;
+		std::string			id;
+		long long				time;
 
 	private:
 		std::time_t			lastTime;
-		int							status;
 		std::string			address;
-		sockaddr			sockaddr;
 
 	public:
 		RequestBuffer reqBuff;
@@ -39,19 +40,17 @@ class Client{
 		std::time_t	getLastTime();
 
 		bool NewRequest(Server &ser);
-		bool OldRequest(ITT_CLIENT it, Server &ser);
-		bool CgiRequest(ITT_CLIENT it, Server &ser);
+		bool OldRequest();
+		bool CgiRequest();
 
 		void ClientUpload(Server &ser);
 		void Error();
 
 	public: //Geters
 		int getFd();
-		struct sockaddr &getAddr();
-		void setAddr(struct sockaddr &addr);
 		void setLastTime(std::time_t tm);
 		void switchEvent(int fd, int Flag);
-
-
+		void resetClient();
+		void clearClient();
 
 };

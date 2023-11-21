@@ -2,7 +2,8 @@
 #include "../include/AllMethod.hpp"
 #include "../../Utils/include/DirListing.hpp"
 #include "../../Uploader/include/Upload.hpp"
-#include <cstdlib>
+#include "../../Utils/include/Logger.hpp"
+#include "../../HttpElement/include/Global.hpp"
 
 ResponseHandler::ResponseHandler(Server &ser, Request &req, Response &res) : ser(ser), req(req), res(res)
 {
@@ -59,7 +60,7 @@ void ResponseHandler::serveDirectory(){
 	size_t size;
 	int type;
 
-	if (req.getMethod() == "DELETE") {//NOTE : req is DELETE
+	if (req.getMethod() == "DELETE") {
 		res.setCode(403);
 		return;
 	}
@@ -72,7 +73,7 @@ void ResponseHandler::serveDirectory(){
 			return;
 		}
 	}
-	if (autoindex){ //TODO : List Dir if auto index on
+	if (autoindex){
 		std::string output;
 		if (DirListing::getDirlistigHtml(res.path, output, req.getPath())){
 			char *buffer = new char[output.size()];
@@ -82,13 +83,10 @@ void ResponseHandler::serveDirectory(){
 			res.setHeadr("Content-Length: " + convertCode(output.size()));
 			res.setHeadr("Content-Type: text/html");
 			res.setCode(200);
+			return;
 		}
-		else
-			res.setCode(403);
 	}
-	else{
-		res.setCode(403);
-	}
+	res.setCode(403);
 }
 
 
@@ -102,7 +100,7 @@ bool ResponseHandler::checkCGI(std::string path){
 
 void ResponseHandler::handelCGI(){
 
-	if (req.getMethod() == "DELETE") {//NOTE : req is DELETE  && iscgi == Not Implemented
+	if (req.getMethod() == "DELETE") {
 		res.setCode(501);
 		return;
 	}
@@ -123,9 +121,9 @@ void ResponseHandler::serveFile(std::string path, size_t size){
 		handelCGI();
 		return;
 	}
-	if (req.getMethod() == "DELETE") {//NOTE : req is DELETE
+	if (req.getMethod() == "DELETE") {
 		if (unlink(path.c_str()) == 0)
-			res.setCode(200);//NOTE : No Content???
+			res.setCode(200);
 		else
 			res.setCode(500); //NOTE : check permission
 		return;
@@ -133,16 +131,15 @@ void ResponseHandler::serveFile(std::string path, size_t size){
 	std::ifstream file(path.c_str());
 
 	if (!file.is_open()){
-		res.setCode(500);
+		res.setCode(403);
 		return;
 	}
 	char *buffer = new char[R_READ];
+	std::memset(buffer, 0, R_READ);
 	file.read(buffer, R_READ);
 	res.setBuffer(buffer, file.gcount());
 	res.pos = file.gcount();
-	res.stillSend = true;
-	if (file.eof())
-		res.stillSend = false;
+	res.stillSend = !file.eof();
 	file.close();
 	res.setHeadr("Content-Length: " + convertCode(size));
 	res.setHeadr("Content-Type: " + findMimeType(path, ser));
@@ -232,9 +229,9 @@ void ResponseHandler::simpleGet(){
 	}
 	if (type == FILE)
 		serveFile(res.path, size);
-	else if (type == DIRECTORY) //TODO :  try index.html || check auto index
+	else if (type == DIRECTORY)
 		serveDirectory();
-	else if (type == NOT_FOUND) //TODO : Generate 404
+	else if (type == NOT_FOUND)
 		res.setCode(404);
 
 }
@@ -242,10 +239,10 @@ void ResponseHandler::simpleGet(){
 bool ResponseHandler::checkRedirection(){
 	char *buffer;
 	if (location->isRedirection()){
+		res.redirection = true;
 		res.setCode(location->getRedirectionCode());
-		if (res.getCode() >= 300 && res.getCode() < 400){
+		if (res.getCode() >= 300 && res.getCode() < 400)
 			res.setHeadr("Location: " + location->getRedirectionText());
-		}
 		else {
 			res.setHeadr("Content-Length: " + convertCode(location->getRedirectionText().size()));
 			res.setHeadr("Content-Type: text/html");
@@ -261,7 +258,7 @@ bool ResponseHandler::checkRedirection(){
 void ResponseHandler::ResponseHandlere(Server &ser, Request &req, Response &res)
 {
 	LOCATION_ITT it;
-
+	res.redirection = false;
 	if (isLocation(it)) {
 		isLoacation = true;
 		location = it->second;

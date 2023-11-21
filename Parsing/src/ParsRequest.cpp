@@ -18,7 +18,6 @@ Request *ParsRequest::Pars(RequestBuffer &reqBuff)
 		{
 			if (ParsHeaders(*req, header_vect[i]) == false)
 			{
-				// std::cout << header_vect[i] << std::endl;K
 				req->setType(Request::INVALID_REQUEST);
 				break;
 			}
@@ -30,7 +29,6 @@ Request *ParsRequest::Pars(RequestBuffer &reqBuff)
 	{
 		req->setType(Request::INVALID_REQUEST);
 		req->setErrorCode(500);
-		//TODO: ADD SERVER LOG
 		return req;
 	}
 
@@ -53,7 +51,6 @@ Request *ParsRequest::Pars(RequestBuffer &reqBuff)
 	catch(const std::exception& e)
 	{
 		std::cerr << e.what() << '\n';
-		//TODO: LOG HERRE
 	}
 
 
@@ -74,7 +71,6 @@ bool  ParsRequest::isValidKey(std::string key)
 	{
 
 		return false;
-		//TODO: LOG HERE
 	}
 }
 
@@ -117,7 +113,6 @@ bool  ParsRequest::isValidKey(std::string key)
 		catch(std::exception &ex)
 		{
 				return false;
-			//TODO: LOG HERE
 		}
 
 	return true;

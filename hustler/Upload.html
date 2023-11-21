@@ -1,0 +1,97 @@
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <link rel="stylesheet" href="style.css"/>
+    <style>
+        h2 {
+            margin: 20px;
+            color: #fff;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        label {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #3498db;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #2ecc71;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #27ae60;
+        }
+    </style>
+</head>
+ <h1> Hustler Server </h1>
+ <nav  class="navbar">
+    <ul>
+    <li><a href="index.html">  Home </a>    </li>
+    <li><a href="Upload.html" class = "select_menu"> Upload</a>  </li>
+    <li><a href="Python-Cgi.py" > Python Cgi </a>  </li>
+    <li><a href="Session.php"> Session</a>  </li>
+    <li><a href="phpCgi.php"> php Cgi  </a> </li>
+</ul>
+</nav>
+<body>
+
+    <h2 class="title">upload Page</h2>
+
+    <label for="fileInput">Choose a file</label>
+     <input type="file" id="fileInput" style="display:none;">
+     <button onclick="uploadFile()">Upload File</button>
+
+     <script>
+         function uploadFile() {
+             const fileInput = document.getElementById('fileInput');
+             const file = fileInput.files[0];
+
+             if (file) {
+                 const formData = new FormData();
+                 formData.append('file', file);
+
+                 fetch('/upload', {
+                     method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('File uploaded successfully');
+        })
+        .catch(error => {
+            console.error('Error uploading file');
+        });
+    } else {
+        console.error('No file selected');
+    }
+}
+</script>
+
+</body>
+ <footer>
+    Http Hustler Web Server &copy 2023 - 1337
+ </footer>
+
+
+</html>
+

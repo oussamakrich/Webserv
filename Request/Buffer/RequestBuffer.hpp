@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <sys/_types/_size_t.h>
 #include <unistd.h>
 
 #include "Byte.hpp"
@@ -11,7 +12,6 @@
 
 
 #define ALLOWED_CHARS "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?#[]@!$&'()*+,;=%"
-
 #define IS_METHOD_SUPORTED(method)((method == "GET" || method == "DELETE" || method == "POST" ))
 
 class RequestBuffer
@@ -24,14 +24,13 @@ class RequestBuffer
 		std::string									_protocol;
 		std::string									_headers;
 		std::string									_body_path;
-		int											_status;
-
+		int											_increment;
 	private:
 
 		Byte										_buffer;
-		int											_maxBodySize;
+		size_t									_maxBodySize;
 		int											_level;
-		int											_contentLength;
+		long long									_contentLength;
 		bool										_found;
 		std::string									_boundary;
 		int											_chunkSize;
@@ -42,7 +41,8 @@ class RequestBuffer
 
 	public:
 
-		RequestBuffer(int MaxBodySize);
+		int											_status;
+		RequestBuffer(size_t MaxBodySize);
 
 
 	public: //Getters:
@@ -59,7 +59,7 @@ class RequestBuffer
 		void										setProtocol(std::string const &Protocol);
 		void										setHeaders(std::string const &Headers);
 		void										setMethod(std::string const &Method);
-		void										setMaxBodySize(int MaxBodySize);
+		void										setMaxBodySize(size_t MaxBodySize);
 		void										setURI(std::string const &URI);
 		void										setBody(char *body, int size);
 
@@ -68,7 +68,6 @@ class RequestBuffer
 		int				_first_line_handler();
 		int				_headers_handler();
 		int				_get_body_level();
-		std::string		_generate_tmp_file_path();
 		int				_multipart_handler();
 		int				_content_length_handler();
 		int				_body_handler();

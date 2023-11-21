@@ -5,6 +5,8 @@ std::map<std::string, Token> Tokenizer::SpecialSymbols = std::map<std::string, T
 std::stack<Token> Tokenizer::curlyBrackets = std::stack<Token>();
 int Tokenizer::serverFound = 0;
 
+std::string Tokenizer::fileName = "";
+
 Tokenizer::Tokenizer() {}
 
 Tokenizer::~Tokenizer() {}
@@ -47,8 +49,8 @@ void Tokenizer::validateTokens(TOKEN_STRUCTS &tokens)
 				i++;
 			if (i < size && (tokens[i].type == SEMICOLON || tokens[i].type == OPEN_C_BRACKET))
 			{
-				std::cout << SYNTAX_ERROR << tokens[i].column << ":" << tokens[i].row << RESET" expected word or quotes after semicolon.\n";
-				std::cout << RED"\n\t\tError code: ("<< (MISSING_SEMICOLON + 1) <<  ")" << RESET <<"\n";
+				std::cerr << SYNTAX_ERROR <<fileName << ":" << tokens[i].column << ":" << tokens[i].row << RESET" expected word or quotes after semicolon.\n";
+				std::cerr << RED"\n\t\tError code: ("<< (MISSING_SEMICOLON + 1) <<  ")" << RESET <<"\n";
 				exit(1);
 			}
 		}
@@ -59,14 +61,14 @@ void Tokenizer::validateTokens(TOKEN_STRUCTS &tokens)
 				i++;
 			if (i < size && tokens[i].type == CLOSE_C_BRACKET)
 			{
-				std::cout << SYNTAX_ERROR << tokens[i].column << ":" << tokens[i].row << RESET" empty blocks are not allowed.\n";
-				std::cout << RED"\n\t\tError code: ("<< (EMPTY_BLOCK + 1)  <<  ")" << RESET <<"\n";
+				std::cerr << SYNTAX_ERROR  <<fileName << ":" <<  tokens[i].column << ":" << tokens[i].row << RESET" empty blocks are not allowed.\n";
+				std::cerr << RED"\n\t\tError code: ("<< (EMPTY_BLOCK + 1)  <<  ")" << RESET <<"\n";
 				exit(1);
 			}
 			if (i < size && tokens[i].type == SEMICOLON)
 			{
-				std::cout << SYNTAX_ERROR << tokens[i].column << ":" << tokens[i].row << RESET" expected word or quotes before semicolon.\n";
-				std::cout << RED"\n\t\tError code: ("<< (MISSING_SEMICOLON + 1)  <<  ")" << RESET <<"\n";
+				std::cerr << SYNTAX_ERROR  <<fileName << ":" <<  tokens[i].column << ":" << tokens[i].row << RESET" expected word or quotes before semicolon.\n";
+				std::cerr << RED"\n\t\tError code: ("<< (MISSING_SEMICOLON + 1)  <<  ")" << RESET <<"\n";
 				exit(1);
 			}
 		}
@@ -92,8 +94,8 @@ void Tokenizer::QuotesHandler(std::string &line, int lineNumber, unsigned int  &
 {
 	if (line.find(quote, i + 1) == std::string::npos)
 	{
-		if (quote == '\"') std::cout << "Unclosed Double Quotes: line: " << U_WHITE"config.conf:" << lineNumber << ":" << i;
-		else std::cout << "Unclosed Single Quotes: line: " << U_WHITE"config.conf:" << lineNumber << ":" << i;
+		if (quote == '\"') std::cerr << "Unclosed Double Quotes: line: " << U_WHITE << fileName<<":" << lineNumber << ":" << i;
+		else std::cerr << "Unclosed Single Quotes: line: " << U_WHITE<<fileName << ":" << lineNumber << ":" << i;
 		exit(1);
 	}
 	tokens.push_back((t_tokens){
@@ -106,20 +108,22 @@ void Tokenizer::QuotesHandler(std::string &line, int lineNumber, unsigned int  &
 	if (tokens.back().value.empty())
 	{
 		if (quote == '\"')
-			std::cout << SYNTAX_ERROR << lineNumber << ":" << i << RESET" Empty Double Quotes. \n";
+			std::cerr << SYNTAX_ERROR  <<fileName << ":" <<  lineNumber << ":" << i << RESET" Empty Double Quotes. \n";
 		else
-			std::cout << SYNTAX_ERROR << lineNumber << ":" << i << RESET" Empty Single Quotes. \n";
-		std::cout << RED"\n\t\tError code: ("<< (EMPTY_QUOTES + 1) << ")\n" << RESET;
+			std::cerr << SYNTAX_ERROR  <<fileName << ":" <<  lineNumber << ":" << i << RESET" Empty Single Quotes. \n";
+		std::cerr << RED"\n\t\tError code: ("<< (EMPTY_QUOTES + 1) << ")\n" << RESET;
 		exit(1);
 	}
 }
 
-TOKEN_OUT Tokenizer::tokenGenerator(std::ifstream &file)
+TOKEN_OUT Tokenizer::tokenGenerator(std::ifstream &file, std::string filename)
 {
 	TOKEN_STRUCTS	tokens;
 	TOKEN_OUT 	tokenizedFile;
 	int					lineNumber = 1;
 	std::string			line;
+	Tokenizer::fileName = filename;
+
 	Tokenizer::generateTokenMap();
 	while (std::getline(file, line))
 	{
@@ -285,13 +289,13 @@ void Tokenizer::fatalError(Error error,TOKEN_ITERATOR &i, std::string str)
 {
 	if (error == SERVER_BLOCK_NOT_FOUND)
 	{
-		std::cout << SYNTAX_ERROR << 0 << ":" << 0 << str ;
-		std::cout << RED"\t\tError code: ("<< (error + 1) << ")\n" << RESET;
+		std::cerr << SYNTAX_ERROR  <<fileName << ":" <<  0 << ":" << 0 << str ;
+		std::cerr << RED"\t\tError code: ("<< (error + 1) << ")\n" << RESET;
 	}
 	else
 	{
-		std::cout << SYNTAX_ERROR << i->column << ":" << (i)->row << str << i->value << ".\n\n" ;
-		std::cout << RED"\t\tError code: ("<< (error + 1) << ")\n" << RESET;
+		std::cerr << SYNTAX_ERROR  <<fileName << ":" <<  i->column << ":" << (i)->row << str << i->value << ".\n\n" ;
+		std::cerr << RED"\t\tError code: ("<< (error + 1) << ")\n" << RESET;
 	}
 	exit(error + 1);
 }

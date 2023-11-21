@@ -9,7 +9,6 @@ Server::Server(){
 	this->clientMaxBodySize = 1000000;
 	this->autoIndex = false;
 	this->listenRepeat = false;
-	this->ServerOff = false;
 }
 
 Server::~Server()
@@ -36,8 +35,6 @@ Server &Server::operator=(const Server &copy)
 		locations = copy.locations;
 		_listen = copy._listen;
 		clients	= copy.clients;
-
-
 	return *this;
 }
 
@@ -83,7 +80,7 @@ void Server::final()
 
 void Server::setPort(int port) { this->port = port; }
 
-void Server::setClientMaxBodySize(int size) { this->clientMaxBodySize = size; }
+void Server::setClientMaxBodySize(size_t size) { this->clientMaxBodySize = size; }
 
 void Server::setAutoIndex(bool autoIndex) { this->autoIndex = autoIndex; }
 
@@ -107,7 +104,7 @@ bool Server::setMimeType(const TYPES_PAIR& mimeType){ return this->mimeType.inse
 
 void Server::setLocations(const LOCATION_MAP& locations) { this->locations = locations; }
 
-void Server::setSingleLocation(const LOCATION_PAIR& location) {this->locations.insert(location);}
+bool Server::setSingleLocation(const LOCATION_PAIR& location) {return  this->locations.insert(location).second;}
 
 void Server::setItIndex(str_it begin, str_it end){ index.insert(index.end(), begin, end);}
 
@@ -119,7 +116,7 @@ int		Server::getListen() const	{return _listen;}
 
 bool Server::getAutoIndex() const{return autoIndex;}
 
-int		Server::getClientMaxBodySize() const{return clientMaxBodySize;}
+size_t		Server::getClientMaxBodySize() const{return clientMaxBodySize;}
 
 std::string	Server::getHost() const{return host;}
 
@@ -140,37 +137,62 @@ LOCATION_MAP &Server::getAllLocation() { return locations; }
 std::map<std::string, std::string>	Server::getMimeType() const{return mimeType;}
 
 
-//INFO : ++++++++++++++++++++++++++for Print++++++++++++++++++++++++++++++++++++
+addrinfo *addrInfo(std::string host, int port){
 
-std::ostream &operator<<(std::ostream &out, Server &server){
-	out << BLUE "serverName: " << U_YELLOW << server.getServerName() << std::endl;
-	out << RED "\tport: " << GREEN << server.getPort() << std::endl;
-	out << RED "\tclientMaxBodySize: " <<GREEN <<  server.getClientMaxBodySize() << std::endl;
-	out << RED "\thost: " <<GREEN <<  server.getHost() << std::endl;
-	out << RED "\troot: " <<GREEN <<  server.getRoot() << std::endl;
-	out << RED "\tserverName: " <<GREEN <<  server.getServerName() << std::endl;
-	out << RED "\tindex: " << GREEN;
-	for (size_t i = 0; i < server.getIndex().size(); i++)
-		out << server.getIndex()[i] << " ";
-	out << std::endl;
-	out << RED"\terrorPages: "<< RESET;
-	for (size_t i = 0; i < server.getErrorPages().size(); i++)
-		out << server.getErrorPages()[i].first << " " << server.getErrorPages()[i].second << " ";
-	out << std::endl;
-	out << RED"\tdefaultType: " << GREEN << server.getDefaultType() << std::endl;
-	out << RED"\tmimeType: " << std::endl;
+	addrinfo *MyAddr;
+	stringstream PortString;
+	PortString << port;
+	struct addrinfo hints;
+	bzero(&hints, sizeof(hints));
+	hints.ai_flags = AI_PASSIVE;
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
 
-	std::map<std::string, std::string> mime = server.getMimeType();
-	for (std::map<std::string, std::string>::const_iterator it = mime.begin(); it != mime.end(); it++)
-		out << GREEN"\t\t"<< it -> first << " " << it -> second << std::endl;
-	out << RED"\tlocations: " << std::endl;
-	std::cout << RESET;
-	LOCATION_MAP loc = server.getAllLocation();
-	for (std::map<std::string, Location*>::const_iterator it = loc.begin(); it != loc.end(); it++)
-	{
-		out <<it -> first << " " ;
-		it -> second->printLocation();
-		std::cout << std::endl;
+	int	ret = getaddrinfo(host.c_str(), PortString.str().c_str(), &hints, &MyAddr);
+	if(ret){
+		std::cerr << gai_strerror(ret) << std::endl;
+		freeaddrinfo(MyAddr);
+		return NULL;
 	}
-	return out;
+	return MyAddr;
+}
+
+bool creatSocket(int *listen, addrinfo *MyAddr){
+	*listen = socket(MyAddr->ai_family , MyAddr->ai_socktype , 0);
+	if (*listen == -1){
+		perror("socket");
+		freeaddrinfo(MyAddr);
+		return false;
+	}
+	int opt = 1;
+	if (setsockopt(*listen, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
+		perror("setsockopt");
+		return false;
+	}
+	return true;
+}
+
+bool Server::start(){
+
+	if (listenRepeat == true) // NOTE : if the server is repeated dont start it
+		return true;
+	addrinfo *MyAddr = addrInfo(this->getHost(), this->getPort());
+	if (!MyAddr)
+		return false;
+	if (!creatSocket(&_listen, MyAddr))
+		return false;
+
+	if (bind(_listen, MyAddr->ai_addr, MyAddr->ai_addrlen) != 0){
+		perror("bind");
+		freeaddrinfo(MyAddr);
+		return false;
+	}
+	freeaddrinfo(MyAddr);
+	if (listen(_listen, SOMAXCONN) == -1){
+		perror("listen");
+		return false;
+	}
+	fcntl(_listen, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
+	Global::insertFd(_listen);
+	return true;
 }
