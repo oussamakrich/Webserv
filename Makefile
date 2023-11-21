@@ -54,8 +54,7 @@ HEADER =	./HttpElement/include/Client.hpp \
 
 OBJ = $(SRC:.cpp=.o)
 
-CURRENT_DIR = $(shell pwd)
-CONFIG = $(CURRENT_DIR)"/default.conf"
+CONFIG = ./config/default.conf
 
 FLAGS = -Wall -Wextra -Werror -std=c++98 -g
 
@@ -63,7 +62,6 @@ FLAGS = -Wall -Wextra -Werror -std=c++98 -g
 all:$(NAME)
 
 $(NAME): $(OBJ) $(HEADER)
-		@echo "server { listen localhost:8080;  server_name localhost;  root $(CURRENT_DIR)/hustler;  location / { allowed_methods GET;  autoindex on;  root $(CURRENT_DIR)/hustler;}  }" > $(CONFIG)
 		c++ $(FLAGS) $(OBJ) -o $(NAME)
 
 %.o: %.cpp $(HEADER)
