@@ -69,7 +69,7 @@ void	Location::setRedirectionText(string &text)             {   this->redirectio
 void	Location::setRedirection(int code, string &text)       {   setRedirectionCode(code) , setRedirectionText(text);  	}
 void	Location::setPath(string &path)                        {   this->path = path;                                     	}
 void	Location::setUploadOn(bool b)						   {   this->upload = b;                                      	}
-void	Location::setUploadPath(const string	&upload_path)	{	this->upload_path = upload_path;						}
+void	Location::setUploadPath(const string	&upload_path)  {	this->upload_path = upload_path;						}
 void 	Location::setDownload(bool b) 							{	 this->isDown = b;										}
 
 
