@@ -11,5 +11,7 @@ todo
 MyLab
 .gitignore
 ./tmp/*
+*.sh
 config.conf
+.mp4
 ./hustler/test2.mp4

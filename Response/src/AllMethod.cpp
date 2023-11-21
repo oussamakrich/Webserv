@@ -213,7 +213,7 @@ std::string ResponseHandler::GetFileName()
 }
 
 
-void ResponseHandler::simpleGet(){
+void ResponseHandler::simpleGet(){ 
 	res.path = this->root + '/' + req.getPath();
 	size_t size;
 	int type = isFile(res.path, size);

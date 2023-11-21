@@ -264,5 +264,9 @@ bool Cgi::isTimeOut(t_cgiInfo &info)
 
 bool Cgi::KillCgi(t_cgiInfo &info)
 {
-	return kill(info.pid, SIGKILL) == 0;
+	bool status = 0;
+	int s = 0;
+	status = kill(info.pid, SIGKILL) == 0;
+		waitpid(info.pid, &s, WNOHANG );
+	return status;
 }
