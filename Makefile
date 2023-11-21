@@ -57,7 +57,7 @@ OBJ = $(SRC:.cpp=.o)
 CURRENT_DIR = $(shell pwd)
 CONFIG = $(CURRENT_DIR)"/default.conf"
 
-FLAGS = -Wall -Wextra -Werror -std=c++98
+FLAGS = -Wall -Wextra -Werror -std=c++98 -g
 
 
 all:$(NAME)
@@ -73,7 +73,7 @@ clean c:
 			rm -rf $(OBJ)
 
 fclean f: clean
-			rm -rf $(NAME) ./tmp
+			rm -rf $(NAME)
 
 re: fclean all
 

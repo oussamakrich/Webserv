@@ -191,7 +191,6 @@ bool Response::sendResponse(){
 		pos -= ret - HeaderAndStart.size();
 	this->redirection = false;
 	return true;
-
 }
 
 bool Response::ReminderResponse() {
