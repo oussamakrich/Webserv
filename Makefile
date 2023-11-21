@@ -1,4 +1,4 @@
-NAME = webserver
+NAME = webserv
 
 SRC =	./Request/Buffer/RequestBuffer.cpp\
 		./Parsing/src/Tokenizer.cpp\
@@ -57,7 +57,7 @@ OBJ = $(SRC:.cpp=.o)
 CURRENT_DIR = $(shell pwd)
 CONFIG = $(CURRENT_DIR)"/default.conf"
 
-FLAGS = -Wall -Wextra -Werror -std=c++98 -g -fsanitize=address
+FLAGS = -Wall -Wextra -Werror -std=c++98
 
 
 all:$(NAME)
@@ -74,8 +74,7 @@ clean c:
 
 fclean f: clean
 			rm -rf $(NAME) ./tmp
-clear:
-			rm -rf ./Log/*
+
 re: fclean all
 
 .PHONY: all clean fclean re
