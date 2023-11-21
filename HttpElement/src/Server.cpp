@@ -144,7 +144,6 @@ addrinfo *addrInfo(std::string host, int port){
 	PortString << port;
 	struct addrinfo hints;
 	bzero(&hints, sizeof(hints));
-	hints.ai_flags = AI_PASSIVE;
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 
