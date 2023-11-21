@@ -84,7 +84,9 @@ bool Server::handelClient(ITT_CLIENT it, pollfd pfd){
 	return true;
 }
 
-void Server::checkTimeOut(){
+void Server::checkTimeOut()
+{	
+	waitpid(-1, 0, WNOHANG);
 	ITT_CLIENT it = clients.begin();
 	Client *client;
 

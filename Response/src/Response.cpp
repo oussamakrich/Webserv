@@ -6,6 +6,7 @@
 #include "../../include/includes.hpp"
 #include "../../Utils/include/Logger.hpp"
 #include "../../HttpElement/include/Global.hpp"
+#include <sys/wait.h>
 
 Response::Response(int fd){
 	this->_seek_pos = 0;
@@ -22,11 +23,20 @@ Response::Response(int fd){
 	this->iHaveUpload = false;// false
 	this->stillSend = false;// sttll send the reminder
 	this->isCGI = false;
+	this->cgiInfo.pid = 0;
 	this->redirection = false;
 }
 
-Response::~Response(){
+Response::~Response()
+{
 	delete [] this->buffer;
+
+	if (this->isCGI){
+		Cgi::KillCgi(cgiInfo);
+		Cgi::CgiUnlink(cgiInfo);
+	}
+	if (this->iHaveUpload)
+		unlink(_source_file.c_str());
 }
 
 int Response::getCode(){ return this->code;}

@@ -74,8 +74,7 @@ void  Global::run(){
 
 	startServers();
 	while(true){
-
-		checkTimeOut(servers);
+				checkTimeOut(servers);
 		pollStatus = poll(this->gPollFds.data(), this->gPollFds.size(), -1);
 		if (pollStatus == -1)
 		{
