@@ -279,13 +279,14 @@ int RequestBuffer::_multipart_handler()
 		_body_path = Cgi::getRandomName("/tmp/", "_file");
 	if (_maxBodySize <= 0)
 		return (unlink(_body_path.c_str()), _status = 413, _status);
-
 	std::ofstream _file(_body_path, std::ios::out | std::ios::binary |
 	std::ios::app);
 	if (_file.is_open() == false)
 		return (_status = 507, _status);
 	std::string _line;
 	std::ifstream _file2(_body_path, std::ios::in | std::ios::binary);
+	if (_file2.is_open() == false)
+		return (_status = 507, _file.close(), _status);
 	_file2.seekg(_seek_pos);
 	while (std::getline(_file2, _line))
 	{
