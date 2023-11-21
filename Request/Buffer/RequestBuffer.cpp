@@ -239,6 +239,8 @@ int	RequestBuffer::_chunked_handler()
 		ss >> std::hex >> _chunkSize;
 		if (_tmp != NULL) delete [] _tmp;
 		_buffer.resize(_pos + _increment);
+		if ((_pos + _increment > _maxBodySize))
+			return (_maxBodySize = 0, unlink(_body_path.c_str()), _status = 413, _status);
 		_maxBodySize -= _pos + _increment;
 	}
 	if (_chunkSize == 0)	return (_status = 1, _status);
@@ -256,7 +258,6 @@ int	RequestBuffer::_chunked_handler()
 			_file.close();
 			_buffer.resize(_chunkSize + _increment);
 			_chunkSize = -1;
-
 		}
 		else
 		{
@@ -354,19 +355,13 @@ int RequestBuffer::_body_handler()
 
 int	RequestBuffer::insertBuffer(const char *buffer, int size)
 {
-	// try {
-		_buffer = _buffer + Byte(buffer, size);
-		switch (_level)
-		{
-			case 0: _status = _first_line_handler(); break;
-			case 1: _status = _headers_handler(); break;
-			case 2: _status = _body_handler(); break;
-			default: break;
-		}
-	// }
-	// catch (std::exception &e)
-	// {
-	// 	_status = 500;
-	// }
+	_buffer = _buffer + Byte(buffer, size);
+	switch (_level)
+	{
+		case 0: _status = _first_line_handler(); break;
+		case 1: _status = _headers_handler(); break;
+		case 2: _status = _body_handler(); break;
+		default: break;
+	}
 	return _status;
 }

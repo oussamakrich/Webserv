@@ -4,7 +4,6 @@ std::map<std::string, Token> Tokenizer::SpecialWords = std::map<std::string, Tok
 std::map<std::string, Token> Tokenizer::SpecialSymbols = std::map<std::string, Token>();
 std::stack<Token> Tokenizer::curlyBrackets = std::stack<Token>();
 int Tokenizer::serverFound = 0;
-
 std::string Tokenizer::fileName = "";
 
 Tokenizer::Tokenizer() {}
@@ -30,8 +29,6 @@ void Tokenizer::generateTokenMap(void){
 	SpecialWords["download"] = DOWNLOAD;
 	SpecialWords["upload_path"] = UPLOAD_PATH;
 	SpecialWords["cgi"] = CGI;
-	SpecialSymbols["["] = OPEN_S_BRACKET;
-	SpecialSymbols["]"] = CLOSE_S_BRACKET;
 	SpecialSymbols["{"] = OPEN_C_BRACKET;
 	SpecialSymbols["}"] = CLOSE_C_BRACKET;
 	SpecialSymbols[";"] = SEMICOLON;
