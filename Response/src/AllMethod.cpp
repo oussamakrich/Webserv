@@ -125,7 +125,7 @@ void ResponseHandler::serveFile(std::string path, size_t size){
 		if (unlink(path.c_str()) == 0)
 			res.setCode(200);
 		else
-			res.setCode(500); //NOTE : check permission
+			res.setCode(403);
 		return;
 	}
 	std::ifstream file(path.c_str());
@@ -155,7 +155,7 @@ void ResponseHandler::_extract_resources_from_request()
 	std::string contentType = req.getHeader("Content-Type");
 	unsigned long pos = contentType.find("boundary=");
 	if (pos == std::string::npos)
-		return;
+		return ;
 	pos += 9;
 	unsigned long end = contentType.find(";", pos);
 	if (end == std::string::npos)
