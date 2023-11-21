@@ -71,28 +71,38 @@ void Global::startServers(){
 void  Global::run(){
 	int pollStatus;
 	size_t i;
+	int timeout = -1;
 
 	startServers();
-	while(true){
-
-		checkTimeOut(servers);
-		pollStatus = poll(this->gPollFds.data(), this->gPollFds.size(), -1);
-		if (pollStatus == -1)
-		{
-			perror("poll");
-			continue;
-		}
-		for (i = 0; i < gPollFds.size() && pollStatus ; i++)
-		{
-			if (gPollFds[i].revents & POLLHUP){
-				this->callHandelFds(gPollFds[i]);
-				pollStatus--;
+	while(true)
+	{
+		try{
+			checkTimeOut(servers);
+			if (gPollFds.size() != servers.size())
+				timeout = TIME_OUT * MILISECONDS;
+			else
+				timeout = -1;
+			pollStatus = poll(this->gPollFds.data(), this->gPollFds.size(), timeout);
+			if (pollStatus == -1)
+			{
+				perror("poll");
 				continue;
 			}
-			if (((gPollFds[i].revents & POLLIN) || (gPollFds[i].revents & POLLOUT))){
-				this->callHandelFds(gPollFds[i]);
-				pollStatus--;
+			for (i = 0; i < gPollFds.size() && pollStatus ; i++)
+			{
+				if (gPollFds[i].revents & POLLHUP){
+					this->callHandelFds(gPollFds[i]);
+					pollStatus--;
+					continue;
+				}
+				if (((gPollFds[i].revents & POLLIN) || (gPollFds[i].revents & POLLOUT))){
+					this->callHandelFds(gPollFds[i]);
+					pollStatus--;
+				}
 			}
+		}
+		catch (std::exception &e){
+			std::cerr << e.what() << std::endl;	
 		}
 	}
 }

@@ -8,6 +8,7 @@
 
 #define MAP_STRING std::map<std::string, std::string>
 #define MAP_STRITT std::map<std::string, std::string>::iterator
+#define MILISECONDS 1000
 
 class Global {
 	private:
