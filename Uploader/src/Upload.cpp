@@ -12,7 +12,6 @@ Upload::Upload(Server &ser, Response &res):ser(ser), res(res)
 {
 	try
 	{
-		std::cout << "Uploading..." << std::endl;
 		Uploader();
 	}
 	catch(const std::exception& e)

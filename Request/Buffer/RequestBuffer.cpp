@@ -239,7 +239,7 @@ int	RequestBuffer::_chunked_handler()
 		ss >> std::hex >> _chunkSize;
 		if (_tmp != NULL) delete [] _tmp;
 		_buffer.resize(_pos + _increment);
-		if ((_pos + _increment > _maxBodySize))
+		if (static_cast<size_t>(_pos + _increment) > _maxBodySize)
 			return (_maxBodySize = 0, unlink(_body_path.c_str()), _status = 413, _status);
 		_maxBodySize -= _pos + _increment;
 	}
