@@ -4,7 +4,7 @@
 #include "HttpElement/include/Cgi.hpp"
 
 #ifndef CONFIG_PATH
-# define CONFIG_PATH "./config/defaultff.conf"
+# define CONFIG_PATH "./config/default.conf"
 #endif
 
 int main (int argc, char **argv)
