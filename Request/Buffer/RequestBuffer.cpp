@@ -84,7 +84,7 @@ int RequestBuffer::_first_line_handler()
 	if (_uri.size() > 2048)				return 414;
 	// if the URI contains not allowed characters, return 400: bad request.
 	if (_uri.find_first_not_of(ALLOWED_CHARS) != std::string::npos) return 400;
-	if ((_pos = _buffer.find("\r\n", 2)) == 0 || (_pos = _buffer.find("\n", 1)) == 0)	return 1; // This mean that the request does not have headers.
+	if ((_pos = _buffer.find("\r\n", 2)) == 0 || (_pos = _buffer.find("\n", 1)) == 0)	return 400; // This mean that the request does not have headers.
 	_level++;
 	_status = _headers_handler();
 	_found = true;
@@ -111,7 +111,7 @@ int RequestBuffer::_headers_handler()
 		_level++;
 		if (_method == "POST")
 			_status = _body_handler();
-		else // TEST: remove this else if you want to allow GET requests with body.
+		else 
 			_status = 1;
 		return (_status);
 	}
@@ -147,7 +147,7 @@ int RequestBuffer::_headers_handler()
 		_level++;
 		if (_method == "POST")
 			_status = _body_handler();
-		else // TEST: remove this else if you want to allow GET requests with body.
+		else 
 			_status = 1;
 		return (_status);
 	}

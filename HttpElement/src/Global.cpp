@@ -111,8 +111,13 @@ Server &Global::FindServer(const MAP_STRING &headers, Server &ser){
 
 	std::string value;
 
-	value = headers.at("Host");
-	if (value.empty())
+	try{
+		value = headers.at("Host");
+	}
+	catch(...){
+		return ser;
+	}
+		if (value.empty())
 		return ser;
 	stringstream ss(value);
 	std::getline(ss, value, ':');

@@ -173,7 +173,7 @@ bool creatSocket(int *listen, addrinfo *MyAddr){
 
 bool Server::start(){
 
-	if (listenRepeat == true) // NOTE : if the server is repeated dont start it
+	if (listenRepeat == true) 
 		return true;
 	addrinfo *MyAddr = addrInfo(this->getHost(), this->getPort());
 	if (!MyAddr)
